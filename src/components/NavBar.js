@@ -80,8 +80,21 @@ const NavBar = () => {
                     Remember Prompts
                   </NavLink>
                 </NavItem>
+                
               )}
-
+   {isAuthenticated && (
+                <NavItem>
+                  <NavLink
+                    tag={RouterNavLink}
+                    to="/reported-prompts"
+                    exact
+                    activeClassName="router-link-exact-active"
+                  >
+                    Reported Prompts
+                  </NavLink>
+                </NavItem>
+                
+              )}
             </Nav>
             <Nav className="d-none d-md-block" navbar>
               {!isAuthenticated && (

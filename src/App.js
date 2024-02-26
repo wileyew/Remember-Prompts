@@ -8,6 +8,7 @@ import Footer from "./components/Footer";
 import Home from "./views/Home";
 import Profile from "./views/Profile";
 import ExternalApi from "./views/ExternalApi";
+import PublicReports from "./views/PublicReportedIssuesAndRememberTriggers";
 import { useAuth0 } from "@auth0/auth0-react";
 import history from "./utils/history";
 
@@ -17,6 +18,7 @@ import "./App.css";
 // fontawesome
 import initFontAwesome from "./utils/initFontAwesome";
 import SearchReportIssuesUseChatbot from "./views/SearchReportIssuesUseChatbot";
+import PublicReportedIssuesAndRememberTriggers from "./views/PublicReportedIssuesAndRememberTriggers";
 initFontAwesome();
 
 const App = () => {
@@ -63,6 +65,7 @@ const App = () => {
             <Route path="/profile" component={Profile} />
             <Route path="/external-api" component={ExternalApi} />
             <Route path="/remember-prompts" component={SearchReportIssuesUseChatbot} />
+            <Route path="/reported-prompts" component={PublicReportedIssuesAndRememberTriggers} />
           </Switch>
         </Container>
         <Footer mode={mode} />
