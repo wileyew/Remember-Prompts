@@ -109,7 +109,18 @@ function BotpressChatbot() {
       window.botpressWebChat.onEvent(() => {
         window.botpressWebChat.sendEvent({ type: "show" });
       }, ["LIFECYCLE.LOADED"]);
-    };
+      window.botpressWebChat.init({
+        type: "text",
+        channel: "web",
+        payload: {
+          // Ensure this structure matches what your Botpress bot expects
+          text: 'SET_USER_DATA', // Assuming 'text' is how you distinguish payload types in your Botpress setup
+          userData: {
+            email: 'Evan',
+            name: 'wiley',
+          },
+        },
+      });    };
     document.body.appendChild(script);
 
     return () => {
