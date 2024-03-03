@@ -42,6 +42,12 @@ const SearchReportIssuesUseChatbot = () => {
         });
 
         window.botpressWebChat.onEvent((event) => {
+          // setTimeout(() => {
+          //   window.botpressWebChat.sendPayload({
+          //     type: 'text', // Assuming 'text' is a recognized type for text messages
+          //     text: 'Starting your session  ' + user.name + ', '+ ' ' + 'the email associated with your account is ' + ' ' + user.email + ' ' + ', type anything to continue!', // The message you want to send
+          //   });
+          // }, 6000)
 
           // Delay sending the payload by 6000 milliseconds (6 seconds)
           setTimeout(() => {
