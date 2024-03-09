@@ -14,7 +14,13 @@ const BotpressTable = () => {
         }
         const data = await response.json();
 
-        setTableData(data.documents || []);
+        // Safeguard if 'data' is not directly an array
+        // Assuming 'data' is the array; adjust if it's wrapped in an object e.g., data.results
+        const dataArray = Array.isArray(data) ? data : (data.documents || []);
+
+        // Filter for public documents, assuming 'privacy: false' indicates public
+        const publicData = dataArray.filter(doc => !doc.privacy);
+        setTableData(publicData);
         setIsLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -26,15 +32,13 @@ const BotpressTable = () => {
     fetchDataFromDatabase();
   }, []);
 
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
   const renderValue = (value) => {
     // Check if the value is an object, and if so, stringify it. Otherwise, return the value directly.
     return typeof value === 'object' && value !== null ? JSON.stringify(value) : value;
   };
-
-  const renderPrivacy = (isPrivate) => {
-    return isPrivate ? "Private" : "Public";
-  };
-
   return (
     <div>
       <h2>Reported Prompts</h2>
@@ -44,7 +48,6 @@ const BotpressTable = () => {
             <th>Prompt</th>
             <th>Hallucination Answer</th>
             <th>Answer Updated</th>
-            <th>Answer Version Answer Updated</th>
             <th>Version Chatbot Hallucination Answer</th>
             <th>Chatbot Platform</th>
             <th>Updated Prompt Answer</th>
@@ -60,14 +63,13 @@ const BotpressTable = () => {
             <tr key={index}>
               <td>{renderValue(doc.prompt)}</td>
               <td>{renderValue(doc.hallucinationAnswer)}</td>
-              <td>{renderValue(doc.answerUpdated)}</td>
-              <td>{renderValue(doc.answerVersionAnswerUpdated)}</td>
+              <td>{renderValue(doc.answerUpdated || 'N/A')}</td>
               <td>{renderValue(doc.versionChatbotHallucinationAnswer)}</td>
               <td>{renderValue(doc.chatbotPlatform)}</td>
               <td>{renderValue(doc.updatedPromptAnswer)}</td>
               <td>{renderValue(doc.promptTrigger)}</td>
               <td>{renderValue(doc.keywordSearch)}</td>
-              <td>{renderPrivacy(doc.privacy)}</td>
+              <td>{renderValue(doc.privacy ? "Private" : "Public")}</td>
               <td>{renderValue(doc.email)}</td>
               <td>{renderValue(doc.name)}</td>
             </tr>
