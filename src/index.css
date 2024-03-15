@@ -50,3 +50,101 @@ code {
   gap: 20px;
   padding: 20px;
 }
+
+.botpress-table-container {
+  font-family: Arial, sans-serif;
+}
+
+.botpress-table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.botpress-table-container th,
+.botpress-table-container td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.botpress-table-container th {
+  background-color: #f4f4f4;
+}
+
+.botpress-table-container tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.botpress-table-container tr:hover {
+  background-color: #f1f1f1;
+}
+/* Container for the tab buttons */
+.botpress-table-container .tab-buttons {
+  margin-bottom: 20px;
+}
+
+/* Style for the tab buttons */
+.botpress-table-container button {
+  background-color: #f0f0f0;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 10px 20px;
+  transition: background-color 0.3s ease;
+  border-radius: 5px 5px 0 0;
+  margin-right: 4px;
+  font-size: 16px;
+}
+
+/* Style for the active tab button */
+.botpress-table-container button.active {
+  background-color: #d1eaff;
+  color: #000;
+  font-weight: bold;
+}
+
+/* Hover effect for buttons */
+.botpress-table-container button:hover {
+  background-color: #d1eaff;
+}
+
+/* Styling for the input search box */
+.botpress-table-container input[type="text"] {
+  padding: 8px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+/* Enhancements for the table */
+.botpress-table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.botpress-table-container th,
+.botpress-table-container td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.botpress-table-container th {
+  background-color: #f4f4f4;
+}
+
+.botpress-table-container tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.botpress-table-container tr:hover {
+  background-color: #f1f1f1;
+}
+
