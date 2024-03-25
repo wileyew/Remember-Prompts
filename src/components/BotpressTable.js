@@ -244,7 +244,7 @@ const BotpressTable = () => {
 
     // Append additional columns based on category selection
     if (category === 'copyright') {
-      return [...baseColumns, ...copyrightColumns];
+      return [...copyrightColumns];
     }
 
     return baseColumns; // Default to baseColumns if no specific category is selected
