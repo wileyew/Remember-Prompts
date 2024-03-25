@@ -22,7 +22,7 @@ const SearchReportIssuesUseChatbot = () => {
       const script = document.createElement("script");
       script.src = "https://cdn.botpress.cloud/webchat/v0/inject.js";
       script.async = true;
-      script.onload = async () => { // Marked as async if you need to perform async operations inside
+      script.onload = () => {
         window.botpressWebChat.init({
           botId: botpress.botId,
           hostUrl: "https://cdn.botpress.cloud/webchat/v0",
@@ -41,58 +41,39 @@ const SearchReportIssuesUseChatbot = () => {
           stylesheet: 'https://style-.....a.vercel.app/bot.css',
         });
 
-        window.botpressWebChat.onEvent((event) => {
-          // setTimeout(() => {
-          //   window.botpressWebChat.sendPayload({
-          //     type: 'text', // Assuming 'text' is a recognized type for text messages
-          //     text: 'Starting your session  ' + user.name + ', '+ ' ' + 'the email associated with your account is ' + ' ' + user.email + ' ' + ', type anything to continue!', // The message you want to send
-          //   });
-          // }, 6000)
-
-          // Delay sending the payload by 6000 milliseconds (6 seconds)
-          // setTimeout(() => {
-            window.botpressWebChat.sendPayload({
-              type: 'event',
-              name: 'SET_USER_DATA',
-              data: {
-                email: user.email,
-                name: user.name,
-              },
-            });
-          // }, 6000)
-
-          if (event.type === "webchatLoaded") {
-            console.log("Botpress chatbot loaded.");
-
-            // Delay sending the payload by 6000 milliseconds (6 seconds)
-            setTimeout(() => {
-              window.botpressWebChat.sendPayload({
-                type: 'event',
-                name: 'SET_USER_DATA',
-                data: {
-                  email: user.email,
-                  name: user.name,
-                },
-              });
-
-              window.botpressWebChat.init({
-                userData: {
-                  user: user.name,
-                  email: user.email
-                },
-              });
-            }, 6000);
-          }
-        }, ["webchatLoaded"]);
+        // Send payload when chatbot is loaded
         setTimeout(() => {
           window.botpressWebChat.sendPayload({
-            type: 'text', // Assuming 'text' is a recognized type for text messages
-            text: 'Hello, ' + user.name + ',' + ' ' + 'starting your session associated with the email ' + user.email + '.', // The message you want to send
+            type: 'text',
+            text: 'Hello, ' + user.name + ',' + ' ' + 'starting your session associated with the email ' + user.email + '.',
           });
-        }, 6000);
+        }, 2000); // Adjust the delay as needed
       };
 
+      //   // Send welcome message after a delay
+      //   setTimeout(() => {
+      //     window.botpressWebChat.sendPayload({
+      //       type: 'text',
+      //       text: 'Hello, ' + user.name + ',' + ' ' + 'starting your session associated with the email ' + user.email + '.',
+      //     });
+      //   }, 2000); // Adjust the delay as needed
+      // };
+
       document.body.appendChild(script);
+
+      // Event listener for new chat session
+      window.botpressWebChat.onEvent((event) => {
+        if (event.type === "open") {
+          console.log("New chat session started.");
+          // Send payload for new chat session
+          setTimeout(() => {
+            window.botpressWebChat.sendPayload({
+              type: 'text',
+              text: 'Hello, ' + user.name + ',' + ' ' + 'starting your session associated with the email ' + user.email + '.',
+            });
+          })
+        }
+      }, ["open"]);
 
       return () => {
         document.body.removeChild(script);
@@ -101,6 +82,18 @@ const SearchReportIssuesUseChatbot = () => {
 
     // Execute the async function within useEffect
     initBotpressChat();
+    const btnConvoAdd = document.getElementById('btn-convo-add');
+    if (btnConvoAdd) {
+      console.log('button clicked');
+      btnConvoAdd.addEventListener('click', () => {
+        setTimeout(() => {
+          window.botpressWebChat.sendPayload({
+            type: 'text',
+            text: 'Hello, ' + user.name + ',' + ' ' + 'starting your session associated with the email ' + user.email + '.',
+          });
+        }, 2000);
+      });
+    }
   }, [user.email, user.name]);
 
   return (
