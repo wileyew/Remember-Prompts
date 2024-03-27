@@ -53,6 +53,12 @@ code {
 
 .botpress-table-container {
   font-family: Arial, sans-serif;
+  margin-top: 20px; /* Adjust based on your nav bar's height */
+  padding: 0 10px; /* Provides padding on the sides */
+  max-width: 98%; /* Prevents the table from extending too wide */
+  margin-left: auto; /* Together with margin-right, centers the container */
+  margin-right: auto;
+  overflow-x: auto; /* Ensures the table itself is scrollable horizontally if it exceeds the container's width */
 }
 
 .botpress-table-container table {
@@ -147,4 +153,5 @@ code {
 .botpress-table-container tr:hover {
   background-color: #f1f1f1;
 }
+
 

@@ -131,7 +131,7 @@ const BotpressTable = () => {
   
   
   return (
-    <div className="botpress-table-container">
+    <div className="botpress-table-container" style={{ marginTop: '20px', maxWidth: '98%', margin: '20px auto', overflowX: 'auto'}}>
       <h2>Reported Prompts</h2>
       <div className="tab-buttons">
         <button
