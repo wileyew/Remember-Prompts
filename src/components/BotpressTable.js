@@ -30,7 +30,7 @@ const BotpressTable = () => {
                 const dataArray = Array.isArray(data) ? data : data.documents || [];
                 const safeReplace = (value) => typeof value === 'string' ? value.replace(/"/g, '') : 'N/A';
         
-                const transformedData = dataArray.map(data => ({
+                let transformedData = dataArray.map(data => ({
                   prompt: safeReplace(data.prompt),
                   hallucinationAnswer: safeReplace(data.hallucination_answer),
                   answerUpdated: safeReplace(data.answer_updated),
@@ -45,10 +45,12 @@ const BotpressTable = () => {
                   infringementPrompt: safeReplace(data.infringementPrompt),
                   copyrightAnswer: safeReplace(data.copyrightAnswer),
                   dataSource: safeReplace(data.dataSource)
-                })).filter(row => {
-                  const { privacy, infringementPrompt, copyrightAnswer, dataSource, ...otherProps } = row;
-                  return !Object.values(otherProps).every(value => value === 'N/A');
-                });
+                })).filter(row => searchQuery === '' || Object.values(row).some(value => value.toLowerCase().includes(searchQuery.toLowerCase())));
+                if (searchQuery) {
+                  transformedData = transformedData.filter(row =>
+                    Object.values(row).some(value => value.toLowerCase().includes(searchQuery.toLowerCase()))
+                  );
+                }
 
                 setTableData(transformedData);
                 setIsLoading(false);
@@ -60,7 +62,7 @@ const BotpressTable = () => {
             };    
 
     fetchDataFromDatabase();
-  }, [user.email]);
+  }, [user.email, searchQuery]);
 
   const columns = useMemo(() => {
     const baseColumns = [
@@ -153,10 +155,10 @@ const BotpressTable = () => {
         </select>
       </div>
       <input
-        type="text"
-        placeholder="Search..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
+      type="text"
+      placeholder="Search..."
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
       />
       <table {...getTableProps()}>
         <thead>
