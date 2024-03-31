@@ -10,6 +10,7 @@ const cleanEmail = (email) => {
 
 const BotpressTable = () => {
   const { user } = useAuth0();
+  const [originalData, setOriginalData] = useState([]); // Store the original fetched data
   const [tableData, setTableData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -44,15 +45,19 @@ const BotpressTable = () => {
                   name: safeReplace(data.name),
                   infringementPrompt: safeReplace(data.infringementPrompt),
                   copyrightAnswer: safeReplace(data.copyrightAnswer),
-                  dataSource: safeReplace(data.dataSource)
+                  dataSource: safeReplace(data.dataSource),
+                  securityImpact: safeReplace(data.security_impact),
+                  securityIncidentRisk: safeReplace(data.security_incident_risk),
+                  privacyRequested: safeReplace(data.privacy_requested),
+                  keywordSearch: safeReplace(data.keyword_search)
+
                 })).filter(row => searchQuery === '' || Object.values(row).some(value => value.toLowerCase().includes(searchQuery.toLowerCase())));
                 if (searchQuery) {
                   transformedData = transformedData.filter(row =>
                     Object.values(row).some(value => value.toLowerCase().includes(searchQuery.toLowerCase()))
                   );
                 }
-
-                setTableData(transformedData);
+                setOriginalData(transformedData); 
                 setIsLoading(false);
               } catch (error) {
                 console.error('Error fetching data:', error);
@@ -62,7 +67,21 @@ const BotpressTable = () => {
             };    
 
     fetchDataFromDatabase();
-  }, [user.email, searchQuery]);
+  }, [user.email, searchQuery, tableData, category]);
+
+  useEffect(() => {
+    // Apply filters based on search query and category
+    let filteredData = originalData.filter(item => {
+      const searchCondition = searchQuery === '' || Object.values(item).some(value => value.toString().toLowerCase().includes(searchQuery.toLowerCase()));
+      if (category === 'security') {
+        return searchCondition && item.securityImpact !== 'N/A' && item.securityIncidentRisk !== 'N/A';
+      }
+      return searchCondition; // Apply only search filter for other categories
+    });
+
+    setTableData(filteredData);
+  }, [originalData, searchQuery, category]); // Re-filter whenever these dependencies change
+
 
   const columns = useMemo(() => {
     const baseColumns = [
@@ -85,12 +104,25 @@ const BotpressTable = () => {
       { Header: 'Copyright Answer', accessor: 'copyrightAnswer' },
       { Header: 'Data Source', accessor: 'dataSource' },
     ];
+
+const securityColumns = [
+  {Header: 'Prompt', accessor: 'prompt'},
+  {Header: 'Security Impact', accessor: 'securityImpact'},
+  {Header: 'Security Incident Risk', accessor: 'securityIncidentRisk'},
+  { Header: 'Privacy requested', accessor: 'privacyRequested' },
+  { Header: 'Keyword Search', accessor: 'keywordSearch' },
+]
     
 
     // Append additional columns based on category selection
     if (category === 'copyright') {
       console.log('copyright');
       return [...copyrightColumns];
+    }
+
+    if (category === 'security') {
+      console.log('security');
+      return [...securityColumns];
     }
    
     if (category === 'hallucinations') {
@@ -151,6 +183,8 @@ const BotpressTable = () => {
         <select onChange={handleCategoryChange} value={category}>
           <option value="all">Hallucinations</option>
           <option value="copyright">Copyright</option>
+          <option value="security">Security Issues</option>
+
           {/* Add more categories as needed */}
         </select>
       </div>
