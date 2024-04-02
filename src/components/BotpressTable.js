@@ -273,7 +273,9 @@ const BotpressTable = () => {
           securityIncidentRisk: JSON.stringify(data.security_incident_risk) || 'N/A',
           privacyRequested: JSON.stringify(data.privacy_requested) || 'N/A',
           keywordSearch: JSON.stringify(data.keyword_search) || 'N/A'
-        }));
+        })).filter(item => 
+          item.prompt !== 'N/A'
+        );
         setOriginalData(transformedData);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -291,7 +293,14 @@ const BotpressTable = () => {
     let filteredData = originalData.filter(item => {
       const matchesSearchQuery = searchQuery === '' || Object.values(item).some(value => value.toLowerCase().includes(searchQuery.toLowerCase()));
       // Example category-based filtering logic
+      if (category === 'hallucinations') {
+        console.log('category selected hallucinations');
+        return matchesSearchQuery && item.prompt && item.hallucinationAnswer && item.answerUpdated !== 'N/A';
+      }
+     
       if (category === 'security') {
+        console.log('category selected security');
+
         return matchesSearchQuery && item.securityImpact && item.securityImpact !== 'N/A';
       }
       // Add more conditions for different categories or return true to include all items by default
