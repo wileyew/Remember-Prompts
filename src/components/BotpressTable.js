@@ -272,7 +272,8 @@ const BotpressTable = () => {
           securityImpact: JSON.stringify(data.security_impact) || 'N/A',
           securityIncidentRisk: JSON.stringify(data.security_incident_risk) || 'N/A',
           privacyRequested: JSON.stringify(data.privacy_requested) || 'N/A',
-          keywordSearch: JSON.stringify(data.keyword_search) || 'N/A'
+          keywordSearch: JSON.stringify(data.keyword_search) || 'N/A',
+          category: JSON.stringify(data.category) || 'N/A',
         })).filter(item => 
           item.prompt !== 'N/A'
         );
@@ -291,19 +292,16 @@ const BotpressTable = () => {
   useEffect(() => {
     // Filtering data based on searchQuery and category
     let filteredData = originalData.filter(item => {
-      const matchesSearchQuery = searchQuery === '' || Object.values(item).some(value => value.toLowerCase().includes(searchQuery.toLowerCase()));
-      // Example category-based filtering logic
+      const matchesSearchQuery = searchQuery === '' || Object.values(item).some(value => value.toString().toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      // When 'hallucinations' category is selected, filter to show only rows with that category
       if (category === 'hallucinations') {
-        console.log('category selected hallucinations');
-        return matchesSearchQuery && item.prompt && item.hallucinationAnswer && item.answerUpdated !== 'N/A';
+        return matchesSearchQuery && item.category.replace(/"/g, '') === 'hallucinations'; // Ensure we clean the category string from JSON formatting
+      } else if (category === 'security') {
+        // Existing logic for 'security' category, as an example of handling other categories
+        return matchesSearchQuery && item.securityImpact !== 'N/A' && item.securityIncidentRisk !== 'N/A';
       }
-     
-      if (category === 'security') {
-        console.log('category selected security');
-
-        return matchesSearchQuery && item.securityImpact && item.securityImpact !== 'N/A';
-      }
-      // Add more conditions for different categories or return true to include all items by default
+      // If another category is selected or no category is specifically chosen, default to showing all data
       return matchesSearchQuery;
     });
     setTableData(filteredData);
@@ -327,6 +325,7 @@ const BotpressTable = () => {
       { Header: 'Privacy', accessor: 'privacy', Cell: ({ value }) => value },
       { Header: 'Email', accessor: 'email', Cell: ({value}) => cleanEmail(value) },
       { Header: 'Name', accessor: 'name' },
+      {Header: 'Category', accessor: 'category'}
     ];
     const copyrightColumns = [
         { Header: 'Infringement Prompt', accessor: 'infringementPrompt' },
