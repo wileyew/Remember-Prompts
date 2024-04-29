@@ -3,7 +3,7 @@ import { useTable } from 'react-table';
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
 
 const cleanEmail = (email) => {
-  if (!email) return '';  // Safeguard against undefined emails
+  if (!email) return '';
   const trimmedEmail = email.trim();
   const emailMatch = trimmedEmail.match(/^[^@\s]+@[^@\s]+\.[^@\s]+/);
   return emailMatch ? emailMatch[0].toLowerCase() : '';
@@ -19,6 +19,7 @@ const BotpressTable = () => {
   const [activeTab, setActiveTab] = useState('allReports');
   const [highlightedRow, setHighlightedRow] = useState(null);
   const [category, setCategory] = useState('hallucinations');
+  const [userUpvotes, setUserUpvotes] = useState(new Set()); // Store IDs of upvoted rows by the user
 
   useEffect(() => {
     const fetchDataFromDatabase = async () => {
@@ -49,7 +50,8 @@ const BotpressTable = () => {
           securityIncidentRisk: JSON.stringify(data.security_incident_risk) || 'N/A',
           privacyRequested: JSON.stringify(data.privacy_requested) || 'N/A',
           category: (JSON.stringify(data.category) || '').replace(/"/g, '').toLowerCase(),
-          upvotes: data.upvotes || 0
+          upvotes: data.upvotes || 0,
+          id: data.id  // assuming each data entry has a unique identifier
         }));
         setOriginalData(transformedData);
       } catch (error) {
@@ -81,21 +83,42 @@ const BotpressTable = () => {
   }, []);
 
   const handleUpvote = useCallback((id) => {
-    setOriginalData(currentData =>
-      currentData.map(item =>
-        item.id === id ? { ...item, upvotes: item.upvotes + 1 } : item
-      )
-    );
-  }, []);
-
-  const columns = useMemo(() => [
-    { Header: 'Prompt', accessor: 'prompt' },
-    { Header: 'Category', accessor: 'category' },
-    { Header: 'Upvotes', accessor: 'upvotes', Cell: ({ row }) => (
-        <button onClick={() => handleUpvote(row.original.id)}>{row.values.upvotes}</button>
-      )
+    if (!userUpvotes.has(id)) {
+      setUserUpvotes(new Set(userUpvotes).add(id));
+      setOriginalData(currentData =>
+        currentData.map(item =>
+          item.id === id ? { ...item, upvotes: item.upvotes + 1 } : item
+        )
+      );
     }
-  ], [handleUpvote]);
+  }, [userUpvotes]);
+
+  const columns = useMemo(() => {
+    const baseColumns = [
+      { Header: 'Prompt', accessor: 'prompt' },
+      { Header: 'Category', accessor: 'category' },
+      { Header: 'Upvotes', accessor: 'upvotes', Cell: ({ row }) => (
+          <button onClick={() => handleUpvote(row.original.id)} disabled={userUpvotes.has(row.original.id)}>
+            {row.values.upvotes}
+          </button>
+        )
+      }
+    ];
+
+    if (category === 'hallucinations') {
+      const hallucinationColumns = [
+        { Header: 'Updated Answer', accessor: 'answerUpdated' },
+        { Header: 'Version', accessor: 'versionChatbotHallucinationAnswer' },
+        { Header: 'Platform', accessor: 'chatbotPlatform' },
+        { Header: 'Updated Prompt Answer', accessor: 'updatedPromptAnswer' },
+        { Header: 'Trigger', accessor: 'promptTrigger' },
+        { Header: 'Keyword Search', accessor: 'keywordSearch' },
+      ];
+      return [...baseColumns, ...hallucinationColumns];
+    }
+
+    return baseColumns;
+  }, [handleUpvote, userUpvotes, category]);
 
   const tableInstance = useTable({ columns, data: tableData });
 
