@@ -33,23 +33,24 @@ const BotpressTable = () => {
         const dataArray = Array.isArray(data) ? data : data.documents || [];
         const transformedData = dataArray.map(data => ({
           ...data,
-          prompt: JSON.stringify(data.prompt) || 'N/A',
-          hallucinationAnswer: JSON.stringify(data.hallucination_answer) || 'N/A',
-          answerUpdated: JSON.stringify(data.answer_updated) || 'N/A',
-          versionChatbotHallucinationAnswer: JSON.stringify(data.version_chatbot_hallucination_answer) || 'N/A',
-          chatbotPlatform: JSON.stringify(data.chatbot_platform) || 'N/A',
-          updatedPromptAnswer: JSON.stringify(data.updated_prompt_answer) || 'N/A',
-          promptTrigger: JSON.stringify(data.prompt_trigger) || 'N/A',
-          keywordSearch: JSON.stringify(data.keyword_search) || 'N/A',
-          privacy: JSON.stringify(data.privacy || '').toLowerCase().includes("public") ? "Public" : "Private",
-          email: cleanEmail(data.email),
-          name: JSON.stringify(data.name) || 'N/A',
-          copyrightAnswer: JSON.stringify(data.copyrightAnswer) || 'N/A',
-          dataSource: JSON.stringify(data.dataSource) || 'N/A',
-          securityImpact: JSON.stringify(data.security_impact) || 'N/A',
-          securityIncidentRisk: JSON.stringify(data.security_incident_risk) || 'N/A',
-          privacyRequested: JSON.stringify(data.privacy_requested) || 'N/A',
-          category: (JSON.stringify(data.category) || '').replace(/"/g, '').toLowerCase(),
+          prompt: (JSON.stringify(data.prompt) || 'N/A').replace(/\\|"/g, ''),
+          infringementPrompt: (JSON.stringify(data.infringementPrompt) || 'N/A').replace(/\\|"/g, ''),
+          hallucinationAnswer: (JSON.stringify(data.hallucination_answer) || 'N/A').replace(/\\|"/g, ''),
+          answerUpdated: (JSON.stringify(data.answer_updated) || 'N/A').replace(/\\|"/g, ''),
+          versionChatbotHallucinationAnswer: (JSON.stringify(data.version_chatbot_hallucination_answer) || 'N/A').replace(/\\|"/g, ''),
+          chatbotPlatform: (JSON.stringify(data.chatbot_platform) || 'N/A').replace(/\\|"/g, ''),
+          updatedPromptAnswer: (JSON.stringify(data.updated_prompt_answer) || 'N/A').replace(/\\|"/g, ''),
+          promptTrigger: (JSON.stringify(data.prompt_trigger) || 'N/A').replace(/\\|"/g, ''),
+          keywordSearch: (JSON.stringify(data.keyword_search) || 'N/A').replace(/\\|"/g, ''),
+          privacy: (JSON.stringify(data.privacy || '').toLowerCase().includes("public") ? "Public" : "Private").replace(/\\|"/g, ''),
+          email: cleanEmail(data.email).replace(/\\|"/g, ''),
+          name: (JSON.stringify(data.name) || 'N/A').replace(/\\|"/g, ''),
+          copyrightAnswer: (JSON.stringify(data.copyrightAnswer) || 'N/A').replace(/\\|"/g, ''),
+          dataSource: (JSON.stringify(data.dataSource) || 'N/A').replace(/\\|"/g, ''),
+          securityImpact: (JSON.stringify(data.security_impact) || 'N/A').replace(/\\|"/g, ''),
+          securityIncidentRisk: (JSON.stringify(data.security_incident_risk) || 'N/A').replace(/\\|"/g, ''),
+          privacyRequested: (JSON.stringify(data.privacy_requested) || 'N/A').replace(/\\|"/g, ''),
+          category: (JSON.stringify(data.category) || '').replace(/\\|"/g, '').toLowerCase(),
           upvotes: data.upvotes || 0,
           id: data.id  // assuming each data entry has a unique identifier
         }));
@@ -95,7 +96,6 @@ const BotpressTable = () => {
 
   const columns = useMemo(() => {
     const baseColumns = [
-      { Header: 'Prompt', accessor: 'prompt' },
       { Header: 'Category', accessor: 'category' },
       { Header: 'Upvotes', accessor: 'upvotes', Cell: ({ row }) => (
           <button onClick={() => handleUpvote(row.original.id)} disabled={userUpvotes.has(row.original.id)}>
@@ -107,11 +107,32 @@ const BotpressTable = () => {
 
     if (category === 'hallucinations') {
       const hallucinationColumns = [
-        { Header: 'Updated Answer', accessor: 'answerUpdated' },
+        { Header: 'Hallucination Answer', accessor: 'hallucinationAnswer' },
         { Header: 'Version', accessor: 'versionChatbotHallucinationAnswer' },
         { Header: 'Platform', accessor: 'chatbotPlatform' },
         { Header: 'Updated Prompt Answer', accessor: 'updatedPromptAnswer' },
         { Header: 'Trigger', accessor: 'promptTrigger' },
+        { Header: 'Keyword Search', accessor: 'keywordSearch' },
+      ];
+      return [...baseColumns, ...hallucinationColumns];
+    }
+
+    if (category === 'copyright') {
+      const hallucinationColumns = [
+        { Header: 'Infringement Prompt', accessor: 'infringementPrompt' },
+        { Header: 'Copyright Answer', accessor: 'copyrightAnswer' },
+        { Header: 'Data Source', accessor: 'dataSource' },
+      
+      ];
+      return [...baseColumns, ...hallucinationColumns];
+    }
+
+    if (category === 'security') {
+      const hallucinationColumns = [
+        { Header: 'Security Impact', accessor: 'securityImpact' },
+        { Header: 'Security Incident Risk', accessor: 'securityIncidentRisk' },
+        { Header: 'Data Source', accessor: 'dataSource' },
+        { Header: 'Platform', accessor: 'chatbotPlatform' },
         { Header: 'Keyword Search', accessor: 'keywordSearch' },
       ];
       return [...baseColumns, ...hallucinationColumns];
@@ -146,7 +167,6 @@ const BotpressTable = () => {
       </div>
       <div>
         <select onChange={handleCategoryChange} value={category}>
-          <option value="all">All Categories</option>
           <option value="hallucinations">Hallucinations</option>
           <option value="copyright">Copyright</option>
           <option value="security">Security Issues</option>
