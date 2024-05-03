@@ -107,6 +107,7 @@ const BotpressTable = () => {
 
     if (category === 'hallucinations') {
       const hallucinationColumns = [
+        { Header: 'Prompt', accessor: 'prompt' },
         { Header: 'Hallucination Answer', accessor: 'hallucinationAnswer' },
         { Header: 'Version', accessor: 'versionChatbotHallucinationAnswer' },
         { Header: 'Platform', accessor: 'chatbotPlatform' },
@@ -129,6 +130,7 @@ const BotpressTable = () => {
 
     if (category === 'security') {
       const hallucinationColumns = [
+        { Header: 'Prompt', accessor: 'prompt' },
         { Header: 'Security Impact', accessor: 'securityImpact' },
         { Header: 'Security Incident Risk', accessor: 'securityIncidentRisk' },
         { Header: 'Data Source', accessor: 'dataSource' },
@@ -137,6 +139,14 @@ const BotpressTable = () => {
       ];
       return [...baseColumns, ...hallucinationColumns];
     }
+    if (category === 'memory') {
+      const hallucinationColumns = [
+        { Header: 'Prompt', accessor: 'prompt' },
+        { Header: 'Trigger for Recall', accessor: 'prompt_record' },
+      ];
+      return [...baseColumns, ...hallucinationColumns];
+    }
+
 
     return baseColumns;
   }, [handleUpvote, userUpvotes, category]);
@@ -170,6 +180,7 @@ const BotpressTable = () => {
           <option value="hallucinations">Hallucinations</option>
           <option value="copyright">Copyright</option>
           <option value="security">Security Issues</option>
+          <option value="memory">Memory Recall</option>
         </select>
       </div>
       <input type="text" placeholder="Search..." value={searchQuery} onChange={handleSearchChange} />
