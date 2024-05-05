@@ -30,7 +30,7 @@ const DynamicForm = ({ onSave }) => {
     e.preventDefault();
     if (validateForm()) {
       setIsSubmitting(true);
-      fetch('http://your-backend-server-url/submit', {
+      fetch('http://localhost:5001/insert-prompts"', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
