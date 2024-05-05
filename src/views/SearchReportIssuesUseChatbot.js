@@ -1,12 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Hero from "../components/Hero";
 import BotpressChatbot from "../components/BotpressChatbot";
+import DynamicForm from "../components/DynamicForm"; // Import the DynamicForm component
 import botpress from "../botpress.json";
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
 
 const SearchReportIssuesUseChatbot = () => {
   const { user } = useAuth0();
-  console.log('user from browser' + user.email);
+  const [displayForm, setDisplayForm] = useState(false); // State to toggle between form and chatbot
 
   useEffect(() => {
     // Mock async function to demonstrate async/await usage
@@ -50,15 +51,6 @@ const SearchReportIssuesUseChatbot = () => {
         }, 2000); // Adjust the delay as needed
       };
 
-      //   // Send welcome message after a delay
-      //   setTimeout(() => {
-      //     window.botpressWebChat.sendPayload({
-      //       type: 'text',
-      //       text: 'Hello, ' + user.name + ',' + ' ' + 'starting your session associated with the email ' + user.email + '.',
-      //     });
-      //   }, 2000); // Adjust the delay as needed
-      // };
-
       document.body.appendChild(script);
 
       // Event listener for new chat session
@@ -99,7 +91,16 @@ const SearchReportIssuesUseChatbot = () => {
   return (
     <>
       <Hero />
-      <BotpressChatbot />
+      {displayForm ? ( // Render DynamicForm if displayForm is true
+        <DynamicForm />
+      ) : (
+        // Otherwise, render BotpressChatbot
+        <BotpressChatbot />
+      )}
+      {/* Toggle button to switch between form and chatbot */}
+      <button onClick={() => setDisplayForm(prev => !prev)}>
+        {displayForm ? "Switch to Chatbot" : "Switch to Form"}
+      </button>
     </>
   );
 };
