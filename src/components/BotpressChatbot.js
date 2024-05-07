@@ -68,7 +68,7 @@ function BotpressChatbot() {
         document.body.removeChild(script);
       };
     }
-  }, [showChatbot]);
+  }, [showChatbot, user]); // Include 'user' in the dependency array
 
   const handleChatbotToggle = () => {
     setShowChatbot(!showChatbot);
@@ -76,8 +76,11 @@ function BotpressChatbot() {
 
   return (
     <div>
-      <button id="btn-conversations" onClick={handleChatbotToggle}>Toggle Chatbot</button>
-      {showChatbot && <div id="botpress-chatbot"></div>}
+      <label className="switch"> {/* Use className instead of class */}
+        <input type="checkbox" id="btn-conversations" onClick={handleChatbotToggle} /> {/* Closing input tag */}
+        {showChatbot && <div id="botpress-chatbot"></div>}
+        <span className="slider round"></span> {/* Use className instead of class */}
+      </label>
     </div>
   );
 }
