@@ -59,7 +59,7 @@ const DynamicForm = ({ onSave }) => {
       { name: 'hallucinationAnswer', label: 'Hallucination Answer' },
       { name: 'versionChatbotHallucinationAnswer', label: 'Version' },
       { name: 'chatbotPlatform', label: 'Platform' },
-      { name: 'updatedPromptAnswer', label: 'Updated Prompt Answer' },
+      { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer' },
       { name: 'promptTrigger', label: 'Trigger' },
       { name: 'keywordSearch', label: 'Keyword Search' },
     ],

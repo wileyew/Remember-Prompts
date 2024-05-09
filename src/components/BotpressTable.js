@@ -111,7 +111,7 @@ const BotpressTable = () => {
         { Header: 'Hallucination Answer', accessor: 'hallucinationAnswer' },
         { Header: 'Version', accessor: 'versionChatbotHallucinationAnswer' },
         { Header: 'Platform', accessor: 'chatbotPlatform' },
-        { Header: 'Updated Prompt Answer', accessor: 'updatedPromptAnswer' },
+        { Header: 'Proposed Correct Answer', accessor: 'updatedPromptAnswer' },
         { Header: 'Trigger', accessor: 'promptTrigger' },
         { Header: 'Keyword Search', accessor: 'keywordSearch' },
       ];

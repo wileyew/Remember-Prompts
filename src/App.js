@@ -14,6 +14,7 @@ import SearchReportIssuesUseChatbot from "./views/SearchReportIssuesUseChatbot";
 import PublicReportedIssuesAndRememberTriggers from "./views/PublicReportedIssuesAndRememberTriggers";
 import ButtonComponent from "./components/ButtonComponent"; // Ensure this is the correct path
 import initFontAwesome from "./utils/initFontAwesome";
+import BotpressChatbot from "./components/BotpressChatbot";
 
 initFontAwesome();
 
@@ -72,6 +73,7 @@ const App = () => {
             <Route path="/external-api" component={ExternalApi} />
             <Route path="/remember-prompts" render={() => <Chatbot user={user} />} />
             <Route path="/reported-prompts" component={PublicReportedIssuesAndRememberTriggers} />
+            <Route path="/insert-prompts" component={BotpressChatbot} />
             <Route path="/conversations" component={ButtonComponent} />
           </Switch>
         </Container>
