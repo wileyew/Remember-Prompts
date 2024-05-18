@@ -10,6 +10,7 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.static(join(__dirname, "build")));
+app.use(express.json()); // Middleware to parse JSON bodies
 
 const port = 5001;
 
@@ -38,6 +39,7 @@ app.get("/reported-prompts", async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 // Sanitize input to prevent XSS attacks
 const sanitizeInput = (input) => {
   return String(input).replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -46,6 +48,7 @@ const sanitizeInput = (input) => {
 app.post("/insert-prompts", async (req, res) => {
   console.log('inside function');
   const { userId, category, ...fields } = req.body;
+  console.log('user id ' + userId);
 
   // Sanitize and structure document fields
   const document = {};
@@ -82,7 +85,6 @@ app.post("/insert-prompts", async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-
 
 app.get('*', (req, res) => res.sendFile(join(__dirname, 'build', 'index.html')));
 

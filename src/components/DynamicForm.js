@@ -1,10 +1,80 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth0 } from "@auth0/auth0-react";
+import botpress from "../botpress.json";
+
 
 const DynamicForm = ({ onSave }) => {
+  
   const [category, setCategory] = useState('hallucinations');
   const [formData, setFormData] = useState({});
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showChatbot, setShowChatbot] = useState(false); // State to toggle chatbot
+  const { user } = useAuth0(); // Get user information from Auth0
+
+  const userId = user.sub;
+  const botpressid = botpress.botId;; // Replace with your Botpress bot ID
+  const clientId = botpress.clientId; // Replace with your client ID
+
+  useEffect(() => {
+    if (showChatbot) {
+      const script = document.createElement("script");
+      script.src = "https://cdn.botpress.cloud/webchat/v0/inject.js";
+      script.async = true;
+      script.onload = () => {
+        console.log("Botpress script loaded.");
+        window.botpressWebChat.init({
+          botId: botpressid,
+          hostUrl: "https://cdn.botpress.cloud/webchat/v0",
+          messagingUrl: "https://messaging.botpress.cloud",
+          clientId: clientId,
+          botName: "Remember Prompts",
+          containerWidth: "100%",
+          layoutWidth: "100%",
+          outerHeight: "50%",
+          innerHeight: "50%",
+          hideWidget: false,
+          disableAnimations: true,
+        });
+        window.botpressWebChat.onEvent(() => {
+          window.botpressWebChat.sendEvent({ type: "show" });
+        }, ["LIFECYCLE.LOADED"]);
+        window.botpressWebChat.sendEvent({
+          type: "text",
+          channel: "web",
+          payload: {
+            text: 'SET_USER_DATA',
+            userData: {
+              email: user.email,
+              name: user.name,
+            },
+          },
+        });
+
+        const btnConvoAdd = document.getElementById('btn-convo-add');
+        if (btnConvoAdd) {
+          btnConvoAdd.addEventListener('click', () => {
+            setTimeout(() => {
+              window.botpressWebChat.sendPayload({
+                type: 'text',
+                text: `Hello, ${user.name}, starting your session associated with the email ${user.email}.`,
+              });
+            }, 2000);
+          });
+        }
+      };
+
+      document.body.appendChild(script);
+
+      return () => {
+        document.body.removeChild(script);
+      };
+    }
+  }, [showChatbot, user]);
+
+  const handleChatbotToggle = () => {
+    setShowChatbot(!showChatbot);
+  };
 
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
@@ -30,12 +100,18 @@ const DynamicForm = ({ onSave }) => {
     e.preventDefault();
     if (validateForm()) {
       setIsSubmitting(true);
-      fetch('http://localhost:5001/insert-prompts"', {
+      console.log('user information ' + userId);
+      const dataToSubmit = {
+        ...formData,
+        userId: userId, // Include user ID in the form data
+        category: category // Include category in the form data
+      };
+      fetch('http://localhost:5001/insert-prompts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToSubmit),
       })
         .then((response) => response.json())
         .then((data) => {
@@ -55,36 +131,40 @@ const DynamicForm = ({ onSave }) => {
   // Define form fields for each category
   const formFields = {
     hallucinations: [
-      { name: 'prompt', label: 'Prompt' },
-      { name: 'hallucinationAnswer', label: 'Hallucination Answer' },
-      { name: 'versionChatbotHallucinationAnswer', label: 'Version' },
-      { name: 'chatbotPlatform', label: 'Platform' },
-      { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer' },
-      { name: 'promptTrigger', label: 'Trigger' },
-      { name: 'keywordSearch', label: 'Keyword Search' },
+      { name: 'prompt', label: 'Prompt', type: 'textarea' },
+      { name: 'hallucinationAnswer', label: 'Hallucination Answer', type: 'textarea' },
+      { name: 'versionChatbotHallucinationAnswer', label: 'Version', type: 'textarea' },
+      { name: 'chatbotPlatform', label: 'Platform', type: 'textarea' },
+      { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer', type: 'textarea' },
+      { name: 'promptTrigger', label: 'Trigger', type: 'textarea' },
+      { name: 'keywordSearch', label: 'Keyword Search', type: 'textarea' },
     ],
     copyright: [
-      { name: 'infringementPrompt', label: 'Infringement Prompt' },
-      { name: 'copyrightAnswer', label: 'Copyright Answer' },
-      { name: 'dataSource', label: 'Data Source' },
+      { name: 'infringementPrompt', label: 'Infringement Prompt', type: 'textarea' },
+      { name: 'copyrightAnswer', label: 'Copyright Answer', type: 'textarea' },
+      { name: 'dataSource', label: 'Data Source', type: 'textarea' },
     ],
     security: [
-      { name: 'prompt', label: 'Prompt' },
-      { name: 'securityImpact', label: 'Security Impact' },
-      { name: 'securityIncidentRisk', label: 'Security Incident Risk' },
-      { name: 'dataSource', label: 'Data Source' },
-      { name: 'chatbotPlatform', label: 'Platform' },
-      { name: 'keywordSearch', label: 'Keyword Search' },
+      { name: 'prompt', label: 'Prompt', type: 'textarea' },
+      { name: 'securityImpact', label: 'Security Impact', type: 'textarea' },
+      { name: 'securityIncidentRisk', label: 'Security Incident Risk', type: 'textarea' },
+      { name: 'dataSource', label: 'Data Source', type: 'textarea' },
+      { name: 'chatbotPlatform', label: 'Platform', type: 'textarea' },
+      { name: 'keywordSearch', label: 'Keyword Search', type: 'textarea' },
     ],
     memory: [
-      { name: 'prompt', label: 'Prompt' },
-      { name: 'promptTrigger', label: 'Trigger for Recall' },
+      { name: 'prompt', label: 'Prompt', type: 'textarea' },
+      { name: 'promptTrigger', label: 'Trigger for Recall', type: 'textarea' },
     ],
   };
 
   return (
     <div>
       <h1>Submit a Report</h1>
+      <button onClick={handleChatbotToggle}>
+        {showChatbot ? 'Hide Chatbot' : 'Show Chatbot'}
+      </button>
+      
       <form onSubmit={handleFormSubmit}>
         <label>
           Category:
@@ -100,18 +180,31 @@ const DynamicForm = ({ onSave }) => {
           <div key={field.name}>
             <label>
               {field.label}:
-              <input
-                type="text"
-                name={field.name}
-                value={formData[field.name] || ''}
-                onChange={handleChange}
-              />
+              {field.type === 'textarea' ? (
+                <textarea
+                  name={field.name}
+                  value={formData[field.name] || ''}
+                  onChange={handleChange}
+                  rows="4"
+                  cols="50"
+                  style={{ whiteSpace: 'pre-wrap' }}
+                />
+              ) : (
+                <input
+                  type="text"
+                  name={field.name}
+                  value={formData[field.name] || ''}
+                  onChange={handleChange}
+                />
+              )}
             </label>
             {formErrors[field.name] && <div style={{ color: 'red' }}>{formErrors[field.name]}</div>}
           </div>
         ))}
 
-        <button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Submitting...' : 'Submit'}</button>
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Submitting...' : 'Submit'}
+        </button>
       </form>
     </div>
   );
