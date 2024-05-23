@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useAuth0 } from "@auth0/auth0-react";
 import botpress from "../botpress.json";
 
-
 const DynamicForm = ({ onSave }) => {
   
   const [category, setCategory] = useState('hallucinations');
@@ -131,30 +130,30 @@ const DynamicForm = ({ onSave }) => {
   // Define form fields for each category
   const formFields = {
     hallucinations: [
-      { name: 'prompt', label: 'Prompt', type: 'textarea' },
-      { name: 'hallucinationAnswer', label: 'Hallucination Answer', type: 'textarea' },
-      { name: 'versionChatbotHallucinationAnswer', label: 'Version', type: 'textarea' },
-      { name: 'chatbotPlatform', label: 'Platform', type: 'textarea' },
-      { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer', type: 'textarea' },
-      { name: 'promptTrigger', label: 'Trigger', type: 'textarea' },
-      { name: 'keywordSearch', label: 'Keyword Search', type: 'textarea' },
+      { name: 'prompt', label: 'Prompt' },
+      { name: 'hallucinationAnswer', label: 'Hallucination Answer' },
+      { name: 'versionChatbotHallucinationAnswer', label: 'Version' },
+      { name: 'chatbotPlatform', label: 'Platform' },
+      { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer' },
+      { name: 'promptTrigger', label: 'Trigger' },
+      { name: 'keywordSearch', label: 'Keyword Search' },
     ],
     copyright: [
-      { name: 'infringementPrompt', label: 'Infringement Prompt', type: 'textarea' },
-      { name: 'copyrightAnswer', label: 'Copyright Answer', type: 'textarea' },
-      { name: 'dataSource', label: 'Data Source', type: 'textarea' },
+      { name: 'infringementPrompt', label: 'Infringement Prompt' },
+      { name: 'copyrightAnswer', label: 'Copyright Answer' },
+      { name: 'dataSource', label: 'Data Source' },
     ],
     security: [
-      { name: 'prompt', label: 'Prompt', type: 'textarea' },
-      { name: 'securityImpact', label: 'Security Impact', type: 'textarea' },
-      { name: 'securityIncidentRisk', label: 'Security Incident Risk', type: 'textarea' },
-      { name: 'dataSource', label: 'Data Source', type: 'textarea' },
-      { name: 'chatbotPlatform', label: 'Platform', type: 'textarea' },
-      { name: 'keywordSearch', label: 'Keyword Search', type: 'textarea' },
+      { name: 'prompt', label: 'Prompt' },
+      { name: 'securityImpact', label: 'Security Impact' },
+      { name: 'securityIncidentRisk', label: 'Security Incident Risk' },
+      { name: 'dataSource', label: 'Data Source' },
+      { name: 'chatbotPlatform', label: 'Platform' },
+      { name: 'keywordSearch', label: 'Keyword Search' },
     ],
     memory: [
-      { name: 'prompt', label: 'Prompt', type: 'textarea' },
-      { name: 'promptTrigger', label: 'Trigger for Recall', type: 'textarea' },
+      { name: 'prompt', label: 'Prompt' },
+      { name: 'promptTrigger', label: 'Trigger for Recall' },
     ],
   };
 
@@ -180,23 +179,15 @@ const DynamicForm = ({ onSave }) => {
           <div key={field.name}>
             <label>
               {field.label}:
-              {field.type === 'textarea' ? (
-                <textarea
-                  name={field.name}
-                  value={formData[field.name] || ''}
-                  onChange={handleChange}
-                  rows="4"
-                  cols="50"
-                  style={{ whiteSpace: 'pre-wrap' }}
-                />
-              ) : (
-                <input
-                  type="text"
-                  name={field.name}
-                  value={formData[field.name] || ''}
-                  onChange={handleChange}
-                />
-              )}
+              <textarea
+                name={field.name}
+                value={formData[field.name] || ''}
+                onChange={handleChange}
+                rows="4"
+                cols="50"
+                wrap="soft"
+                className="form-control"
+              />
             </label>
             {formErrors[field.name] && <div style={{ color: 'red' }}>{formErrors[field.name]}</div>}
           </div>

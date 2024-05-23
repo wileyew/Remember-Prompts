@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import botpress from "../botpress.json";
+import "../DynamicForm.css"; // Import the CSS file for styling
 
 const botpressid = botpress.botId;
 const clientId = botpress.clientId;
@@ -10,6 +11,7 @@ function BotpressChatbot() {
   const [showChatbot, setShowChatbot] = useState(false);
   const [formData, setFormData] = useState({});
   const [category, setCategory] = useState('hallucinations');
+  const [formErrors, setFormErrors] = useState({});
 
   useEffect(() => {
     if (showChatbot) {
@@ -23,36 +25,28 @@ function BotpressChatbot() {
           messagingUrl: "https://messaging.botpress.cloud",
           clientId: clientId,
           botName: "Remember Prompts",
-          // Set the width of the WebChat container and layout to 100% (Full Screen)
-          containerWidth: "100%25",
-          layoutWidth: "100%25",
-          outerHeight: "50%25",
-          innerHeight: "50%25",
-          // Hide the widget and disable animations
-          hideWidget: false, // Change to false to show the widget
+          containerWidth: "100%",
+          layoutWidth: "100%",
+          outerHeight: "50%",
+          innerHeight: "50%",
+          hideWidget: false,
           disableAnimations: true,
-          // stylesheet: 'https://style-.....a.vercel.app/bot.css',
         });
         window.botpressWebChat.onEvent(() => {
           window.botpressWebChat.sendEvent({ type: "show" });
         }, ["LIFECYCLE.LOADED"]);
-        window.botpressWebChat.init({
+        window.botpressWebChat.sendEvent({
           type: "text",
           channel: "web",
           payload: {
-            // Ensure this structure matches what your Botpress bot expects
-            text: 'SET_USER_DATA', // Assuming 'text' is how you distinguish payload types in your Botpress setup
+            text: 'SET_USER_DATA',
             userData: {
               email: user.email,
               name: user.name,
             },
           },
         });
-        window.botpressWebChat.onEvent(() => {
-          setShowChatbot(false);
-        }, ["LIFECYCLE.UNLOADED"]);
 
-      
         const btnConvoAdd = document.getElementById('btn-convo-add');
         if (btnConvoAdd) {
           console.log('button clicked');
@@ -73,14 +67,14 @@ function BotpressChatbot() {
         document.body.removeChild(script);
       };
     }
-  }, [showChatbot, user]); // Include 'user' in the dependency array
+  }, [showChatbot, user]);
 
   const handleChatbotToggle = () => {
     setShowChatbot(!showChatbot);
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // const response = await fetch('http://localhost:5001/reported-prompts');
 
     try {
       const response = await fetch('http://localhost:5001/insert-prompts', {
@@ -91,7 +85,7 @@ function BotpressChatbot() {
         body: JSON.stringify({
           ...formData,
           category,
-          userId: user.sub, // Assuming you want to include some user identifier
+          userId: user.sub,
         }),
       });
       if (response.ok) {
@@ -114,6 +108,17 @@ function BotpressChatbot() {
       ...prevFormData,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    formFields[category].forEach((field) => {
+      if (!formData[field.name]) {
+        errors[field.name] = `${field.label} is required.`;
+      }
+    });
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const formFields = {
@@ -146,20 +151,21 @@ function BotpressChatbot() {
   };
 
   return (
-
     <div>
-          <div>
-      <label className="switch"> {/* Use className instead of class */}
-        <input type="checkbox" id="btn-conversations" onClick={handleChatbotToggle} /> {/* Closing input tag */}
+      <div>
+        <label className="switch">
+          <input type="checkbox" onClick={handleChatbotToggle} /> 
+          <span className="slider round"></span>
+        </label>
         {showChatbot && <div id="botpress-chatbot"></div>}
-        <span className="slider round"></span> {/* Use className instead of class */}
-      </label>
-    </div>
-      <p> Not interested in the chatbot experience? No worries! You can always submit a report below. </p>
+      </div>
+      <p>Want to interact with our chatbot instead of submitting a form? You can always click on the chatbot icon in the lower right corner of every page. </p>
       <h1>Submit a Report</h1>
-      <form onSubmit={handleSubmit}>
+
+      <form onSubmit={handleSubmit} className="report-form">
         <label>
           Category:
+          <br />
           <select name="category" value={category} onChange={handleCategoryChange}>
             <option value="hallucinations">Hallucinations</option>
             <option value="copyright">Copyright</option>
@@ -169,18 +175,21 @@ function BotpressChatbot() {
         </label>
 
         {formFields[category].map(field => (
-          <div key={field.name}>
+          <div key={field.name} className="form-field">
             <label>
               {field.label}:
-              <input
-                className="form-control"
-                type="text"
+              <br />
+              <textarea
                 name={field.name}
                 value={formData[field.name] || ''}
                 onChange={handleChange}
+                rows="5"
+                cols="90"
+                wrap="soft"
+                className="editable-div"
               />
             </label>
-            <br />
+            {formErrors[field.name] && <div style={{ color: 'red' }}>{formErrors[field.name]}</div>}
           </div>
         ))}
 
@@ -191,92 +200,3 @@ function BotpressChatbot() {
 }
 
 export default BotpressChatbot;
-//use this code and insert the same into dynamic form code
-// import React, { useEffect, useState } from "react";
-// import botpress from "../botpress.json";
-// import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
-// import history from '../utils/history'; 
-
-// const botpressid = botpress.botId;
-// const clientId = botpress.clientId;
-
-// function BotpressChatbot() {
-//   const { user } = useAuth0();
-//   const [showChatbot, setShowChatbot] = useState(false);
-
-//   useEffect(() => {
-//     if (showChatbot) {
-//       const script = document.createElement("script");
-//       script.src = "https://cdn.botpress.cloud/webchat/v0/inject.js";
-//       script.async = true;
-//       script.onload = () => {
-//         window.botpressWebChat.init({
-//           botId: botpressid,
-//           hostUrl: "https://cdn.botpress.cloud/webchat/v0",
-//           messagingUrl: "https://messaging.botpress.cloud",
-//           clientId: clientId,
-//           botName: "Remember Prompts",
-//           // Set the width of the WebChat container and layout to 100% (Full Screen)
-//           containerWidth: "100%25",
-//           layoutWidth: "100%25",
-//           outerHeight: "50%25",
-//           innerHeight: "50%25",
-//           // Hide the widget and disable animations
-//           hideWidget: false, // Change to false to show the widget
-//           disableAnimations: true,
-//           // stylesheet: 'https://style-.....a.vercel.app/bot.css',
-//         });
-//         window.botpressWebChat.onEvent(() => {
-//           window.botpressWebChat.sendEvent({ type: "show" });
-//         }, ["LIFECYCLE.LOADED"]);
-//         window.botpressWebChat.init({
-//           type: "text",
-//           channel: "web",
-//           payload: {
-//             // Ensure this structure matches what your Botpress bot expects
-//             text: 'SET_USER_DATA', // Assuming 'text' is how you distinguish payload types in your Botpress setup
-//             userData: {
-//               email: user.email,
-//               name: user.name,
-//             },
-//           },
-//         });
-      
-//         const btnConvoAdd = document.getElementById('btn-convo-add');
-//         if (btnConvoAdd) {
-//           console.log('button clicked');
-//           btnConvoAdd.addEventListener('click', () => {
-//             setTimeout(() => {
-//               window.botpressWebChat.sendPayload({
-//                 type: 'text',
-//                 text: 'Hello, ' + user.name + ',' + ' ' + 'starting your session associated with the email ' + user.email + '.',
-//               });
-//             }, 2000);
-//           });
-//         }
-//       };
-
-//       document.body.appendChild(script);
-
-//       return () => {
-//         document.body.removeChild(script);
-//       };
-//     }
-//   }, [showChatbot, user]); // Include 'user' in the dependency array
-
-//   const handleChatbotToggle = () => {
-//     setShowChatbot(!showChatbot);
-//   };
-
-//   return (
-//     <div>
-//       <label className="switch"> {/* Use className instead of class */}
-//         <input type="checkbox" id="btn-conversations" onClick={handleChatbotToggle} /> {/* Closing input tag */}
-//         {showChatbot && <div id="botpress-chatbot"></div>}
-//         <span className="slider round"></span> {/* Use className instead of class */}
-//       </label>
-//     </div>
-//   );
-// }
-
-// export default BotpressChatbot;

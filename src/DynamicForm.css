@@ -35,17 +35,6 @@ body {
   transition: background-color 0.3s, color 0.3s; /* Smooth transition for theme changes */
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
-  font-size: var(--font-size-code);
-  background-color: #eee; /* Light background for code elements */
-  padding: 0.2em 0.4em;
-  border-radius: 4px;
-  transition: background-color 0.3s; /* Smooth transition for theme changes */
-}
-
-/* Optionally, add a container or wrapper for content to leverage Flexbox or Grid */
 .wrapper {
   display: flex; /* Or grid */
   flex-direction: column; /* Adjust as needed */
@@ -64,23 +53,10 @@ code {
   font-size: 1.2em;
   margin-bottom: 5px;
   color: var(--text-color); /* Ensure label text color is appropriate for the mode */
+  text-align: left; /* Left justify the label text */
 }
 
-.report-form textarea {
-  padding: 8px;
-  margin-top: 5px;
-  margin-bottom: 20px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  width: 50% !important; /* Force width to 50% */
-  box-sizing: border-box;
-  font-size: 16px;
-  white-space: pre-wrap !important; /* Ensure text wraps */
-  word-wrap: break-word !important; /* Ensure text wraps */
-  overflow-wrap: break-word !important; /* Ensure text wraps */
-}
-
-.report-form .editable-div {
+.editable-div {
   padding: 8px;
   margin-top: 5px;
   margin-bottom: 20px;
@@ -95,6 +71,7 @@ code {
   min-height: 100px; /* Set a minimum height */
   background-color: white; /* Background color for better visibility */
   color: black; /* Text color */
+  text-align: left; /* Left justify the textarea content */
 }
 
 .report-form button {
