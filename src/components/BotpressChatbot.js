@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import botpress from "../botpress.json";
+import "../../src/index.css"; 
 
 const botpressid = botpress.botId;
 const clientId = botpress.clientId;
@@ -149,11 +150,6 @@ function BotpressChatbot() {
 
     <div>
           <div>
-      <label className="switch"> {/* Use className instead of class */}
-        <input type="checkbox" id="btn-conversations" onClick={handleChatbotToggle} /> {/* Closing input tag */}
-        {showChatbot && <div id="botpress-chatbot"></div>}
-        <span className="slider round"></span> {/* Use className instead of class */}
-      </label>
     </div>
       <p> Not interested in the chatbot experience? No worries! You can always submit a report below. </p>
       <h1>Submit a Report</h1>
@@ -172,12 +168,15 @@ function BotpressChatbot() {
           <div key={field.name}>
             <label>
               {field.label}:
-              <input
-                className="form-control"
-                type="text"
+              <br></br>
+              <textarea
                 name={field.name}
                 value={formData[field.name] || ''}
                 onChange={handleChange}
+                rows="5"
+                cols="90"
+                wrap="soft"
+                className="editable-div"
               />
             </label>
             <br />
