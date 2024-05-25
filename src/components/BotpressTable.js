@@ -1,12 +1,17 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { useTable } from 'react-table';
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
+import "../../src/index.css"; // Import the CSS file for styling
 
 const cleanEmail = (email) => {
   if (!email) return '';
   const trimmedEmail = email.trim();
   const emailMatch = trimmedEmail.match(/^[^@\s]+@[^@\s]+\.[^@\s]+/);
   return emailMatch ? emailMatch[0].toLowerCase() : '';
+};
+
+const removeQuotesAndSlashes = (text) => {
+  return typeof text === 'string' ? text.replace(/[\\"]/g, '') : 'N/A';
 };
 
 const BotpressTable = () => {
@@ -33,24 +38,24 @@ const BotpressTable = () => {
         const dataArray = Array.isArray(data) ? data : data.documents || [];
         const transformedData = dataArray.map(data => ({
           ...data,
-          prompt: (JSON.stringify(data.prompt) || 'N/A').replace(/\\|"/g, ''),
-          infringementPrompt: (JSON.stringify(data.infringementPrompt) || 'N/A').replace(/\\|"/g, ''),
-          hallucinationAnswer: (JSON.stringify(data.hallucination_answer) || 'N/A').replace(/\\|"/g, ''),
-          answerUpdated: (JSON.stringify(data.answer_updated) || 'N/A').replace(/\\|"/g, ''),
-          versionChatbotHallucinationAnswer: (JSON.stringify(data.version_chatbot_hallucination_answer) || 'N/A').replace(/\\|"/g, ''),
-          chatbotPlatform: (JSON.stringify(data.chatbot_platform) || 'N/A').replace(/\\|"/g, ''),
-          updatedPromptAnswer: (JSON.stringify(data.updated_prompt_answer) || 'N/A').replace(/\\|"/g, ''),
-          promptTrigger: (JSON.stringify(data.prompt_trigger) || 'N/A').replace(/\\|"/g, ''),
-          keywordSearch: (JSON.stringify(data.keyword_search) || 'N/A').replace(/\\|"/g, ''),
-          privacy: (JSON.stringify(data.privacy || '').toLowerCase().includes("public") ? "Public" : "Private").replace(/\\|"/g, ''),
-          email: cleanEmail(data.email).replace(/\\|"/g, ''),
-          name: (JSON.stringify(data.name) || 'N/A').replace(/\\|"/g, ''),
-          copyrightAnswer: (JSON.stringify(data.copyrightAnswer) || 'N/A').replace(/\\|"/g, ''),
-          dataSource: (JSON.stringify(data.dataSource) || 'N/A').replace(/\\|"/g, ''),
-          securityImpact: (JSON.stringify(data.security_impact) || 'N/A').replace(/\\|"/g, ''),
-          securityIncidentRisk: (JSON.stringify(data.security_incident_risk) || 'N/A').replace(/\\|"/g, ''),
-          privacyRequested: (JSON.stringify(data.privacy_requested) || 'N/A').replace(/\\|"/g, ''),
-          category: (JSON.stringify(data.category) || '').replace(/\\|"/g, '').toLowerCase(),
+          prompt: removeQuotesAndSlashes(data.prompt),
+          infringementPrompt: removeQuotesAndSlashes(data.infringementPrompt),
+          hallucinationAnswer: removeQuotesAndSlashes(data.hallucinationAnswer),
+          answerUpdated: removeQuotesAndSlashes(data.answer_version_answer_updated),
+          versionChatbotHallucinationAnswer: removeQuotesAndSlashes(data.versionChatbotHallucinationAnswer),
+          chatbotPlatform: removeQuotesAndSlashes(data.chatbot_platform),
+          updatedPromptAnswer: removeQuotesAndSlashes(data.updated_prompt_answer),
+          promptTrigger: removeQuotesAndSlashes(data.prompt_trigger),
+          keywordSearch: removeQuotesAndSlashes(data.keyword_search),
+          privacy: removeQuotesAndSlashes(data.privacy || '').toLowerCase().includes("public") ? "Public" : "Private",
+          email: cleanEmail(data.email),
+          name: removeQuotesAndSlashes(data.name),
+          copyrightAnswer: removeQuotesAndSlashes(data.copyrightAnswer),
+          dataSource: removeQuotesAndSlashes(data.dataSource),
+          securityImpact: removeQuotesAndSlashes(data.security_impact),
+          securityIncidentRisk: removeQuotesAndSlashes(data.security_incident_risk),
+          privacyRequested: removeQuotesAndSlashes(data.privacy_requested),
+          category: removeQuotesAndSlashes(data.category || '').toLowerCase(),
           upvotes: data.upvotes || 0,
           id: data.id  // assuming each data entry has a unique identifier
         }));
@@ -66,14 +71,16 @@ const BotpressTable = () => {
   }, []);
 
   useEffect(() => {
-    const filteredData = originalData.filter(item =>
-      (searchQuery === '' || Object.values(item).some(value =>
-        (value ? value.toString().toLowerCase().includes(searchQuery.toLowerCase()) : false)))
-      && (category === 'all' || item.category === category)
-    );
+    const filteredData = originalData.filter(item => {
+      const matchesSearchQuery = searchQuery === '' || Object.values(item).some(value =>
+        (value ? value.toString().toLowerCase().includes(searchQuery.toLowerCase()) : false));
+      const matchesCategory = category === 'all' || item.category === category;
+      const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' && item.email === cleanEmail(user.email));
+      return matchesSearchQuery && matchesCategory && matchesTab;
+    });
 
     setTableData(filteredData);
-  }, [originalData, searchQuery, category]);
+  }, [originalData, searchQuery, category, activeTab, user.email]);
 
   const handleCategoryChange = useCallback((e) => {
     setCategory(e.target.value);
@@ -175,6 +182,7 @@ const BotpressTable = () => {
           My Reports
         </button>
       </div>
+      <br />
       <div>
         <select onChange={handleCategoryChange} value={category}>
           <option value="hallucinations">Hallucinations</option>
@@ -183,7 +191,9 @@ const BotpressTable = () => {
           <option value="memory">Memory Recall</option>
         </select>
       </div>
+      <br />
       <input type="text" placeholder="Search..." value={searchQuery} onChange={handleSearchChange} />
+      <br /><br />
       <table {...getTableProps()}>
         <thead>
           {headerGroups.map(headerGroup => (

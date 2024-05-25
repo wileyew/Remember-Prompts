@@ -1,13 +1,15 @@
 :root {
   /* Define color scheme and font sizes */
-  --background-color: #f0f0f0;
-  --text-color: #333;
+  --background-color-light: #f0f0f0;
+  --text-color-light: #333;
   --font-size-normal: 16px;
   --font-size-code: 14px;
   
   /* Dark mode colors */
   --background-color-dark: #282c34;
   --text-color-dark: #c7c7c7;
+  --font-size-normal-dark: 16px; /* Adjust font size for dark mode if needed */
+  --font-size-code-dark: 14px; /* Adjust font size for code elements in dark mode */
 }
 
 /* Use a media query for dark mode preferences */
@@ -15,6 +17,8 @@
   :root {
     --background-color: var(--background-color-dark);
     --text-color: var(--text-color-dark);
+    --font-size-normal: var(--font-size-normal-dark);
+    --font-size-code: var(--font-size-code-dark);
   }
 }
 
@@ -28,248 +32,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--background-color);
   color: var(--text-color);
-  font-size: var(--font-size-normal);
-  line-height: 1.6;
-  transition: background-color 0.3s, color 0.3s; /* Smooth transition for theme changes */
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
-  font-size: var(--font-size-code);
-  background-color: #eee; /* Light background for code elements */
-  padding: 0.2em 0.4em;
-  border-radius: 4px;
-  transition: background-color 0.3s; /* Smooth transition for theme changes */
-}
-
-/* Optionally, add a container or wrapper for content to leverage Flexbox or Grid */
-.wrapper {
-  display: flex; /* Or grid */
-  flex-direction: column; /* Adjust as needed */
-  gap: 20px;
-  padding: 20px;
-}
-
-.botpress-table-container {
-  font-family: Arial, sans-serif;
-  margin-top: 20px; /* Adjust based on your nav bar's height */
-  padding: 0 10px; /* Provides padding on the sides */
-  max-width: 98%; /* Prevents the table from extending too wide */
-  margin-left: auto; /* Together with margin-right, centers the container */
-  margin-right: auto;
-  overflow-x: auto; /* Ensures the table itself is scrollable horizontally if it exceeds the container's width */
-}
-
-.botpress-table-container table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.botpress-table-container th,
-.botpress-table-container td {
-  text-align: left;
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
-}
-
-.botpress-table-container th {
-  background-color: #f4f4f4;
-}
-
-.botpress-table-container tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.botpress-table-container tr:hover {
-  background-color: #f1f1f1;
-}
-/* Container for the tab buttons */
-.botpress-table-container .tab-buttons {
-  margin-bottom: 20px;
-}
-
-/* Style for the tab buttons */
-.botpress-table-container button {
-  background-color: #f0f0f0;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  padding: 10px 20px;
-  transition: background-color 0.3s ease;
-  border-radius: 5px 5px 0 0;
-  margin-right: 4px;
-  font-size: 16px;
-}
-
-/* Style for the active tab button */
-.botpress-table-container button.active {
-  background-color: #d1eaff;
-  color: #000;
-  font-weight: bold;
-}
-
-/* Hover effect for buttons */
-.botpress-table-container button:hover {
-  background-color: #d1eaff;
-}
-
-/* Styling for the input search box */
-.botpress-table-container input[type="text"] {
-  padding: 8px;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  width: 100%;
-  box-sizing: border-box;
-  font-size: 16px;
-}
-
-/* Enhancements for the table */
-.botpress-table-container table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-.botpress-table-container th,
-.botpress-table-container td {
-  text-align: left;
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
-}
-
-.botpress-table-container th {
-  background-color: #f4f4f4;
-}
-
-.botpress-table-container tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.botpress-table-container tr:hover {
-  background-color: #f1f1f1;
-}
-
-/* The switch - the box around the slider */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
-
-/* Hide default HTML checkbox */
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-/* The slider */
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-input:checked + .slider {
-  background-color: #2196F3;
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
-
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
-.height-30, .height-40, .height-50 {
-  height: var(--height);
-
-  &.btn, &.form-control {
-    line-height: var(--height);
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-}
-
-.height-30 {
-  --height: 30px;
-}
-
-.height-40 {
-  --height: 40px;
-}
-
-.height-50 {
-  --height: 50px;
-}
-
-:root {
-  /* Define color scheme and font sizes */
-  --background-color: #f0f0f0;
-  --text-color: #333;
-  --font-size-normal: 16px;
-  --font-size-code: 14px;
-  
-  /* Dark mode colors */
-  --background-color-dark: #282c34;
-  --text-color-dark: #c7c7c7;
-  --tab-background-color-dark: #444;
-  --tab-text-color: #fff;
-}
-
-/* Use a media query for dark mode preferences */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background-color: var(--background-color-dark);
-    --text-color: var(--text-color-dark);
-  }
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: var(--background-color);
-  color: white;
   font-size: var(--font-size-normal);
   line-height: 1.6;
   transition: background-color 0.3s, color 0.3s; /* Smooth transition for theme changes */
@@ -309,8 +71,8 @@ body {
   word-wrap: break-word; /* Ensure text wraps */
   overflow-wrap: break-word; /* Ensure text wraps */
   min-height: 100px; /* Set a minimum height */
-  background-color: white; /* Background color for better visibility */
-  color: black; /* Text color */
+  background-color: var(--background-color-light); /* Background color for better visibility */
+  color: var(--text-color-light); /* Text color */
   text-align: left; /* Left justify the textarea content */
 }
 
