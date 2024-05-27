@@ -8,18 +8,18 @@ const clientId = botpress.clientId;
 
 function BotpressChatbot() {
   const { user } = useAuth0();
-  const [showChatbot, setShowChatbot] = useState(false);
+  const [showChatbot, setShowChatbot] = useState(true);
   const [formData, setFormData] = useState({});
   const [category, setCategory] = useState('hallucinations');
-  const [sliderChecked, setSliderChecked] = useState(false);
+  const [sliderChecked, setSliderChecked] = useState(true);
 
   useEffect(() => {
     const widgetContainer = document.getElementById('bp-web-widget-container');
     if (widgetContainer) {
-      widgetContainer.style.display = showChatbot ? 'none' : 'block'; 
+      widgetContainer.style.display = sliderChecked ? 'block' : 'none'; 
     }
   
-    if (showChatbot) {
+    if (sliderChecked) {
       const script = document.createElement("script");
       script.src = "https://cdn.botpress.cloud/webchat/v0/inject.js";
       script.async = true;
@@ -80,7 +80,7 @@ function BotpressChatbot() {
         document.body.removeChild(script);
       };
     }
-  }, [showChatbot, user]); 
+  }, [sliderChecked, user]); 
 
   useEffect(() => {
     const bpWidgetBtn = document.querySelector('.bpw-widget-btn.bpw-floating-button.bpw-anim-undefined');
@@ -131,7 +131,6 @@ function BotpressChatbot() {
   };
 
   const handleChatbotToggle = () => {
-    setShowChatbot(!showChatbot);
     setSliderChecked(!sliderChecked);
   };
 
@@ -170,10 +169,9 @@ function BotpressChatbot() {
       <h1>Submit a Report</h1>
       <p>Check out the chatbot experience by clicking on the black background with white dialogue button in the bottom right corner. The chatbot is connected to ChatGPT to provide a creative memory recall trigger for prompt or prompt answers that are difficult to remember. For example, to remember George Washington as the first president, chatgpt may give a prompt trigger for washer with a ton on it! Don't want to use the chatbot? No worries, simply click the toggle below and use the form below!</p>
       <label className={`switch ${showChatbot ? 'active' : ''}`}>
-        <input type="checkbox" id="btn-conversations" checked={showChatbot} onChange={handleChatbotToggle} />
+        <input type="checkbox" id="btn-conversations" checked={sliderChecked} onChange={handleChatbotToggle} />
         <span className="slider round"></span>
       </label>
-      {sliderChecked}
       <form onSubmit={handleSubmit}>
         <label>
           Category:
