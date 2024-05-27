@@ -11,7 +11,7 @@ function BotpressChatbot() {
   const [showChatbot, setShowChatbot] = useState(false);
   const [formData, setFormData] = useState({});
   const [category, setCategory] = useState('hallucinations');
-  const [sliderValue, setSliderValue] = useState(0);
+  const [sliderChecked, setSliderChecked] = useState(false);
 
   useEffect(() => {
     const widgetContainer = document.getElementById('bp-web-widget-container');
@@ -82,6 +82,13 @@ function BotpressChatbot() {
     }
   }, [showChatbot, user]); 
 
+  useEffect(() => {
+    const bpWidgetBtn = document.querySelector('.bpw-widget-btn.bpw-floating-button.bpw-anim-undefined');
+    if (bpWidgetBtn) {
+      bpWidgetBtn.style.display = sliderChecked ? 'block' : 'none';
+    }
+  }, [sliderChecked]);
+
   const formFields = {
     hallucinations: [
       { name: 'prompt', label: 'Prompt' },
@@ -90,12 +97,14 @@ function BotpressChatbot() {
       { name: 'chatbotPlatform', label: 'Platform' },
       { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer' },
       { name: 'promptTrigger', label: 'Trigger' },
-      { name: 'keywordSearch', label: 'Keyword Search' }
+      { name: 'dataSource', label: 'Data Source' },
+      { name: 'justification', label: 'Reason for Hallucination' }
     ],
     copyright: [
       { name: 'infringementPrompt', label: 'Infringement Prompt' },
       { name: 'copyrightAnswer', label: 'Copyright Answer' },
-      { name: 'dataSource', label: 'Data Source' }
+      { name: 'dataSource', label: 'Data Source' },
+      { name: 'justification', label: 'Reason for Copyright Infringement' }
     ],
     security: [
       { name: 'prompt', label: 'Prompt' },
@@ -103,11 +112,14 @@ function BotpressChatbot() {
       { name: 'securityIncidentRisk', label: 'Security Incident Risk' },
       { name: 'dataSource', label: 'Data Source' },
       { name: 'chatbotPlatform', label: 'Platform' },
-      { name: 'keywordSearch', label: 'Keyword Search' }
+      { name: 'dataSource', label: 'Data Source' },
+      { name: 'justification', label: 'Why is this a security issue?' }
+
     ],
     memory: [
       { name: 'prompt', label: 'Prompt' },
-      { name: 'promptTrigger', label: 'Trigger for Recall' }
+      { name: 'promptAnswer', label: 'Prompt Answer' },
+      { name: 'promptTrigger', label: 'Trigger for Recall' },
     ]
   };
 
@@ -120,7 +132,7 @@ function BotpressChatbot() {
 
   const handleChatbotToggle = () => {
     setShowChatbot(!showChatbot);
-    setSliderValue(showChatbot ? 0 : 1); // Set slider value based on chatbot visibility
+    setSliderChecked(!sliderChecked);
   };
 
   const handleSubmit = async (e) => {
@@ -156,11 +168,12 @@ function BotpressChatbot() {
   return (
     <div>
       <h1>Submit a Report</h1>
+      <p>Check out the chatbot experience by clicking on the black background with white dialogue button in the bottom right corner. The chatbot is connected to ChatGPT to provide a creative memory recall trigger for prompt or prompt answers that are difficult to remember. For example, to remember George Washington as the first president, chatgpt may give a prompt trigger for washer with a ton on it! Don't want to use the chatbot? No worries, simply click the toggle below and use the form below!</p>
       <label className={`switch ${showChatbot ? 'active' : ''}`}>
-      <input type="checkbox" id="btn-conversations" checked={showChatbot} onChange={handleChatbotToggle} /> {/* Checkbox for functionality */}
-      <span className="slider round"></span>
-      {showChatbot && <div id="app"></div>}
-    </label>
+        <input type="checkbox" id="btn-conversations" checked={showChatbot} onChange={handleChatbotToggle} />
+        <span className="slider round"></span>
+      </label>
+      {sliderChecked}
       <form onSubmit={handleSubmit}>
         <label>
           Category:
@@ -194,7 +207,6 @@ function BotpressChatbot() {
         <button type="submit">Submit</button>
       </form>
     </div>
-    
   );
 }
 

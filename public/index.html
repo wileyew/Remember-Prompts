@@ -52,7 +52,11 @@
     <script>
       function toggleChatbot() {
         var slider = document.getElementById("btn-conversations");
-        slider.checked = !slider.checked; // Toggle the checkbox state
+        if (slider.checked === false) {
+          console.log('entering function');
+          document.getElementById('tchat-label').hidden = true;
+
+        }// Toggle the checkbox state
         // Perform other actions you want when toggling the chatbot
         // For example, show/hide the chatbot div
       }
