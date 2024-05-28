@@ -12,6 +12,7 @@ function BotpressChatbot() {
   const [formData, setFormData] = useState({});
   const [category, setCategory] = useState('hallucinations');
   const [sliderChecked, setSliderChecked] = useState(true);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   useEffect(() => {
     const widgetContainer = document.getElementById('bp-web-widget-container');
@@ -136,7 +137,10 @@ function BotpressChatbot() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setShowConfirmationModal(true);
+  };
 
+  const handleConfirmSubmit = async () => {
     try {
       const response = await fetch('http://localhost:5001/insert-prompts', {
         method: 'POST',
@@ -157,6 +161,11 @@ function BotpressChatbot() {
     } catch (error) {
       console.error("Network error:", error);
     }
+    setShowConfirmationModal(false);
+  };
+
+  const handleCancelSubmit = () => {
+    setShowConfirmationModal(false);
   };
 
   const handleCategoryChange = (e) => {
@@ -168,10 +177,11 @@ function BotpressChatbot() {
     <div>
       <h1>Submit a Report</h1>
       <p>Check out the chatbot experience by clicking on the black background with white dialogue button in the bottom right corner. The chatbot is connected to ChatGPT to provide a creative memory recall trigger for prompt or prompt answers that are difficult to remember. For example, to remember George Washington as the first president, chatgpt may give a prompt trigger for washer with a ton on it! Don't want to use the chatbot? No worries, simply click the toggle below and use the form below!</p>
-      <label className={`switch ${showChatbot ? 'active' : ''}`}>
+      <label className={`switch ${sliderChecked ? 'active' : ''}`}>
         <input type="checkbox" id="btn-conversations" checked={sliderChecked} onChange={handleChatbotToggle} />
         <span className="slider round"></span>
       </label>
+      {sliderChecked}
       <form onSubmit={handleSubmit}>
         <label>
           Category:
@@ -204,6 +214,13 @@ function BotpressChatbot() {
 
         <button type="submit">Submit</button>
       </form>
+      {showConfirmationModal && (
+        <div className="confirmation-modal">
+          <p>Are you sure you want to submit the form?</p>
+          <button onClick={handleConfirmSubmit}>Confirm</button>
+          <button onClick={handleCancelSubmit}>Cancel</button>
+        </div>
+      )}
     </div>
   );
 }
