@@ -99,7 +99,8 @@ function BotpressChatbot() {
       { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer' },
       { name: 'promptTrigger', label: 'Trigger' },
       { name: 'dataSource', label: 'Data Source' },
-      { name: 'justification', label: 'Reason for Hallucination' }
+      { name: 'justification', label: 'Reason for Hallucination' },
+      {name: 'privacyRequested', label: 'Submit Report Publicly? If not checked, we will assume this is a private report and will only be shown in My Reports.', type: 'checkbox'}
     ],
     copyright: [
       { name: 'infringementPrompt', label: 'Infringement Prompt' },
@@ -125,9 +126,10 @@ function BotpressChatbot() {
   };
 
   const handleChange = (e) => {
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: value,
     }));
   };
 
@@ -195,18 +197,27 @@ function BotpressChatbot() {
 
         {formFields[category].map(field => (
           <div key={field.name}>
-            <label>
+           <label>
               {field.label}:
               <br></br>
-              <textarea
-                name={field.name}
-                value={formData[field.name] || ''}
-                onChange={handleChange}
-                rows="5"
-                cols="90"
-                wrap="soft"
-                className="editable-div"
-              />
+              {field.type === 'checkbox' ? (
+                <input
+                  type="checkbox"
+                  name={field.name}
+                  checked={formData[field.name] || false}
+                  onChange={handleChange}
+                />
+              ) : (
+                <textarea
+                  name={field.name}
+                  value={formData[field.name] || ''}
+                  onChange={handleChange}
+                  rows="5"
+                  cols="90"
+                  wrap="soft"
+                  className="editable-div"
+                />
+              )}
             </label>
             <br />
           </div>
@@ -215,10 +226,12 @@ function BotpressChatbot() {
         <button type="submit">Submit</button>
       </form>
       {showConfirmationModal && (
-        <div className="confirmation-modal">
-          <p>Are you sure you want to submit the form?</p>
-          <button onClick={handleConfirmSubmit}>Confirm</button>
-          <button onClick={handleCancelSubmit}>Cancel</button>
+        <div className="modal">
+          <div className="modal-content">
+            <p>Are you sure you want to submit the form?</p>
+            <button onClick={handleConfirmSubmit}>Confirm</button>
+            <button onClick={handleCancelSubmit}>Cancel</button>
+          </div>
         </div>
       )}
     </div>

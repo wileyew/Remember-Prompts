@@ -41,7 +41,7 @@ const BotpressTable = () => {
           prompt: removeQuotesAndSlashes(data.prompt),
           infringementPrompt: removeQuotesAndSlashes(data.infringementPrompt),
           hallucinationAnswer: removeQuotesAndSlashes(data.hallucinationAnswer),
-          answerUpdated: removeQuotesAndSlashes(data.answer_version_answer_updated),
+          answerUpdated: removeQuotesAndSlashes(data.updatedPromptAnswer),
           versionChatbotHallucinationAnswer: removeQuotesAndSlashes(data.versionChatbotHallucinationAnswer),
           chatbotPlatform: removeQuotesAndSlashes(data.chatbotPlatform),
           updatedPromptAnswer: removeQuotesAndSlashes(data.updatedPromptAnswer),
@@ -54,7 +54,7 @@ const BotpressTable = () => {
           dataSource: removeQuotesAndSlashes(data.dataSource),
           securityImpact: removeQuotesAndSlashes(data.security_impact),
           securityIncidentRisk: removeQuotesAndSlashes(data.security_incident_risk),
-          privacyRequested: removeQuotesAndSlashes(data.privacy_requested),
+          privacyRequested: removeQuotesAndSlashes(data.privacyRequested),
           category: removeQuotesAndSlashes(data.category || '').toLowerCase(),
           upvotes: data.upvotes || 0,
           id: data.id  // assuming each data entry has a unique identifier
