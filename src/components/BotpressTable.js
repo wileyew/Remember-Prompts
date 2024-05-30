@@ -38,15 +38,14 @@ const BotpressTable = () => {
         const dataArray = Array.isArray(data) ? data : data.documents || [];
         const transformedData = dataArray.map(data => ({
           ...data,
+          chatbotPlatform: removeQuotesAndSlashes(data.chatbotPlatform),
+          versionChatbotHallucinationAnswer: removeQuotesAndSlashes(data.versionChatbot),
           prompt: removeQuotesAndSlashes(data.prompt),
           infringementPrompt: removeQuotesAndSlashes(data.infringementPrompt),
           hallucinationAnswer: removeQuotesAndSlashes(data.hallucinationAnswer),
           answerUpdated: removeQuotesAndSlashes(data.updatedPromptAnswer),
-          versionChatbotHallucinationAnswer: removeQuotesAndSlashes(data.versionChatbotHallucinationAnswer),
-          chatbotPlatform: removeQuotesAndSlashes(data.chatbotPlatform),
           updatedPromptAnswer: removeQuotesAndSlashes(data.updatedPromptAnswer),
           promptTrigger: removeQuotesAndSlashes(data.promptTrigger),
-          keywordSearch: removeQuotesAndSlashes(data.keyword_search),
           privacy: removeQuotesAndSlashes(data.privacy || '').toLowerCase().includes("public") ? "Public" : "Private",
           email: cleanEmail(data.email),
           name: removeQuotesAndSlashes(data.name),
@@ -68,6 +67,9 @@ const BotpressTable = () => {
     };
 
     fetchDataFromDatabase();
+
+
+    
   }, []);
 
   useEffect(() => {
@@ -114,13 +116,13 @@ const BotpressTable = () => {
 
     if (category === 'hallucinations') {
       const hallucinationColumns = [
+        { Header: 'Platform', accessor: 'chatbotPlatform' },
+        { Header: 'Version', accessor: 'versionChatbotHallucinationAnswer' },
         { Header: 'Prompt', accessor: 'prompt' },
         { Header: 'Hallucination Answer', accessor: 'hallucinationAnswer' },
-        { Header: 'Version', accessor: 'versionChatbotHallucinationAnswer' },
-        { Header: 'Platform', accessor: 'chatbotPlatform' },
         { Header: 'Proposed Correct Answer', accessor: 'updatedPromptAnswer' },
-        { Header: 'Data Source', accessor: 'dataSource' },
         { Header: 'Justification', accessor: 'justification' },
+        { Header: 'Data Source', accessor: 'dataSource' },
         { Header: 'Trigger', accessor: 'promptTrigger' },
       ];
       return [...baseColumns, ...hallucinationColumns];

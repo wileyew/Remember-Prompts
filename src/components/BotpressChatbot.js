@@ -92,34 +92,37 @@ function BotpressChatbot() {
 
   const formFields = {
     hallucinations: [
+      { name: 'chatbotPlatform', label: 'Platform' },
+      { name: 'versionChatbot', label: 'Version' },
       { name: 'prompt', label: 'Prompt' },
       { name: 'hallucinationAnswer', label: 'Hallucination Answer' },
-      { name: 'versionChatbotHallucinationAnswer', label: 'Version' },
-      { name: 'chatbotPlatform', label: 'Platform' },
-      { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer' },
-      { name: 'promptTrigger', label: 'Trigger' },
-      { name: 'dataSource', label: 'Data Source' },
-      { name: 'justification', label: 'Reason for Hallucination' },
+      { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer' },      { name: 'dataSource', label: 'Data Source' },
+      { name: 'justification', label: 'Reason for Hallucination (if not known then leave empty)' },
       {name: 'privacyRequested', label: 'Submit Report Publicly? If not checked, we will assume this is a private report and will only be shown in My Reports.', type: 'checkbox'}
     ],
     copyright: [
+      { name: 'chatbotPlatform', label: 'Platform' },
+      { name: 'versionChatbot', label: 'Version' },
       { name: 'infringementPrompt', label: 'Infringement Prompt' },
       { name: 'copyrightAnswer', label: 'Copyright Answer' },
       { name: 'dataSource', label: 'Data Source' },
       { name: 'justification', label: 'Reason for Copyright Infringement' }
     ],
     security: [
+      { name: 'chatbotPlatform', label: 'Platform' },
+      { name: 'versionChatbot', label: 'Version' },
       { name: 'prompt', label: 'Prompt' },
       { name: 'securityImpact', label: 'Security Impact' },
       { name: 'securityIncidentRisk', label: 'Security Incident Risk' },
       { name: 'dataSource', label: 'Data Source' },
-      { name: 'chatbotPlatform', label: 'Platform' },
       { name: 'dataSource', label: 'Data Source' },
       { name: 'justification', label: 'Why is this a security issue?' }
 
     ],
     memory: [
       { name: 'prompt', label: 'Prompt' },
+      { name: 'chatbotPlatform', label: 'Platform' },
+      { name: 'versionChatbot', label: 'Version' },
       { name: 'promptAnswer', label: 'Prompt Answer' },
       { name: 'promptTrigger', label: 'Trigger for Recall' },
     ]
