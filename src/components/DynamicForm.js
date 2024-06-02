@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth0 } from "@auth0/auth0-react";
 import botpress from "../botpress.json";
+import DOMPurify from 'dompurify';
 
 const DynamicForm = ({ onSave }) => {
   const { user } = useAuth0(); // Get user information from Auth0
@@ -80,7 +81,8 @@ const DynamicForm = ({ onSave }) => {
   };
 
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const sanitizedValue = DOMPurify.sanitize(e.target.value);
+    setFormData((prev) => ({ ...prev, [e.target.name]: sanitizedValue }));
   };
 
   const validateForm = () => {
@@ -168,7 +170,7 @@ const DynamicForm = ({ onSave }) => {
           <select name="category" value={category} onChange={handleCategoryChange}>
             <option value="hallucinations">Hallucinations</option>
             <option value="copyright">Copyright</option>
-            <option value="security">Security Issues</option>
+            <option value="security">Security Issue</option>
             <option value="memory">Memory Recall</option>
           </select>
         </label>
