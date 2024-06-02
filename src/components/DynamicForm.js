@@ -2,18 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useAuth0 } from "@auth0/auth0-react";
 import botpress from "../botpress.json";
 
-
 const DynamicForm = ({ onSave }) => {
-  
+  const { user } = useAuth0(); // Get user information from Auth0
   const [category, setCategory] = useState('hallucinations');
   const [formData, setFormData] = useState({});
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showChatbot, setShowChatbot] = useState(false); // State to toggle chatbot
-  const { user } = useAuth0(); // Get user information from Auth0
 
   const userEmail = user.email;
-  const botpressid = botpress.botId;; // Replace with your Botpress bot ID
+  const botpressid = botpress.botId; // Replace with your Botpress bot ID
   const clientId = botpress.clientId; // Replace with your client ID
 
   useEffect(() => {
@@ -100,7 +98,6 @@ const DynamicForm = ({ onSave }) => {
     e.preventDefault();
     if (validateForm()) {
       setIsSubmitting(true);
-      console.log('user information ' + userEmail);
       const dataToSubmit = {
         ...formData,
         userEmail: userEmail, // Include user ID in the form data
@@ -148,7 +145,7 @@ const DynamicForm = ({ onSave }) => {
       { name: 'prompt', label: 'Prompt', type: 'textarea' },
       { name: 'securityImpact', label: 'Security Impact', type: 'textarea' },
       { name: 'securityIncidentRisk', label: 'Security Incident Risk', type: 'textarea' },
-      { name: 'dataSource', label: 'Data Source', type: 'textarea' },
+      { name: 'dataSourceSecurity', label: 'Data Source', type: 'textarea' },
       { name: 'chatbotPlatform', label: 'Platform', type: 'textarea' },
       { name: 'keywordSearch', label: 'Keyword Search', type: 'textarea' },
     ],

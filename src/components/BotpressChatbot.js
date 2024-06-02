@@ -115,7 +115,6 @@ function BotpressChatbot() {
       { name: 'securityImpact', label: 'Security Impact' },
       { name: 'securityIncidentRisk', label: 'Security Incident Risk' },
       { name: 'dataSource', label: 'Data Source' },
-      { name: 'dataSource', label: 'Data Source' },
       { name: 'justification', label: 'Why is this a security issue?' }
 
     ],
