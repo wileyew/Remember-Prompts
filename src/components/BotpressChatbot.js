@@ -98,7 +98,7 @@ function BotpressChatbot() {
       { name: 'hallucinationAnswer', label: 'Hallucination Answer' },
       { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer' },      { name: 'dataSource', label: 'Data Source' },
       { name: 'justification', label: 'Reason for Hallucination (if not known then leave empty)' },
-      {name: 'privacyRequested', label: 'Submit Report Publicly? If not checked, we will assume this is a private report and will only be shown in My Reports.', type: 'checkbox'}
+      {name: 'privacy', label: 'Submit Report Privately? If not checked, we will assume this is a public report and will only be shown in My Reports AND all reports.', type: 'checkbox'}
     ],
     copyright: [
       { name: 'chatbotPlatform', label: 'Platform' },
@@ -155,7 +155,7 @@ function BotpressChatbot() {
         body: JSON.stringify({
           ...formData,
           category,
-          userId: user.sub,
+          userEmail: user.email,
         }),
       });
       if (response.ok) {

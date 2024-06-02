@@ -12,7 +12,7 @@ const DynamicForm = ({ onSave }) => {
   const [showChatbot, setShowChatbot] = useState(false); // State to toggle chatbot
   const { user } = useAuth0(); // Get user information from Auth0
 
-  const userId = user.sub;
+  const userEmail = user.email;
   const botpressid = botpress.botId;; // Replace with your Botpress bot ID
   const clientId = botpress.clientId; // Replace with your client ID
 
@@ -100,10 +100,10 @@ const DynamicForm = ({ onSave }) => {
     e.preventDefault();
     if (validateForm()) {
       setIsSubmitting(true);
-      console.log('user information ' + userId);
+      console.log('user information ' + userEmail);
       const dataToSubmit = {
         ...formData,
-        userId: userId, // Include user ID in the form data
+        userEmail: userEmail, // Include user ID in the form data
         category: category // Include category in the form data
       };
       fetch('http://localhost:5001/insert-prompts', {

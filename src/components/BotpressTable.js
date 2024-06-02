@@ -77,7 +77,9 @@ const BotpressTable = () => {
       const matchesSearchQuery = searchQuery === '' || Object.values(item).some(value =>
         (value ? value.toString().toLowerCase().includes(searchQuery.toLowerCase()) : false));
       const matchesCategory = category === 'all' || item.category === category;
-      const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' && item.email === cleanEmail(user.email));
+    console.log('email from auth 0 ' + JSON.stringify(user.email));
+    console.log('email from mongo backend' + JSON.stringify(item.userEmail));      
+const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' && cleanEmail(item.userEmail).includes(cleanEmail(user.email)));
       return matchesSearchQuery && matchesCategory && matchesTab;
     });
 
