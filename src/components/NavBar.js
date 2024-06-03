@@ -77,7 +77,7 @@ const NavBar = () => {
                     exact
                     activeClassName="router-link-exact-active"
                   >
-                    Remember Prompts
+                   Create a Report
                   </NavLink>
                 </NavItem>
                 

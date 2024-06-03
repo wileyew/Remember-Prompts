@@ -93,7 +93,6 @@ function BotpressChatbot() {
       { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer' },
       { name: 'dataSource', label: 'Data Source' },
       { name: 'justification', label: 'Reason for Hallucination (if not known then leave empty)' },
-      { name: 'privacy', label: 'Submit Report Privately? If not checked, we will assume this is a public report and will only be shown in My Reports AND all reports.', type: 'checkbox' }
     ],
     copyright: [
       { name: 'chatbotPlatform', label: 'Platform' },
@@ -128,11 +127,11 @@ function BotpressChatbot() {
     };
 
     if (patterns.sqlInjection.test(value)) {
-      return "Potential SQL injection detected";
+      return "Potential SQL injection detected, please link to the steps if security issue. We have this as a preventative measure to protect our website.";
     }
 
     if (patterns.xss.test(value)) {
-      return "Potential XSS attack detected";
+      return "Potential XSS attack detected,  please link to the steps if security issue. We have this as a preventative measure to protect our website.";
     }
 
     return null;

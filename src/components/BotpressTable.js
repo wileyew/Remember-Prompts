@@ -180,7 +180,7 @@ const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' && c
     <div className="botpress-table-container" style={{ marginTop: '20px', maxWidth: '98%', margin: '20px auto', overflowX: 'auto' }}>
       <h2>Reported Prompts</h2>
       <div className="tab-buttons">
-        <button className={activeTab === 'allReports' ? 'active' : ''} onClick={() => setActiveTab('allReports')}>
+        <button className={activeTab === 'allReports' ? 'active' : '' ? 'true': ''} onClick={() => setActiveTab('allReports')}>
           All Public Reports
         </button>
         <button className={activeTab === 'myReports' ? 'active' : ''} onClick={() => setActiveTab('myReports')}>
