@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import botpress from "../botpress.json";
 import "../../src/index.css";
+import DOMPurify from 'dompurify';
 
 const botpressid = botpress.botId;
 const clientId = botpress.clientId;
@@ -13,13 +14,15 @@ function BotpressChatbot() {
   const [category, setCategory] = useState('hallucinations');
   const [sliderChecked, setSliderChecked] = useState(true);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
+  const [hasErrors, setHasErrors] = useState(false);
 
   useEffect(() => {
     const widgetContainer = document.getElementById('bp-web-widget-container');
     if (widgetContainer) {
-      widgetContainer.style.display = sliderChecked ? 'block' : 'none'; 
+      widgetContainer.style.display = sliderChecked ? 'block' : 'none';
     }
-  
+
     if (sliderChecked) {
       const script = document.createElement("script");
       script.src = "https://cdn.botpress.cloud/webchat/v0/inject.js";
@@ -31,39 +34,30 @@ function BotpressChatbot() {
           messagingUrl: "https://messaging.botpress.cloud",
           clientId: clientId,
           botName: "Remember Prompts",
-          // Set the width of the WebChat container and layout to 100% (Full Screen)
-          containerWidth: "100%25",
-          layoutWidth: "100%25",
-          outerHeight: "50%25",
-          innerHeight: "50%25",
-          // Hide the widget and disable animations
-          hideWidget: false, // Change to false to show the widget
+          containerWidth: "100%",
+          layoutWidth: "100%",
+          outerHeight: "50%",
+          innerHeight: "50%",
+          hideWidget: false,
           disableAnimations: true,
-          // stylesheet: 'https://style-.....a.vercel.app/bot.css',
         });
         window.botpressWebChat.onEvent(() => {
           window.botpressWebChat.sendEvent({ type: "show" });
         }, ["LIFECYCLE.LOADED"]);
-        window.botpressWebChat.init({
+        window.botpressWebChat.sendEvent({
           type: "text",
           channel: "web",
           payload: {
-            // Ensure this structure matches what your Botpress bot expects
-            text: 'SET_USER_DATA', // Assuming 'text' is how you distinguish payload types in your Botpress setup
+            text: 'SET_USER_DATA',
             userData: {
               email: user.email,
               name: user.name,
             },
           },
         });
-        window.botpressWebChat.onEvent(() => {
-          setShowChatbot(false);
-        }, ["LIFECYCLE.UNLOADED"]);
 
-      
         const btnConvoAdd = document.getElementById('btn-convo-add');
         if (btnConvoAdd) {
-          console.log('button clicked');
           btnConvoAdd.addEventListener('click', () => {
             setTimeout(() => {
               window.botpressWebChat.sendPayload({
@@ -81,7 +75,7 @@ function BotpressChatbot() {
         document.body.removeChild(script);
       };
     }
-  }, [sliderChecked, user]); 
+  }, [sliderChecked, user]);
 
   useEffect(() => {
     const bpWidgetBtn = document.querySelector('.bpw-widget-btn.bpw-floating-button.bpw-anim-undefined');
@@ -96,9 +90,10 @@ function BotpressChatbot() {
       { name: 'versionChatbot', label: 'Version' },
       { name: 'prompt', label: 'Prompt' },
       { name: 'hallucinationAnswer', label: 'Hallucination Answer' },
-      { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer' },      { name: 'dataSource', label: 'Data Source' },
+      { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer' },
+      { name: 'dataSource', label: 'Data Source' },
       { name: 'justification', label: 'Reason for Hallucination (if not known then leave empty)' },
-      {name: 'privacy', label: 'Submit Report Privately? If not checked, we will assume this is a public report and will only be shown in My Reports AND all reports.', type: 'checkbox'}
+      { name: 'privacy', label: 'Submit Report Privately? If not checked, we will assume this is a public report and will only be shown in My Reports AND all reports.', type: 'checkbox' }
     ],
     copyright: [
       { name: 'chatbotPlatform', label: 'Platform' },
@@ -116,7 +111,6 @@ function BotpressChatbot() {
       { name: 'securityIncidentRisk', label: 'Security Incident Risk' },
       { name: 'dataSource', label: 'Data Source' },
       { name: 'justification', label: 'Why is this a security issue?' }
-
     ],
     memory: [
       { name: 'prompt', label: 'Prompt' },
@@ -127,12 +121,39 @@ function BotpressChatbot() {
     ]
   };
 
+  const validateInput = (value) => {
+    const patterns = {
+      sqlInjection: /(\b(SELECT|INSERT|DELETE|UPDATE|DROP|CREATE|ALTER|GRANT|REVOKE)\b|--|;|\/\*|\*\/|')/i,
+      xss: /<.*?>/g,
+    };
+
+    if (patterns.sqlInjection.test(value)) {
+      return "Potential SQL injection detected";
+    }
+
+    if (patterns.xss.test(value)) {
+      return "Potential XSS attack detected";
+    }
+
+    return null;
+  };
+
   const handleChange = (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    const sanitizedValue = DOMPurify.sanitize(value);
+    const error = validateInput(sanitizedValue);
+
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [e.target.name]: value,
+      [e.target.name]: sanitizedValue,
     }));
+
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      [e.target.name]: error,
+    }));
+
+    setHasErrors(Object.values(formErrors).some(err => err));
   };
 
   const handleChatbotToggle = () => {
@@ -175,6 +196,7 @@ function BotpressChatbot() {
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
     setFormData({}); // Reset form data when category changes
+    setFormErrors({});
   };
 
   return (
@@ -199,9 +221,9 @@ function BotpressChatbot() {
 
         {formFields[category].map(field => (
           <div key={field.name}>
-           <label>
+            <label>
               {field.label}:
-              <br></br>
+              <br />
               {field.type === 'checkbox' ? (
                 <input
                   type="checkbox"
@@ -221,11 +243,14 @@ function BotpressChatbot() {
                 />
               )}
             </label>
+            {formErrors[field.name] && (
+              <div style={{ color: 'red' }}>{formErrors[field.name]}</div>
+            )}
             <br />
           </div>
         ))}
 
-        <button type="submit">Submit</button>
+        <button type="submit" disabled={hasErrors || Object.values(formErrors).some(error => error !== null)}>Submit</button>
       </form>
       {showConfirmationModal && (
         <div className="modal">

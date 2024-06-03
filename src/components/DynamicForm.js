@@ -100,10 +100,17 @@ const DynamicForm = ({ onSave }) => {
     e.preventDefault();
     if (validateForm()) {
       setIsSubmitting(true);
+      const sanitizedDataToSubmit = {};
+      for (const key in formData) {
+        if (formData.hasOwnProperty(key)) {
+          sanitizedDataToSubmit[key] = DOMPurify.sanitize(formData[key]);
+        }
+      }
+
       const dataToSubmit = {
-        ...formData,
-        userEmail: userEmail, // Include user ID in the form data
-        category: category // Include category in the form data
+        ...sanitizedDataToSubmit,
+        userEmail: DOMPurify.sanitize(userEmail), // Include user email in the form data
+        category: DOMPurify.sanitize(category) // Include category in the form data
       };
       fetch('http://localhost:5001/insert-prompts', {
         method: 'POST',
@@ -170,7 +177,7 @@ const DynamicForm = ({ onSave }) => {
           <select name="category" value={category} onChange={handleCategoryChange}>
             <option value="hallucinations">Hallucinations</option>
             <option value="copyright">Copyright</option>
-            <option value="security">Security Issue</option>
+            <option value="security">Security Issues</option>
             <option value="memory">Memory Recall</option>
           </select>
         </label>
