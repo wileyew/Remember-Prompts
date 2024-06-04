@@ -25,6 +25,8 @@ const BotpressTable = () => {
   const [highlightedRow, setHighlightedRow] = useState(null);
   const [category, setCategory] = useState('hallucinations');
   const [userUpvotes, setUserUpvotes] = useState(new Set()); // Store IDs of upvoted rows by the user
+  const [comments, setComments] = useState({}); // Store comments for each row
+  const [username, setUsername] = useState(''); // Store the username for comments
 
   useEffect(() => {
     const fetchDataFromDatabase = async () => {
@@ -67,9 +69,6 @@ const BotpressTable = () => {
     };
 
     fetchDataFromDatabase();
-
-
-    
   }, []);
 
   useEffect(() => {
@@ -77,9 +76,7 @@ const BotpressTable = () => {
       const matchesSearchQuery = searchQuery === '' || Object.values(item).some(value =>
         (value ? value.toString().toLowerCase().includes(searchQuery.toLowerCase()) : false));
       const matchesCategory = category === 'all' || item.category === category;
-    console.log('email from auth 0 ' + JSON.stringify(user.email));
-    console.log('email from mongo backend' + JSON.stringify(item.userEmail));      
-const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' && cleanEmail(item.userEmail).includes(cleanEmail(user.email)));
+      const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' && cleanEmail(item.userEmail).includes(cleanEmail(user.email)));
       return matchesSearchQuery && matchesCategory && matchesTab;
     });
 
@@ -94,16 +91,41 @@ const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' && c
     setSearchQuery(e.target.value);
   }, []);
 
-  const handleUpvote = useCallback((id) => {
+  const handleUpvote = useCallback(async (id) => {
     if (!userUpvotes.has(id)) {
-      setUserUpvotes(new Set(userUpvotes).add(id));
-      setOriginalData(currentData =>
-        currentData.map(item =>
-          item.id === id ? { ...item, upvotes: item.upvotes + 1 } : item
-        )
-      );
+      const newUserUpvotes = new Set(userUpvotes).add(id);
+      setUserUpvotes(newUserUpvotes);
+
+      try {
+        const response = await fetch(`http://localhost:5001/upvote/${id}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userEmail: user.email }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to upvote');
+        }
+
+        setOriginalData(currentData =>
+          currentData.map(item =>
+            item.id === id ? { ...item, upvotes: item.upvotes + 1 } : item
+          )
+        );
+      } catch (error) {
+        console.error('Error upvoting:', error);
+      }
     }
-  }, [userUpvotes]);
+  }, [userUpvotes, user.email]);
+
+  const handleAddComment = useCallback((id, comment) => {
+    setComments((prevComments) => ({
+      ...prevComments,
+      [id]: [...(prevComments[id] || []), { username, comment }],
+    }));
+  }, [username]);
 
   const columns = useMemo(() => {
     const baseColumns = [
@@ -112,6 +134,23 @@ const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' && c
           <button onClick={() => handleUpvote(row.original.id)} disabled={userUpvotes.has(row.original.id)}>
             {row.values.upvotes}
           </button>
+        )
+      },
+      { Header: 'Comments', accessor: 'comments', Cell: ({ row }) => (
+          <div>
+            {comments[row.original.id] && comments[row.original.id].map((comment, index) => (
+              <div key={index}><strong>{comment.username}</strong>: {comment.comment}</div>
+            ))}
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const comment = e.target.elements.comment.value;
+              handleAddComment(row.original.id, comment);
+              e.target.reset();
+            }}>
+              <input type="text" name="comment" placeholder="Add a comment" required />
+              <button type="submit">Add</button>
+            </form>
+          </div>
         )
       }
     ];
@@ -135,7 +174,6 @@ const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' && c
         { Header: 'Infringement Prompt', accessor: 'infringementPrompt' },
         { Header: 'Copyright Answer', accessor: 'copyrightAnswer' },
         { Header: 'Data Source', accessor: 'dataSource' },
-      
       ];
       return [...baseColumns, ...hallucinationColumns];
     }
@@ -159,9 +197,8 @@ const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' && c
       return [...baseColumns, ...hallucinationColumns];
     }
 
-
     return baseColumns;
-  }, [handleUpvote, userUpvotes, category]);
+  }, [handleUpvote, userUpvotes, category, comments, handleAddComment]);
 
   const tableInstance = useTable({ columns, data: tableData });
 
@@ -180,7 +217,7 @@ const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' && c
     <div className="botpress-table-container" style={{ marginTop: '20px', maxWidth: '98%', margin: '20px auto', overflowX: 'auto' }}>
       <h2>Reported Prompts</h2>
       <div className="tab-buttons">
-        <button className={activeTab === 'allReports' ? 'active' : '' ? 'true': ''} onClick={() => setActiveTab('allReports')}>
+        <button className={activeTab === 'allReports' ? 'active' : ''} onClick={() => setActiveTab('allReports')}>
           All Public Reports
         </button>
         <button className={activeTab === 'myReports' ? 'active' : ''} onClick={() => setActiveTab('myReports')}>
@@ -198,6 +235,13 @@ const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' && c
       </div>
       <br />
       <input type="text" placeholder="Search..." value={searchQuery} onChange={handleSearchChange} />
+      <br /><br />
+      <div>
+        <label>
+          Username for Comments:
+          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Enter your username" required />
+        </label>
+      </div>
       <br /><br />
       <table {...getTableProps()}>
         <thead>
