@@ -86,37 +86,37 @@ function BotpressChatbot() {
 
   const formFields = {
     hallucinations: [
-      { name: 'chatbotPlatform', label: 'Platform' },
-      { name: 'versionChatbot', label: 'Version' },
-      { name: 'prompt', label: 'Prompt' },
-      { name: 'hallucinationAnswer', label: 'Hallucination Answer' },
-      { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer' },
-      { name: 'dataSource', label: 'Data Source' },
-      { name: 'justification', label: 'Reason for Hallucination (if not known then leave empty)' },
+      { name: 'chatbotPlatform', label: 'Platform', tooltip: 'The platform where the hallucination occurred' },
+      { name: 'versionChatbot', label: 'Version',  tooltip: 'The version of the chatbot used' },
+      { name: 'prompt', label: 'Prompt', tooltip: 'The input given to the chatbot' },
+      { name: 'hallucinationAnswer', label: 'Hallucination Answer', tooltip: 'The incorrect answer provided by the chatbot' },
+      { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer', tooltip: 'The corrected answer you suggest' },
+      { name: 'dataSource', label: 'Data Source', tooltip: 'The source of the correct data' },
+      { name: 'justification', label: 'Reason for Hallucination (if not known then leave empty)', tooltip: 'Explanation for why the hallucination occurred' },
     ],
     copyright: [
-      { name: 'chatbotPlatform', label: 'Platform' },
-      { name: 'versionChatbot', label: 'Version' },
-      { name: 'infringementPrompt', label: 'Infringement Prompt' },
-      { name: 'copyrightAnswer', label: 'Copyright Answer' },
-      { name: 'dataSource', label: 'Data Source' },
-      { name: 'justification', label: 'Reason for Copyright Infringement' }
+      { name: 'chatbotPlatform', label: 'Platform', tooltip: 'The platform where the hallucination occurred' },
+      { name: 'versionChatbot', label: 'Version', tooltip: 'The version of the chatbot used'},
+      { name: 'infringementPrompt', label: 'Infringement Prompt', tooltip: 'The input that led to copyright infringement' },
+      { name: 'copyrightAnswer', label: 'Copyright Answer', tooltip: 'The infringing content provided by the chatbot' },
+      { name: 'dataSource', label: 'Data Source', tooltip: 'The source of the original copyrighted material' },
+      { name: 'justification', label: 'Reason for Copyright Infringement', tooltip: 'Explanation for why the infringement occurred' }
     ],
     security: [
-      { name: 'chatbotPlatform', label: 'Platform' },
-      { name: 'versionChatbot', label: 'Version' },
-      { name: 'prompt', label: 'Prompt' },
-      { name: 'securityImpact', label: 'Security Impact' },
-      { name: 'securityIncidentRisk', label: 'Security Incident Risk' },
-      { name: 'dataSource', label: 'Data Source' },
-      { name: 'justification', label: 'Why is this a security issue?' }
+      { name: 'chatbotPlatform', label: 'Platform', tooltip: 'The platform where the hallucination occurred' },
+      { name: 'versionChatbot', label: 'Version',  tooltip: 'The version of the chatbot used' },
+      { name: 'prompt', label: 'Prompt', tooltip: 'The input given to the chatbot' },
+      { name: 'securityImpact', label: 'Security Impact', tooltip: 'The impact of the security issue' },
+      { name: 'securityIncidentRisk', label: 'Security Incident Risk', tooltip: 'The risk associated with the security incident' },
+      { name: 'dataSource', label: 'Data Source', tooltip: 'The source of the data involved in the security issue'  },
+      { name: 'justification', label: 'Why is this a security issue?', tooltip: 'Explanation for why this is a security issue' }
     ],
     memory: [
-      { name: 'prompt', label: 'Prompt' },
-      { name: 'chatbotPlatform', label: 'Platform' },
-      { name: 'versionChatbot', label: 'Version' },
-      { name: 'promptAnswer', label: 'Prompt Answer' },
-      { name: 'promptTrigger', label: 'Trigger for Recall' },
+      { name: 'prompt', label: 'Prompt', tooltip: 'The prompt that created the need to remember the answer'  },
+      { name: 'chatbotPlatform', label: 'Platform', tooltip: 'The platform where the hallucination occurred' },
+      { name: 'versionChatbot', label: 'Version',  tooltip: 'The version of the chatbot used' },
+      { name: 'promptAnswer', label: 'Prompt Answer', tooltip: 'The answer given by the chatbot which  needs memory recall' },
+      { name: 'promptTrigger', label: 'Trigger for Recall', tooltip: 'Think of a creative answer to help remember a fact. ' },
     ]
   };
 
@@ -202,11 +202,11 @@ function BotpressChatbot() {
     <div>
       <h1>Submit a Report</h1>
       <p>Check out the chatbot experience by clicking on the black background with white dialogue button in the bottom right corner. The chatbot is connected to ChatGPT to provide a creative memory recall trigger for prompt or prompt answers that are difficult to remember. For example, to remember George Washington as the first president, chatgpt may give a prompt trigger for washer with a ton on it! Don't want to use the chatbot? No worries, simply click the toggle below and use the form below!</p>
-      <label className={`switch ${sliderChecked ? 'active' : ''}`}>
+      {/* <label className={`switch ${sliderChecked ? 'active' : ''}`}>
         <input type="checkbox" id="btn-conversations" checked={sliderChecked} onChange={handleChatbotToggle} />
         <span className="slider round"></span>
       </label>
-      {sliderChecked}
+      {sliderChecked} */}
       <form onSubmit={handleSubmit}>
         <label>
           Category:
@@ -220,7 +220,7 @@ function BotpressChatbot() {
 
         {formFields[category].map(field => (
           <div key={field.name}>
-            <label>
+            <label title={field.tooltip}>
               {field.label}:
               <br />
               {field.type === 'checkbox' ? (

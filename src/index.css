@@ -236,4 +236,13 @@ input:checked + .slider:before {
 .modal-content p {
   margin-bottom: 10px;
 }
+label[title]:hover:after {
+  content: attr(title);
+  padding: 4px 8px;
+  background-color: #333;
+  color: white;
+  border-radius: 4px;
+  position: absolute;
+  z-index: 1;
+}
 

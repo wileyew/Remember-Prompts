@@ -137,7 +137,7 @@ const DynamicForm = ({ onSave }) => {
   // Define form fields for each category
   const formFields = {
     hallucinations: [
-      { name: 'prompt', label: 'Prompt', type: 'textarea' },
+      { name: 'prompt', label: 'Prompt', type: 'textarea', tooltip: 'The platform where the hallucination occurred' },
       { name: 'hallucinationAnswer', label: 'Hallucination Answer', type: 'textarea' },
       { name: 'versionChatbotHallucinationAnswer', label: 'Version', type: 'textarea' },
       { name: 'chatbotPlatform', label: 'Platform', type: 'textarea' },
