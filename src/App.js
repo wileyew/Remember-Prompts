@@ -4,6 +4,7 @@ import { Container } from "reactstrap";
 import { useAuth0 } from "@auth0/auth0-react";
 import history from "./utils/history";
 import Loading from "./components/Loading";
+import Tutorials from "./components/Tutorials";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import Chatbot from "./components/BotpressChatbot";
@@ -73,6 +74,7 @@ const App = () => {
             <Route path="/external-api" component={ExternalApi} />
             <Route path="/remember-prompts" render={() => <Chatbot user={user} />} />
             <Route path="/reported-prompts" component={PublicReportedIssuesAndRememberTriggers} />
+            <Route path="/tutorials" component={Tutorials} />
             <Route path="/insert-prompts" component={BotpressChatbot} />
             <Route path="/conversations" component={ButtonComponent} />
           </Switch>
