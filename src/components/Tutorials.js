@@ -9,13 +9,22 @@ const tutorials = [
         title: 'Introduction to AI Hallucinations',
         content: `
           <h2>Definition</h2>
-          <br></br>
-          <p>Explain that AI hallucinations occur when an AI generates content that is not grounded in the provided data or real-world knowledge.</p>
-          <br></br>
+          <p>AI hallucinations occur when an AI model generates outputs (text, images, etc.) that are factually incorrect, nonsensical, or deviate from reality. This is not due to intentional errors, but rather limitations in the AI's training data, understanding of context, or the inherent complexity of the task.</p>
+          
           <h2>Examples</h2>
-          <br></br>
-          <p>Provide examples of AI hallucinations, such as incorrect responses in chatbots or fabricated content in text generation.</p>
-          <br></br>
+          <ul>
+            <li>A chatbot confidently asserting historical events that never happened.</li>
+            <li>A language model generating a story with characters performing physically impossible actions.</li>
+            <li>An image generation tool creating pictures with objects distorted or misrepresented.</li>
+          </ul>
+          
+          <h2>Why It Happens</h2>
+          <p>Hallucinations can arise due to various factors:</p>
+          <ul>
+            <li>Insufficient or biased training data.</li>
+            <li>The AI's attempt to fill in gaps in knowledge with plausible-sounding but incorrect information.</li>
+            <li>Complexity of the task, especially in areas with limited training data or ambiguous scenarios.</li>
+          </ul>
           <h2>Resources</h2>
           <br></br>
           <ul>
@@ -78,11 +87,15 @@ const tutorials = [
       {
         title: 'Introduction to Copyright and AI',
         content: `
-          <h2>Definition</h2>
-          <br></br>
-          <p>Explain copyright law and its implications for generative AI.</p>
-          <br></br>
-          <h2>Examples</h2>
+        <h2>Definition</h2>
+        <p>Copyright law protects original works of authorship, including text, images, music, and code. AI systems, especially generative models, can create content that may infringe upon existing copyrights if they reproduce or substantially copy protected works without permission.</p>
+        
+        <h2>Examples</h2>
+        <ul>
+          <li>An AI image generator producing art that closely resembles a copyrighted painting.</li>
+          <li>An AI-powered writing tool generating text plagiarized from a copyrighted book.</li>
+          <li>An AI music composer creating melodies that are strikingly similar to copyrighted songs.</li>
+        </ul>
           <br></br>
           <p>Provide instances where AI-generated content has led to copyright disputes.</p>
           <br></br>
@@ -147,11 +160,15 @@ const tutorials = [
       {
         title: 'Introduction to Security in AI',
         content: `
-          <h2>Definition</h2>
-          <br></br>
-          <p>Explain the importance of security in AI systems.</p>
-          <br></br>
-          <h2>Examples</h2>
+        <h2>Definition</h2>
+          <p>AI security involves protecting AI systems from vulnerabilities and threats that could compromise their integrity, confidentiality, or availability. This includes safeguarding training data, models, and the infrastructure used to run AI applications.</p>
+          
+          <h2>Examples of Security Incidents</h2>
+          <ul>
+            <li>Data poisoning: Malicious actors intentionally introducing corrupted data into the training set to manipulate the AI's behavior.</li>
+            <li>Adversarial attacks: Crafting inputs designed to deceive AI models and cause them to make incorrect predictions or classifications.</li>
+            <li>Model theft: Unauthorized access and theft of proprietary AI models.</li>
+          </ul>
           <br></br>
           <p>Discuss various security incidents involving AI, such as data breaches and adversarial attacks.</p>
           <br></br>
@@ -209,7 +226,56 @@ const tutorials = [
         `
       }
     ]
-  }
+  },
+  {
+    title: 'Identifying and Addressing Toxicity in AI',
+    lessons: [
+      {
+        title: 'Introduction to Toxicity in AI',
+        content: `
+          <h2>Definition</h2>
+          <br></br>
+          <p>Explain that AI toxicity refers to the generation of harmful, biased, or discriminatory content by AI systems. It's a critical issue with potential negative consequences.</p>
+          <br></br>
+          <h2>Examples</h2>
+          <br></br>
+          <p>Provide examples of AI-generated toxic content, such as hate speech, offensive language, or biased recommendations.</p>
+          <br></br>
+          <h2>Resources</h2>
+          <br></br>
+          <ul>
+            <li><a href="https://www.partnershiponai.org/wp-content/uploads/2023/01/Partnership-on-AI-The-State-of-AI-Ethics-Report-January-2023.pdf">The State of AI Ethics Report</a></li>
+            <li><a href="https://openai.com/blog/our-approach-to-safety/">OpenAI's Approach to Safety</a></li>
+          </ul>
+        `
+      },
+      {
+        title: 'Identifying Toxic Content',
+        content: `
+          <h2>Techniques</h2>
+          <br></br>
+          <ul>
+            <li><strong>Content Filtering</strong>: Use keyword lists, regular expressions, or machine learning classifiers to detect harmful content.</li>
+            <li><strong>Toxicity Models</strong>: Employ pre-trained or custom-built models to assess the toxicity level of generated text.</li>
+          </ul>
+        `
+      },
+      {
+        title: 'Mitigating and Addressing Toxicity',
+        content: `
+          <h2>Approaches</h2>
+          <br></br>
+          <ul>
+            <li><strong>Training Data Bias Mitigation</strong>: Carefully curate training data to remove biases and harmful content.</li>
+            <li><strong>Debiasing Techniques</strong>: Apply techniques to debias AI models and reduce their propensity to generate toxic output.</li>
+            <li><strong>Toxicity Mitigation Models</strong>: Develop models specifically for identifying and filtering toxic content.</li>
+            <li><strong>User Feedback and Reporting</strong>: Establish mechanisms for users to report toxic content and provide feedback.</li>
+          </ul>
+        `
+      }
+    ]
+  } 
+
 ];
 const Tutorials = () => {
     const [selectedTutorial, setSelectedTutorial] = useState('');

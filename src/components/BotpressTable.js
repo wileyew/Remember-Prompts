@@ -179,7 +179,7 @@ const BotpressTable = () => {
     }
 
     if (category === 'security') {
-      const hallucinationColumns = [
+      const securityColumns = [
         { Header: 'Prompt', accessor: 'prompt' },
         { Header: 'Security Impact', accessor: 'securityImpact' },
         { Header: 'Security Incident Risk', accessor: 'securityIncidentRisk' },
@@ -187,14 +187,26 @@ const BotpressTable = () => {
         { Header: 'Platform', accessor: 'chatbotPlatform' },
         { Header: 'Keyword Search', accessor: 'keywordSearch' },
       ];
-      return [...baseColumns, ...hallucinationColumns];
+      return [...baseColumns, ...securityColumns];
     }
+
+if (category === 'other') {
+  const otherColumns = [
+   { Header: 'Prompt', accessor: 'prompt' },
+    { Header: 'Platform', accessor: 'chatbotPlatform' },
+    { Header: 'Version', accessor: 'versionChatbot' },
+    { Header: 'Answer', accessor: 'promptAnswer'},
+    { Header: 'Explanation', accessor: 'other'},
+  ];
+  return [...baseColumns, ...otherColumns];
+}
+
     if (category === 'memory') {
-      const hallucinationColumns = [
+      const memoryColumns = [
         { Header: 'Prompt', accessor: 'prompt' },
         { Header: 'Trigger for Recall', accessor: 'prompt_record' },
       ];
-      return [...baseColumns, ...hallucinationColumns];
+      return [...baseColumns, ...memoryColumns];
     }
 
     return baseColumns;
@@ -231,6 +243,7 @@ const BotpressTable = () => {
           <option value="copyright">Copyright</option>
           <option value="security">Security Issues</option>
           <option value="memory">Memory Recall</option>
+          <option value="other">Other</option>
         </select>
       </div>
       <br />

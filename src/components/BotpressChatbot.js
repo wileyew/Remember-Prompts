@@ -93,6 +93,7 @@ function BotpressChatbot() {
       { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer', tooltip: 'The corrected answer you suggest' },
       { name: 'dataSource', label: 'Data Source', tooltip: 'The source of the correct data' },
       { name: 'justification', label: 'Reason for Hallucination (if not known then leave empty)', tooltip: 'Explanation for why the hallucination occurred' },
+      { name: 'toxicity', label: 'Was this a toxic hallucination? If not leave blank.', tooltip: 'Give a brief explanation of why this is a toxic response, which can contain comments or messages that contain harmful, offensive, or inappropriate content. These can include harassment, insults, or any language that could make others feel unwelcome or unsafe (otherwise leave blank.)'},
     ],
     copyright: [
       { name: 'chatbotPlatform', label: 'Platform', tooltip: 'The platform where the hallucination occurred' },
@@ -117,6 +118,13 @@ function BotpressChatbot() {
       { name: 'versionChatbot', label: 'Version',  tooltip: 'The version of the chatbot used' },
       { name: 'promptAnswer', label: 'Prompt Answer', tooltip: 'The answer given by the chatbot which  needs memory recall' },
       { name: 'promptTrigger', label: 'Trigger for Recall', tooltip: 'Think of a creative answer to help remember a fact. ' },
+    ],
+    other: [
+      { name: 'prompt', label: 'Prompt', tooltip: 'The prompt that created the need to remember the answer'  },
+      { name: 'chatbotPlatform', label: 'Platform', tooltip: 'The platform where the hallucination occurred' },
+      { name: 'versionChatbot', label: 'Version',  tooltip: 'The version of the chatbot used' },
+      { name: 'promptAnswer', label: 'Prompt Answer', tooltip: 'The answer given by the chatbot which  needs memory recall' },
+      { name: 'other', label: 'Give a brief explanation of the issue faced.', tooltip: 'Give a brief explanation of the issue faced. This will help us understand why this does not fit into the any other category.' },
     ]
   };
 
@@ -147,12 +155,7 @@ function BotpressChatbot() {
       [e.target.name]: sanitizedValue,
     }));
 
-    setFormErrors((prevErrors) => ({
-      ...prevErrors,
-      [e.target.name]: error,
-    }));
-
-    setHasErrors(Object.values(formErrors).some(err => err));
+    
   };
 
   const handleChatbotToggle = () => {
@@ -166,12 +169,18 @@ function BotpressChatbot() {
 
   const handleConfirmSubmit = async () => {
     try {
+       // Sanitize the entire formData object before sending
+       const sanitizedFormData = {};
+       for (const key in formData) {
+         sanitizedFormData[key] = DOMPurify.sanitize(formData[key]);
+       }
       const response = await fetch('http://localhost:5001/insert-prompts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          ...sanitizedFormData,
           ...formData,
           category,
           userEmail: user.email,
@@ -215,6 +224,7 @@ function BotpressChatbot() {
             <option value="copyright">Copyright</option>
             <option value="security">Security Issues</option>
             <option value="memory">Memory Recall</option>
+            <option value="other">Other</option>
           </select>
         </label>
 
@@ -249,7 +259,7 @@ function BotpressChatbot() {
           </div>
         ))}
 
-        <button type="submit" disabled={hasErrors || Object.values(formErrors).some(error => error !== null)}>Submit</button>
+        <button type="submit">Submit</button>
       </form>
       {showConfirmationModal && (
         <div className="modal">
