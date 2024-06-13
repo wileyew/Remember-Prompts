@@ -16,6 +16,8 @@ function BotpressChatbot() {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [hasErrors, setHasErrors] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // New state for success modal
+  const [requestCertificate, setRequestCertificate] = useState(false);
 
   useEffect(() => {
     const widgetContainer = document.getElementById('bp-web-widget-container');
@@ -188,6 +190,8 @@ function BotpressChatbot() {
       });
       if (response.ok) {
         console.log("Form submitted successfully");
+        setShowConfirmationModal(false); // Close confirmation modal
+        setShowSuccessModal(true);
       } else {
         console.error("Form submission failed with status: ", response.status);
       }
@@ -199,6 +203,9 @@ function BotpressChatbot() {
 
   const handleCancelSubmit = () => {
     setShowConfirmationModal(false);
+  };
+  const handleCertificateChange = (e) => {
+    setRequestCertificate(e.target.checked);
   };
 
   const handleCategoryChange = (e) => {
@@ -269,7 +276,25 @@ function BotpressChatbot() {
             <button onClick={handleCancelSubmit}>Cancel</button>
           </div>
         </div>
-      )}
+        )}
+         {showSuccessModal && (
+          <div className="modal">
+            <div className="modal-content">
+              <p>Form submitted successfully!</p>
+              <p>Would you like to request a certificate of completion?</p>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={requestCertificate}
+                  onChange={handleCertificateChange}
+                />
+                Request Certificate
+              </label>
+              <br />
+              <button disabled={!requestCertificate}>Download Certificate</button>  {/* Disable button if not checked */}
+            </div>
+          </div>
+          )}
     </div>
   );
 }
