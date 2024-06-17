@@ -91,24 +91,31 @@ const BotpressTable = () => {
     setSearchQuery(e.target.value);
   }, []);
 
-  const handleUpvote = useCallback(async (id) => {
+  const handleUpvote = useCallback(async (id, row) => {
     if (!userUpvotes.has(id)) {
       const newUserUpvotes = new Set(userUpvotes).add(id);
       setUserUpvotes(newUserUpvotes);
-
+      console.log('email for user ' + user.email);
+      console.log('prompt ' + row.prompt);
+      console.log('updated prompt answer' + row.updatedPromptAnswer);
+  
       try {
         const response = await fetch(`http://localhost:5001/upvote/${id}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ userEmail: user.email }),
+          body: JSON.stringify({
+            userEmail: user.email,
+            prompt: row.prompt,
+            updatedPromptAnswer: row.updatedPromptAnswer,
+          }),
         });
-
+  
         if (!response.ok) {
           throw new Error('Failed to upvote');
         }
-
+  
         setOriginalData(currentData =>
           currentData.map(item =>
             item.id === id ? { ...item, upvotes: item.upvotes + 1 } : item
@@ -119,6 +126,7 @@ const BotpressTable = () => {
       }
     }
   }, [userUpvotes, user.email]);
+  
 
   const handleAddComment = useCallback((id, comment) => {
     setComments((prevComments) => ({
@@ -131,7 +139,7 @@ const BotpressTable = () => {
     const baseColumns = [
       { Header: 'Category', accessor: 'category' },
       { Header: 'Upvotes', accessor: 'upvotes', Cell: ({ row }) => (
-          <button onClick={() => handleUpvote(row.original.id)} disabled={userUpvotes.has(row.original.id)}>
+          <button onClick={() => handleUpvote(row.original.id, row)} disabled={userUpvotes.has(row.original.id)}>
             {row.values.upvotes}
           </button>
         )
