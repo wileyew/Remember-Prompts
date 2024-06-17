@@ -79,22 +79,26 @@ app.post("/insert-prompts", async (req, res) => {
 
 // Update upvotes for a prompt
 app.post('/upvote/:id', async (req, res) => {
+  const { userId, category, ...fields } = req.body;
+  const document = Object.fromEntries(
+    Object.entries(fields).map(([key, value]) => [key, sanitizeInput(value)])
+  );
+
+  document.userId = sanitizeInput(userId);
+  document.category = sanitizeInput(category);
   const id = req.params.id;
   const config = {
     method: 'post',
-    url: 'https://data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/insertOne',
+    url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/insertOne',
     headers: {
       'Content-Type': 'application/json',
-      'api-key': 'jXaRAPSi1pp3XxskWF07QA3zmPkDjWudFTl5OrXzytL8ZqtRoSxU6IPWYXby4Xfn'
+      'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
     },
     data: JSON.stringify({
       collection: 'prompts',
       database: 'userprompts',
       dataSource: 'RememberPrompt',
-      filter: { _id: id },
-      update: {
-        $inc: { upvotes: 1 } // Increment upvotes by 1
-      }
+      document: document
     })
   };
 
