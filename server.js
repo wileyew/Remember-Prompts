@@ -19,7 +19,7 @@ const sanitizeInput = (input) => {
   return String(input).replace(/</g, '&lt;').replace(/>/g, '&gt;');
 };
 
-// Fetch prompts from MongoDB
+// Fetch prompts from MongoDB with updated upvotes
 app.get("/reported-prompts", async (req, res) => {
   try {
     const response = await axios({
@@ -43,19 +43,18 @@ app.get("/reported-prompts", async (req, res) => {
   }
 });
 
+
+
 // Insert new prompts
-app.post("/insert-prompts", async (req, res) => {
-  const { userId, category, ...fields } = req.body;
-  const document = Object.fromEntries(
-    Object.entries(fields).map(([key, value]) => [key, sanitizeInput(value)])
-  );
+app.post("/upvote-prompt", async (req, res) => {
 
-  document.userId = sanitizeInput(userId);
-  document.category = sanitizeInput(category);
-
+  //convert 
+  console.log ('request details' + JSON.stringify(req.body ));
+  const { promptId } = req.body;  // Assuming the client sends `promptId` that needs the upvote
+  const promptIdInt = Number(promptId);
   const config = {
     method: 'post',
-    url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/insertOne',
+    url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/updateOne',
     headers: {
       'Content-Type': 'application/json',
       'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
@@ -64,32 +63,34 @@ app.post("/insert-prompts", async (req, res) => {
       collection: 'prompts',
       database: 'userprompts',
       dataSource: 'RememberPrompt',
-      document: document
+      filter: { _id: promptIdInt },  // Filter document by `id`
+      update: {
+        $inc: { upvotes: 1 }  // Increment `upvotes` by 1
+      }
     })
   };
 
   try {
     const response = await axios(config);
-    res.json(response.data);
+    if (response.data.matchedCount === 0) {
+      return res.status(404).send('Prompt not found');
+    }
+    res.json({ message: "Upvote successful", updatedCount: response.data.modifiedCount });
   } catch (error) {
     console.error('Error when calling MongoDB API:', error);
     res.status(500).send('Internal Server Error');
   }
 });
 
+
 // Update upvotes for a prompt
 app.post('/upvote/:id', async (req, res) => {
-  const { userId, category, ...fields } = req.body;
-  const document = Object.fromEntries(
-    Object.entries(fields).map(([key, value]) => [key, sanitizeInput(value)])
-  );
+  console.log('request details' + JSON.stringify(req.body));
+  const { promptId } = req.body;  // Assuming the client sends `promptId` that needs the upvote
 
-  document.userId = sanitizeInput(userId);
-  document.category = sanitizeInput(category);
-  const id = req.params.id;
   const config = {
     method: 'post',
-    url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/insertOne',
+    url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/updateOne',
     headers: {
       'Content-Type': 'application/json',
       'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
@@ -98,17 +99,19 @@ app.post('/upvote/:id', async (req, res) => {
       collection: 'prompts',
       database: 'userprompts',
       dataSource: 'RememberPrompt',
-      document: document
+      filter: { _id: promptId },  // Ensure this ID is correctly formatted if necessary
+      update: {
+        $inc: { upvotes: 1 }  // Increment `upvotes` by 1
+      }
     })
   };
 
   try {
     const response = await axios(config);
-    if (response.data.modifiedCount === 0) {
-      res.status(404).json({ success: false, message: 'No document found with the given ID' });
-    } else {
-      res.json({ success: true, message: 'Upvote successfully incremented', data: response.data });
+    if (response.data.matchedCount === 0) {
+      return res.status(404).send('Prompt not found');
     }
+    res.json({ message: "Upvote successful", updatedCount: response.data.modifiedCount });
   } catch (error) {
     console.error('Error when calling MongoDB API:', error);
     res.status(500).send('Internal Server Error');

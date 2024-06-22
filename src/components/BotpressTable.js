@@ -58,8 +58,9 @@ const BotpressTable = () => {
           privacyRequested: removeQuotesAndSlashes(data.privacyRequested),
           category: removeQuotesAndSlashes(data.category || '').toLowerCase(),
           upvotes: data.upvotes || 0,
-          id: data.id  // assuming each data entry has a unique identifier
+          id: data._id  // assuming each data entry has a unique identifier
         }));
+        setTableData(transformedData);
         setOriginalData(transformedData);
       } catch (error) {
         setError(error.message);
@@ -90,42 +91,82 @@ const BotpressTable = () => {
   const handleSearchChange = useCallback((e) => {
     setSearchQuery(e.target.value);
   }, []);
-
-  const handleUpvote = useCallback(async (id, row) => {
-    if (!userUpvotes.has(id)) {
-      const newUserUpvotes = new Set(userUpvotes).add(id);
-      setUserUpvotes(newUserUpvotes);
-      console.log('email for user ' + user.email);
-      console.log('prompt ' + row.prompt);
-      console.log('updated prompt answer' + row.updatedPromptAnswer);
+  function getCircularReplacer() {
+    const seen = new WeakSet();
+    return (key, value) => {
+      if (typeof value === "object" && value !== null) {
+        if (seen.has(value)) {
+          return; // If circular reference is detected, return undefined or some other value
+        }
+        seen.add(value);
+      }
+      return value;
+    };
+  }
   
+  // Use the replacer function with JSON.stringify
+  const safeStringify = (obj) => {
+    try {
+      return JSON.stringify(obj, getCircularReplacer());
+    } catch (error) {
+      console.error("Failed to stringify object:", error);
+      return '{}'; // Return a default object if stringification fails
+    }
+  };
+  
+  
+
+  const handleUpvote = useCallback(async (id) => {  
+    if (!userUpvotes.has(id)) {
+      setUserUpvotes(prevUpvotes => new Set(prevUpvotes).add(id));
+
+      // Find the correct row based on the id (not index)
+      const rowToUpdate = originalData.find(item => item.id === id);
+      console.log('row to update ' + JSON.stringify(id));
+      if (!rowToUpdate) {
+        console.error("Error: Row not found for upvote");
+        return; 
+      }
+
+      const payload = {
+        userEmail: user.email,
+        id: id,
+        upvotes: rowToUpdate.upvotes + 1, // Increment upvotes immediately 
+      };
+
       try {
         const response = await fetch(`http://localhost:5001/upvote/${id}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            userEmail: user.email,
-            prompt: row.prompt,
-            updatedPromptAnswer: row.updatedPromptAnswer,
-          }),
+          body: JSON.stringify(payload),
         });
-  
+
         if (!response.ok) {
           throw new Error('Failed to upvote');
         }
-  
-        setOriginalData(currentData =>
-          currentData.map(item =>
-            item.id === id ? { ...item, upvotes: item.upvotes + 1 } : item
-          )
-        );
+
+        // Optimistically update the tableData and originalData
+        setTableData(prevData => prevData.map(item => 
+          item.id === id ? { ...item, upvotes: payload.upvotes } : item
+        ));
+        setOriginalData(prevData => prevData.map(item =>
+          item.id === id ? { ...item, upvotes: payload.upvotes } : item
+        ));
+
       } catch (error) {
         console.error('Error upvoting:', error);
+        // Handle the error (e.g., revert the upvote in the UI)
       }
     }
-  }, [userUpvotes, user.email]);
+  }, [userUpvotes, user.email, originalData]); 
+  
+  
+  
+
+  
+  
   
 
   const handleAddComment = useCallback((id, comment) => {
@@ -138,12 +179,12 @@ const BotpressTable = () => {
   const columns = useMemo(() => {
     const baseColumns = [
       { Header: 'Category', accessor: 'category' },
-      { Header: 'Upvotes', accessor: 'upvotes', Cell: ({ row }) => (
-          <button onClick={() => handleUpvote(row.original.id, row)} disabled={userUpvotes.has(row.original.id)}>
-            {row.values.upvotes}
-          </button>
-        )
-      },
+      { Header: 'Upvotes', accessor: 'upvotes', Cell: ({ row }) => ( 
+        <button onClick={() => handleUpvote(row.original.id)} disabled={userUpvotes.has(row.original.id)}>
+          {row.values.upvotes}
+        </button>
+      )},
+      
       { Header: 'Comments', accessor: 'comments', Cell: ({ row }) => (
           <div>
             {comments[row.original.id] && comments[row.original.id].map((comment, index) => (
