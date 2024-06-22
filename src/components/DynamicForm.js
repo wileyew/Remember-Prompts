@@ -106,10 +106,19 @@ const DynamicForm = ({ onSave }) => {
           sanitizedDataToSubmit[key] = DOMPurify.sanitize(formData[key]);
         }
       }
+      // Add the upvotes field with a value of 0
+      sanitizedDataToSubmit.upvotes = 0;
+      sanitizedDataToSubmit.comments = "";
+
+
+    
+
 
       const dataToSubmit = {
         ...sanitizedDataToSubmit,
         userEmail: DOMPurify.sanitize(userEmail), // Include user email in the form data
+        upvotes: upvotes,
+        comments: comments, 
         category: DOMPurify.sanitize(category) // Include category in the form data
       };
       fetch('http://localhost:5001/insert-prompts', {
@@ -144,11 +153,19 @@ const DynamicForm = ({ onSave }) => {
       { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer', type: 'textarea' },
       { name: 'promptTrigger', label: 'Trigger', type: 'textarea' },
       { name: 'keywordSearch', label: 'Keyword Search', type: 'textarea' },
+      {name: 'upvotes', label: 'Allow for upvotes?', type:'checkbox' },
+      {name: 'downvotes', label: 'Allow for downvotes?', type:'checkbox' },
+      {name: 'comments', label: 'Allow for comments?', type:'checkbox' }
+
     ],
     copyright: [
       { name: 'infringementPrompt', label: 'Infringement Prompt', type: 'textarea' },
+      {name: 'platform', label: 'Platform', type:'textarea' },
       { name: 'copyrightAnswer', label: 'Copyright Answer', type: 'textarea' },
       { name: 'dataSource', label: 'Data Source', type: 'textarea' },
+      {name: 'upvotes', label: 'Allow for upvotes?', type:'checkbox' },
+      {name: 'downvotes', label: 'Allow for downvotes?', type:'checkbox' },
+      {name: 'comments', label: 'Allow for comments?', type:'checkbox' }
     ],
     security: [
       { name: 'prompt', label: 'Prompt', type: 'textarea' },
@@ -157,10 +174,18 @@ const DynamicForm = ({ onSave }) => {
       { name: 'dataSourceSecurity', label: 'Data Source', type: 'textarea' },
       { name: 'chatbotPlatform', label: 'Platform', type: 'textarea' },
       { name: 'keywordSearch', label: 'Keyword Search', type: 'textarea' },
+      {name: 'upvotes', label: 'Allow for upvotes?', type:'checkbox' },
+      {name: 'downvotes', label: 'Allow for downvotes?', type:'checkbox' },
+      {name: 'comments', label: 'Allow for comments?', type:'checkbox' }
     ],
     memory: [
       { name: 'prompt', label: 'Prompt', type: 'textarea' },
       { name: 'promptTrigger', label: 'Trigger for Recall', type: 'textarea' },
+      {name: 'upvotes', label: 'Allow for upvotes?', type:'checkbox' },
+      {name: 'upvotes', label: 'Allow for upvotes?', type:'checkbox' },
+      {name: 'downvotes', label: 'Allow for downvotes?', type:'checkbox' },
+      {name: 'comments', label: 'Allow for comments?', type:'checkbox' }
+
     ],
   };
 

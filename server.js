@@ -43,6 +43,38 @@ app.get("/reported-prompts", async (req, res) => {
   }
 });
 
+app.post("/insert-prompts", async (req, res) => {
+  const { userId, category, upvotes, downvotes, comments, ...fields } = req.body;
+  const document = Object.fromEntries(
+    Object.entries(fields).map(([key, value]) => [key, sanitizeInput(value)])
+  );
+
+  document.userId = sanitizeInput(userId);
+  document.category = sanitizeInput(category);
+
+  const config = {
+    method: 'post',
+    url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/insertOne',
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
+    },
+    data: JSON.stringify({
+      collection: 'prompts',
+      database: 'userprompts',
+      dataSource: 'RememberPrompt',
+      document: document
+    })
+  };
+  try {
+    const response = await axios(config);
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error when calling MongoDB API:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 
 // Insert new prompts
