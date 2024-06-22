@@ -182,7 +182,6 @@ const DynamicForm = ({ onSave }) => {
       { name: 'prompt', label: 'Prompt', type: 'textarea' },
       { name: 'promptTrigger', label: 'Trigger for Recall', type: 'textarea' },
       {name: 'upvotes', label: 'Allow for upvotes?', type:'checkbox' },
-      {name: 'upvotes', label: 'Allow for upvotes?', type:'checkbox' },
       {name: 'downvotes', label: 'Allow for downvotes?', type:'checkbox' },
       {name: 'comments', label: 'Allow for comments?', type:'checkbox' }
 
@@ -210,28 +209,39 @@ const DynamicForm = ({ onSave }) => {
         {formFields[category].map((field) => (
           <div key={field.name}>
             <label>
-              {field.label}:
-              {field.type === 'textarea' ? (
-                <textarea
+            {field.label}:
+              {field.type === 'checkbox' ? (
+                <input
+                  type={field.type} // Set the type to "checkbox"
                   name={field.name}
-                  value={formData[field.name] || ''}
+                  checked={formData[field.name] || false} // Set checked state based on formData
                   onChange={handleChange}
-                  rows="4"
-                  cols="50"
-                  style={{ whiteSpace: 'pre-wrap' }}
                 />
               ) : (
-                <input
-                  type="text"
-                  name={field.name}
-                  value={formData[field.name] || ''}
-                  onChange={handleChange}
-                />
+                field.type === 'textarea' ? (
+                  <textarea
+                    name={field.name}
+                    value={formData[field.name] || ''}
+                    onChange={handleChange}
+                    rows="4"
+                    cols="50"
+                    style={{ whiteSpace: 'pre-wrap' }}
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    name={field.name}
+                    value={formData[field.name] || ''}
+                    onChange={handleChange}
+                  />
+                )
               )}
             </label>
             {formErrors[field.name] && <div style={{ color: 'red' }}>{formErrors[field.name]}</div>}
           </div>
+          
         ))}
+       
 
         <button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Submitting...' : 'Submit'}

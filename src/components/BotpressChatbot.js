@@ -96,6 +96,9 @@ function BotpressChatbot() {
       { name: 'dataSource', label: 'Data Source', tooltip: 'The source of the correct data' },
       { name: 'justification', label: 'Reason for Hallucination (if not known then leave empty)', tooltip: 'Explanation for why the hallucination occurred' },
       { name: 'toxicity', label: 'Was this a toxic hallucination? If not leave blank.', tooltip: 'Give a brief explanation of why this is a toxic response, which can contain comments or messages that contain harmful, offensive, or inappropriate content. These can include harassment, insults, or any language that could make others feel unwelcome or unsafe (otherwise leave blank.)'},
+      {name: 'upvotes', label: 'Allow for upvotes?', type:'checkbox' },
+      {name: 'downvotes', label: 'Allow for downvotes?', type:'checkbox' },
+      {name: 'comments', label: 'Allow for comments?', type:'checkbox' }
     ],
     copyright: [
       { name: 'chatbotPlatform', label: 'Platform', tooltip: 'The platform where the hallucination occurred' },
