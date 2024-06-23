@@ -9,6 +9,7 @@ const clientId = botpress.clientId;// Destructuring for easier access
 
 function BotpressChatbot() {
   const { user } = useAuth0();
+  const [processedFormData, setProcessedFormData] = useState({}); // New state for processed form data
   const [showChatbot, setShowChatbot] = useState(true);
   const [formData, setFormData] = useState({});
   const [category, setCategory] = useState('hallucinations');
@@ -161,9 +162,9 @@ function BotpressChatbot() {
       { name: 'dataSource', label: 'Data Source', tooltip: 'The source of the correct data' },
       { name: 'justification', label: 'Reason for Hallucination (if not known then leave empty)', tooltip: 'Explanation for why the hallucination occurred' },
       { name: 'toxicity', label: 'Was this a toxic hallucination (if not leave blank)? ', tooltip: 'Give a brief explanation of why this is a toxic response, which can contain comments or messages that contain harmful, offensive, or inappropriate content. These can include harassment, insults, or any language that could make others feel unwelcome or unsafe (otherwise leave blank.)'},
-      {name: 'upvotes', label: 'Allow for upvotes?', type:'checkbox' },
-      {name: 'downvotes', label: 'Allow for downvotes?', type:'checkbox' },
-      {name: 'comments', label: 'Allow for comments?', type:'checkbox' }
+      {name: 'upvotes', label: 'Allow for upvotes by other users?', type:'checkbox' },
+      {name: 'downvotes', label: 'Allow for downvotes by other users?', type:'checkbox' },
+      {name: 'comments', label: 'Allow for comments by other users?', type:'checkbox' }
     ],
     copyright: [
       { name: 'chatbotPlatform', label: 'Platform', tooltip: 'The platform where the hallucination occurred' },
@@ -171,7 +172,10 @@ function BotpressChatbot() {
       { name: 'infringementPrompt', label: 'Infringement Prompt', tooltip: 'The input that led to copyright infringement' },
       { name: 'copyrightAnswer', label: 'Copyright Answer', tooltip: 'The infringing content provided by the chatbot' },
       { name: 'dataSource', label: 'Data Source', tooltip: 'The source of the original copyrighted material' },
-      { name: 'justification', label: 'Reason for Copyright Infringement', tooltip: 'Explanation for why the infringement occurred' }
+      { name: 'justification', label: 'Reason for Copyright Infringement', tooltip: 'Explanation for why the infringement occurred' },
+      {name: 'upvotes', label: 'Allow for upvotes by other users?', type:'checkbox' },
+      {name: 'downvotes', label: 'Allow for downvotes by other users?', type:'checkbox' },
+      {name: 'comments', label: 'Allow for comments by other users?', type:'checkbox' }
     ],
     security: [
       { name: 'chatbotPlatform', label: 'Platform', tooltip: 'The platform where the hallucination occurred' },
@@ -180,7 +184,10 @@ function BotpressChatbot() {
       { name: 'securityImpact', label: 'Security Impact', tooltip: 'The impact of the security issue' },
       { name: 'securityIncidentRisk', label: 'Security Incident Risk', tooltip: 'The risk associated with the security incident' },
       { name: 'dataSource', label: 'Data Source', tooltip: 'The source of the data involved in the security issue'  },
-      { name: 'justification', label: 'Why is this a security issue?', tooltip: 'Explanation for why this is a security issue' }
+      { name: 'justification', label: 'Why is this a security issue?', tooltip: 'Explanation for why this is a security issue' },
+      {name: 'upvotes', label: 'Allow for upvotes by other users?', type:'checkbox' },
+      {name: 'downvotes', label: 'Allow for downvotes by other users?', type:'checkbox' },
+      {name: 'comments', label: 'Allow for comments by other users?', type:'checkbox' }
     ],
     memory: [
       { name: 'prompt', label: 'Prompt', tooltip: 'The prompt that created the need to remember the answer'  },
@@ -188,6 +195,9 @@ function BotpressChatbot() {
       { name: 'versionChatbot', label: 'Version',  tooltip: 'The version of the chatbot used' },
       { name: 'promptAnswer', label: 'Prompt Answer', tooltip: 'The answer given by the chatbot which  needs memory recall' },
       { name: 'promptTrigger', label: 'Trigger for Recall', tooltip: 'Think of a creative answer to help remember a fact. ' },
+      {name: 'upvotes', label: 'Allow for upvotes by other users?', type:'checkbox' },
+      {name: 'downvotes', label: 'Allow for downvotes by other users?', type:'checkbox' },
+      {name: 'comments', label: 'Allow for comments by other users?', type:'checkbox' }
     ],
     other: [
       { name: 'prompt', label: 'Prompt', tooltip: 'The prompt that created the need to remember the answer'  },
@@ -195,6 +205,9 @@ function BotpressChatbot() {
       { name: 'versionChatbot', label: 'Version',  tooltip: 'The version of the chatbot used' },
       { name: 'promptAnswer', label: 'Prompt Answer', tooltip: 'The answer given by the chatbot which  needs memory recall' },
       { name: 'other', label: 'Give a brief explanation of the issue faced', tooltip: 'Give a brief explanation of the issue faced. This will help us understand why this does not fit into the any other category.' },
+      {name: 'upvotes', label: 'Allow for upvotes by other users?', type:'checkbox' },
+      {name: 'downvotes', label: 'Allow for downvotes by other users?', type:'checkbox' },
+      {name: 'comments', label: 'Allow for comments by other users?', type:'checkbox' }
     ]
   };
 
@@ -216,8 +229,23 @@ function BotpressChatbot() {
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
+    const newData = prepareCheckboxData(formData); // Process the form data
+    setProcessedFormData(newData);
+
     setShowConfirmationModal(true);
   };
+  const prepareCheckboxData = (formData) => {
+    const processedData = { ...formData }; // Create a copy
+    for (const key of ['upvotes', 'downvotes', 'comments']) {
+      if (processedData[key]) {
+        processedData[key] = key === 'comments' ? "" : 0;
+      } else {
+        delete processedData[key]; // Remove unchecked checkboxes from the payload
+      }
+    }
+    return processedData;
+  };
+
 
   // Confirm form submission
   const handleConfirmSubmit = async () => {
@@ -225,7 +253,7 @@ function BotpressChatbot() {
       const response = await fetch('http://localhost:5001/insert-prompts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, category, userEmail: user.email }),
+        body: JSON.stringify({ ...formData,  ...processedFormData, category, userEmail: user.email }),
       });
       if (response.ok) {
         setShowSuccessModal(true);
