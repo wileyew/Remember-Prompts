@@ -160,7 +160,7 @@ function BotpressChatbot() {
       { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer', tooltip: 'The corrected answer you suggest' },
       { name: 'dataSource', label: 'Data Source', tooltip: 'The source of the correct data' },
       { name: 'justification', label: 'Reason for Hallucination (if not known then leave empty)', tooltip: 'Explanation for why the hallucination occurred' },
-      { name: 'toxicity', label: 'Was this a toxic hallucination? If not leave blank.', tooltip: 'Give a brief explanation of why this is a toxic response, which can contain comments or messages that contain harmful, offensive, or inappropriate content. These can include harassment, insults, or any language that could make others feel unwelcome or unsafe (otherwise leave blank.)'},
+      { name: 'toxicity', label: 'Was this a toxic hallucination (if not leave blank)? ', tooltip: 'Give a brief explanation of why this is a toxic response, which can contain comments or messages that contain harmful, offensive, or inappropriate content. These can include harassment, insults, or any language that could make others feel unwelcome or unsafe (otherwise leave blank.)'},
       {name: 'upvotes', label: 'Allow for upvotes?', type:'checkbox' },
       {name: 'downvotes', label: 'Allow for downvotes?', type:'checkbox' },
       {name: 'comments', label: 'Allow for comments?', type:'checkbox' }
@@ -194,7 +194,7 @@ function BotpressChatbot() {
       { name: 'chatbotPlatform', label: 'Platform', tooltip: 'The platform where the hallucination occurred' },
       { name: 'versionChatbot', label: 'Version',  tooltip: 'The version of the chatbot used' },
       { name: 'promptAnswer', label: 'Prompt Answer', tooltip: 'The answer given by the chatbot which  needs memory recall' },
-      { name: 'other', label: 'Give a brief explanation of the issue faced.', tooltip: 'Give a brief explanation of the issue faced. This will help us understand why this does not fit into the any other category.' },
+      { name: 'other', label: 'Give a brief explanation of the issue faced', tooltip: 'Give a brief explanation of the issue faced. This will help us understand why this does not fit into the any other category.' },
     ]
   };
 
@@ -247,8 +247,10 @@ function BotpressChatbot() {
         <input type="checkbox" checked={sliderChecked} onChange={() => setSliderChecked(!sliderChecked)} />
         <span className="slider round"></span>
       </label>
+      <br></br>
 
       <form onSubmit={handleSubmit}>
+        <br></br>
   <label>
     Category:
     <select value={category} onChange={e => setCategory(e.target.value)}>
@@ -260,36 +262,39 @@ function BotpressChatbot() {
     </select>
   </label>
   {/* Mapping over the correct array based on selected category */}
-  {formFields[category].map(field => (
-    <div key={field.name}>
+{/* Mapping over the correct array based on selected category */}
+{formFields[category].map(field => (
+  <div key={field.name} className="form-group">
+    {field.type !== 'checkbox' ? (
       <label title={field.tooltip}>{field.label}:
-        {field.type !== 'checkbox' ? (
-          <textarea 
-            name={field.name} 
-            value={formData[field.name] || ''} 
-            onChange={handleChange} 
-            rows="5"
-            cols="90"
-            wrap="soft"
-            className="editable-div"
-          />
-        ) : (
-          <span className="checkbox-label">
-            <input 
-              type="checkbox" 
-              name={field.name} 
-              checked={formData[field.name] || false} 
-              onChange={handleChange}
-            />
-            <span style={{ marginLeft: '0.5rem' }}>{field.label}</span>
-          </span>
-        )}
+      <br></br>
+        <textarea 
+          name={field.name} 
+          value={formData[field.name] || ''} 
+          onChange={handleChange} 
+          rows="2"
+          cols="30"
+        />
       </label>
-      {formErrors[field.name] && <div style={{ color: 'red' }}>{formErrors[field.name]}</div>}
-      <br />
-    </div>
-  ))}
+    ) : (
+      <div>
+        <input 
+          type="checkbox" 
+          name={field.name} 
+          checked={formData[field.name] || false} 
+          onChange={handleChange}
+        />
+        <span style={{ marginLeft: '0.5rem' }}>{field.label}</span>
+      </div>
+    )}
+    {formErrors[field.name] && <div style={{ color: 'red' }}>{formErrors[field.name]}</div>}
+  </div>
+))}
+<br></br>
   <button type="submit">Submit</button>
+  <br></br>
+  <br></br>
+
 </form>
 
       {showConfirmationModal && (

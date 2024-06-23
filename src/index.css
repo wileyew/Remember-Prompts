@@ -245,4 +245,134 @@ label[title]:hover:after {
   position: absolute;
   z-index: 1;
 }
+/* Overall form styling */
+form {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Creates two columns */
+  gap: 10px; /* Sets the gap between grid items */
+  max-width: 800px; /* Adjusts the maximum width of the form */
+  margin: auto; /* Centers the form horizontally */
+}
+
+/* Styling for each form group */
+.form-group {
+  display: flex;
+  flex-direction: column; /* Arranges label and input in a column */
+  gap: 5px; /* Sets the gap between the label and the input */
+}
+
+/* Label styling for better alignment and display */
+label {
+  display: block;
+  font-weight: bold;
+}
+
+/* Adjusts the size of textareas */
+textarea {
+  height: 60px; /* Fixed height for textareas */
+  resize: vertical; /* Allows resizing only vertically */
+}
+
+/* Styling for checkboxes to align with other inputs */
+input[type="checkbox"] {
+  margin-top: 5px; /* Aligns checkbox better with its label */
+}
+
+/* Error message styling */
+.form-group div[style] {
+  color: red;
+  font-size: 0.8rem;
+  margin-top: -5px; /* Nudges the error message up slightly */
+}
+
+/* Modal styling for confirmation and success messages */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  width: 90%;
+  max-width: 400px;
+}
+
+.modal button {
+  margin-top: 10px;
+  margin-right: 5px;
+}
+
+/* Button styling */
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #ccc;
+}
+
+/* Switches styling for better UI */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  form {
+    grid-template-columns: 1fr; /* Stacks inputs vertically on smaller screens */
+  }
+}
 
