@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import botpress from "../botpress.json";
-import "../../src/index.css";
+import "../index.css";
 import DOMPurify from 'dompurify';
 
 const botpressid = botpress.botId;
-const clientId = botpress.clientId;
+const clientId = botpress.clientId;// Destructuring for easier access
 
 function BotpressChatbot() {
   const { user } = useAuth0();
@@ -15,16 +15,16 @@ function BotpressChatbot() {
   const [sliderChecked, setSliderChecked] = useState(true);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [formErrors, setFormErrors] = useState({});
-  const [hasErrors, setHasErrors] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false); // New state for success modal
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [requestCertificate, setRequestCertificate] = useState(false);
 
+  // Effect to load and manage the Botpress chat widget script
   useEffect(() => {
     const widgetContainer = document.getElementById('bp-web-widget-container');
     if (widgetContainer) {
-      widgetContainer.style.display = sliderChecked ? 'block' : 'none';
+      widgetContainer.style.display = sliderChecked ? 'block' : 'none'; 
     }
-
+  
     if (sliderChecked) {
       const script = document.createElement("script");
       script.src = "https://cdn.botpress.cloud/webchat/v0/inject.js";
@@ -36,30 +36,39 @@ function BotpressChatbot() {
           messagingUrl: "https://messaging.botpress.cloud",
           clientId: clientId,
           botName: "Remember Prompts",
-          containerWidth: "100%",
-          layoutWidth: "100%",
-          outerHeight: "50%",
-          innerHeight: "50%",
-          hideWidget: false,
+          // Set the width of the WebChat container and layout to 100% (Full Screen)
+          containerWidth: "100%25",
+          layoutWidth: "100%25",
+          outerHeight: "50%25",
+          innerHeight: "50%25",
+          // Hide the widget and disable animations
+          hideWidget: false, // Change to false to show the widget
           disableAnimations: true,
+          // stylesheet: 'https://style-.....a.vercel.app/bot.css',
         });
         window.botpressWebChat.onEvent(() => {
           window.botpressWebChat.sendEvent({ type: "show" });
         }, ["LIFECYCLE.LOADED"]);
-        window.botpressWebChat.sendEvent({
+        window.botpressWebChat.init({
           type: "text",
           channel: "web",
           payload: {
-            text: 'SET_USER_DATA',
+            // Ensure this structure matches what your Botpress bot expects
+            text: 'SET_USER_DATA', // Assuming 'text' is how you distinguish payload types in your Botpress setup
             userData: {
               email: user.email,
               name: user.name,
             },
           },
         });
+        window.botpressWebChat.onEvent(() => {
+          setShowChatbot(false);
+        }, ["LIFECYCLE.UNLOADED"]);
 
+      
         const btnConvoAdd = document.getElementById('btn-convo-add');
         if (btnConvoAdd) {
+          console.log('button clicked');
           btnConvoAdd.addEventListener('click', () => {
             setTimeout(() => {
               window.botpressWebChat.sendPayload({
@@ -77,15 +86,71 @@ function BotpressChatbot() {
         document.body.removeChild(script);
       };
     }
+    if (sliderChecked) {
+      loadBotpressScript();
+    }
+    return () => {
+      const script = document.getElementById("botpress-script");
+      if (script) document.body.removeChild(script);
+    };
   }, [sliderChecked, user]);
 
-  useEffect(() => {
-    const bpWidgetBtn = document.querySelector('.bpw-widget-btn.bpw-floating-button.bpw-anim-undefined');
-    if (bpWidgetBtn) {
-      bpWidgetBtn.style.display = sliderChecked ? 'block' : 'none';
+  // Function to load the Botpress chat widget
+  const loadBotpressScript = () => {
+    const existingScript = document.getElementById("botpress-script");
+    if (!existingScript) {
+      const script = document.createElement("script");
+      script.src = "https://cdn.botpress.cloud/webchat/v0/inject.js";
+      script.async = true;
+      script.id = "botpress-script";
+      script.onload = () => initializeChatbot();
+      document.body.appendChild(script);
     }
-  }, [sliderChecked]);
+  };
 
+  // Function to initialize the chat widget with user data
+  const initializeChatbot = () => {
+    window.botpressWebChat.init({
+      botId: "61635aac-6038-42ca-b1a7-9d836bb38116",
+      hostUrl: "https://cdn.botpress.cloud/webchat/v0",
+      messagingUrl: "https://messaging.botpress.cloud",
+      clientId: clientId,
+      botName: "Remember Prompts",
+      containerWidth: "100%",
+      layoutWidth: "100%",
+      outerHeight: "50%",
+      innerHeight: "50%",
+      hideWidget: false,
+      disableAnimations: true,
+    });
+
+    window.botpressWebChat.sendEvent({
+      type: "text",
+      channel: "web",
+      payload: {
+        text: 'SET_USER_DATA',
+        userData: {
+          email: user.email,
+          name: user.name,
+        },
+      },
+    });
+
+    window.botpressWebChat.onEvent(() => {
+      window.botpressWebChat.sendEvent({ type: "show" });
+    }, ["LIFECYCLE.LOADED"]);
+  };
+
+  // Handle changes to form inputs
+  const handleChange = (e) => {
+    const { name, type, checked, value } = e.target;
+    const inputValue = type === 'checkbox' ? checked : value;
+    const sanitizedValue = DOMPurify.sanitize(inputValue);
+    const error = validateInput(sanitizedValue);
+
+    setFormData(prev => ({ ...prev, [name]: sanitizedValue }));
+    setFormErrors(prev => ({ ...prev, [name]: error }));
+  };
   const formFields = {
     hallucinations: [
       { name: 'chatbotPlatform', label: 'Platform', tooltip: 'The platform where the hallucination occurred' },
@@ -133,70 +198,41 @@ function BotpressChatbot() {
     ]
   };
 
+  // Validation function for form inputs
   const validateInput = (value) => {
     const patterns = {
       sqlInjection: /(\b(SELECT|INSERT|DELETE|UPDATE|DROP|CREATE|ALTER|GRANT|REVOKE)\b|--|;|\/\*|\*\/|')/i,
       xss: /<.*?>/g,
     };
-
     if (patterns.sqlInjection.test(value)) {
-      return "Potential SQL injection detected, please link to the steps if security issue. We have this as a preventative measure to protect our website.";
+      return "Potential SQL injection detected.";
     }
-
     if (patterns.xss.test(value)) {
-      return "Potential XSS attack detected,  please link to the steps if security issue. We have this as a preventative measure to protect our website.";
+      return "Potential XSS attack detected.";
     }
-
     return null;
   };
 
-  const handleChange = (e) => {
-    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-    const sanitizedValue = DOMPurify.sanitize(value);
-    const error = validateInput(sanitizedValue);
-
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [e.target.name]: sanitizedValue,
-    }));
-
-    
-  };
-
-  const handleChatbotToggle = () => {
-    setSliderChecked(!sliderChecked);
-  };
-
-  const handleSubmit = async (e) => {
+  // Handle form submission
+  const handleSubmit = (e) => {
     e.preventDefault();
     setShowConfirmationModal(true);
   };
 
+  // Confirm form submission
   const handleConfirmSubmit = async () => {
     try {
-       // Sanitize the entire formData object before sending
-       const sanitizedFormData = {};
-       for (const key in formData) {
-         sanitizedFormData[key] = DOMPurify.sanitize(formData[key]);
-       }
       const response = await fetch('http://localhost:5001/insert-prompts', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...sanitizedFormData,
-          ...formData,
-          category,
-          userEmail: user.email,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, category, userEmail: user.email }),
       });
       if (response.ok) {
-        console.log("Form submitted successfully");
-        setShowConfirmationModal(false); // Close confirmation modal
         setShowSuccessModal(true);
+        setFormData({});
+        setFormErrors({});
       } else {
-        console.error("Form submission failed with status: ", response.status);
+        console.error("Form submission failed:", response.status);
       }
     } catch (error) {
       console.error("Network error:", error);
@@ -204,100 +240,75 @@ function BotpressChatbot() {
     setShowConfirmationModal(false);
   };
 
-  const handleCancelSubmit = () => {
-    setShowConfirmationModal(false);
-  };
-  const handleCertificateChange = (e) => {
-    setRequestCertificate(e.target.checked);
-  };
-
-  const handleCategoryChange = (e) => {
-    setCategory(e.target.value);
-    setFormData({}); // Reset form data when category changes
-    setFormErrors({});
-  };
-
   return (
     <div>
       <h1>Submit a Report</h1>
-      <p>Check out the chatbot experience by clicking on the black background with white dialogue button in the bottom right corner. The chatbot is connected to ChatGPT to provide a creative memory recall trigger for prompt or prompt answers that are difficult to remember. For example, to remember George Washington as the first president, chatgpt may give a prompt trigger for washer with a ton on it! Don't want to use the chatbot? No worries, simply click the toggle below and use the form below!</p>
-      {/* <label className={`switch ${sliderChecked ? 'active' : ''}`}>
-        <input type="checkbox" id="btn-conversations" checked={sliderChecked} onChange={handleChatbotToggle} />
+      <label className={`switch ${sliderChecked ? 'active' : ''}`}>
+        <input type="checkbox" checked={sliderChecked} onChange={() => setSliderChecked(!sliderChecked)} />
         <span className="slider round"></span>
       </label>
-      {sliderChecked} */}
+
       <form onSubmit={handleSubmit}>
-        <label>
-          Category:
-          <select name="category" value={category} onChange={handleCategoryChange}>
-            <option value="hallucinations">Hallucinations</option>
-            <option value="copyright">Copyright</option>
-            <option value="security">Security Issues</option>
-            <option value="memory">Memory Recall</option>
-            <option value="other">Other</option>
-          </select>
-        </label>
+  <label>
+    Category:
+    <select value={category} onChange={e => setCategory(e.target.value)}>
+      <option value="hallucinations">Hallucinations</option>
+      <option value="copyright">Copyright</option>
+      <option value="security">Security Issues</option>
+      <option value="memory">Memory Recall</option>
+      <option value="other">Other</option>
+    </select>
+  </label>
+  {/* Mapping over the correct array based on selected category */}
+  {formFields[category].map(field => (
+    <div key={field.name}>
+      <label title={field.tooltip}>{field.label}:
+        {field.type !== 'checkbox' ? (
+          <textarea 
+            name={field.name} 
+            value={formData[field.name] || ''} 
+            onChange={handleChange} 
+            rows="5"
+            cols="90"
+            wrap="soft"
+            className="editable-div"
+          />
+        ) : (
+          <span className="checkbox-label">
+            <input 
+              type="checkbox" 
+              name={field.name} 
+              checked={formData[field.name] || false} 
+              onChange={handleChange}
+            />
+            <span style={{ marginLeft: '0.5rem' }}>{field.label}</span>
+          </span>
+        )}
+      </label>
+      {formErrors[field.name] && <div style={{ color: 'red' }}>{formErrors[field.name]}</div>}
+      <br />
+    </div>
+  ))}
+  <button type="submit">Submit</button>
+</form>
 
-        {formFields[category].map(field => (
-          <div key={field.name}>
-            <label title={field.tooltip}>
-              {field.label}:
-              <br />
-              {field.type === 'checkbox' ? (
-                <input
-                  type="checkbox"
-                  name={field.name}
-                  checked={formData[field.name] || false}
-                  onChange={handleChange}
-                />
-              ) : (
-                <textarea
-                  name={field.name}
-                  value={formData[field.name] || ''}
-                  onChange={handleChange}
-                  rows="5"
-                  cols="90"
-                  wrap="soft"
-                  className="editable-div"
-                />
-              )}
-            </label>
-            {formErrors[field.name] && (
-              <div style={{ color: 'red' }}>{formErrors[field.name]}</div>
-            )}
-            <br />
-          </div>
-        ))}
-
-        <button type="submit">Submit</button>
-      </form>
       {showConfirmationModal && (
         <div className="modal">
-          <div className="modal-content">
-            <p>Are you sure you want to submit the form?</p>
-            <button onClick={handleConfirmSubmit}>Confirm</button>
-            <button onClick={handleCancelSubmit}>Cancel</button>
-          </div>
+          <p>Are you sure you want to submit the form?</p>
+          <button onClick={handleConfirmSubmit}>Confirm</button>
+          <button onClick={() => setShowConfirmationModal(false)}>Cancel</button>
         </div>
-        )}
-         {showSuccessModal && (
-          <div className="modal">
-            <div className="modal-content">
-              <p>Form submitted successfully!</p>
-              <p>Would you like to request a certificate of completion?</p>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={requestCertificate}
-                  onChange={handleCertificateChange}
-                />
-                Request Certificate
-              </label>
-              <br />
-              <button disabled={!requestCertificate}>Download Certificate</button>  {/* Disable button if not checked */}
-            </div>
-          </div>
-          )}
+      )}
+      {showSuccessModal && (
+        <div className="modal">
+          <p>Form submitted successfully!</p>
+          <label>
+            Request Certificate
+            <input type="checkbox" checked={requestCertificate} onChange={e => setRequestCertificate(e.target.checked)} />
+          </label>
+          <button disabled={!requestCertificate}>Download Certificate</button>
+        </div>
+      )}
     </div>
   );
 }
