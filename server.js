@@ -16,8 +16,11 @@ const port = 5001;
 
 // Function to sanitize input
 const sanitizeInput = (input) => {
-  return String(input).replace(/</g, '&lt;').replace(/>/g, '&gt;');
-};
+  return String(input).replace(/<script.*?>.*?<\/script>/gi, '')
+                      .replace(/<[\/\!]*?[^<>]*?>/gi, '')
+                      .replace(/<style.*?>.*?<\/style>/gi, '')
+                      .replace(/<![\s\S]*?--[ \t\n\r]*>/gi, '');
+                    };
 
 // Fetch prompts from MongoDB with updated upvotes
 app.get("/reported-prompts", async (req, res) => {
@@ -44,111 +47,122 @@ app.get("/reported-prompts", async (req, res) => {
 });
 
 app.post("/insert-prompts", async (req, res) => {
-  const { userId, category, upvotes, downvotes, comments, ...fields } = req.body;
-  const document = Object.fromEntries(
-    Object.entries(fields).map(([key, value]) => [key, sanitizeInput(value)])
-  );
+  const { email, category, upvotes, downvotes, comments, ...formData } = req.body;
 
-  document.userId = sanitizeInput(userId);
-  document.category = sanitizeInput(category);
+  const document = {
+      category: sanitizeInput(category),
+      userId: sanitizeInput(email),
+      upvotes: upvotes ? 0 : undefined,  
+      downvotes: downvotes ? 0 : undefined,
+      comments: comments ? "" : undefined,
+  };
+
+  // Only add unique keys from formData that are not already defined in the document
+  const filteredFormData = Object.keys(formData)
+      .filter(key => !document.hasOwnProperty(key))
+      .reduce((acc, key) => {
+          acc[key] = sanitizeInput(formData[key]);
+          return acc; // No need to modify upvotes, downvotes, comments here
+      }, {});
+
+  // Combine document and filteredFormData
+  const finalDocument = { ...document, ...filteredFormData };
+
 
   const config = {
-    method: 'post',
-    url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/insertOne',
-    headers: {
-      'Content-Type': 'application/json',
-      'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
-    },
-    data: JSON.stringify({
-      collection: 'prompts',
-      database: 'userprompts',
-      dataSource: 'RememberPrompt',
-      document: document
-    })
+      method: 'post',
+      url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/insertOne',
+      headers: {
+          'Content-Type': 'application/json',
+          'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
+      },
+      data: JSON.stringify({
+          collection: 'prompts',
+          database: 'userprompts',
+          dataSource: 'RememberPrompt',
+          document: finalDocument  // Use the final, combined document
+      })
   };
+
   try {
-    const response = await axios(config);
-    res.json(response.data);
+      const response = await axios(config);
+      res.json(response.data);
   } catch (error) {
-    console.error('Error when calling MongoDB API:', error);
-    res.status(500).send('Internal Server Error');
+      console.error('Error when calling MongoDB API:', error);
+      res.status(500).send('Internal Server Error');
   }
 });
 
 
-
-// Insert new prompts
-app.post("/upvote-prompt", async (req, res) => {
-
-  //convert 
-  console.log ('request details' + JSON.stringify(req.body ));
-  const { promptId } = req.body;  // Assuming the client sends `promptId` that needs the upvote
-  const promptIdInt = Number(promptId);
-  const config = {
-    method: 'post',
-    url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/updateOne',
-    headers: {
-      'Content-Type': 'application/json',
-      'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
-    },
-    data: JSON.stringify({
-      collection: 'prompts',
-      database: 'userprompts',
-      dataSource: 'RememberPrompt',
-      filter: { _id: promptIdInt },  // Filter document by `id`
-      update: {
-        $inc: { upvotes: 1 }  // Increment `upvotes` by 1
-      }
-    })
-  };
-
-  try {
-    const response = await axios(config);
-    if (response.data.matchedCount === 0) {
-      return res.status(404).send('Prompt not found');
-    }
-    res.json({ message: "Upvote successful", updatedCount: response.data.modifiedCount });
-  } catch (error) {
-    console.error('Error when calling MongoDB API:', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-
-// Update upvotes for a prompt
 app.post('/upvote/:id', async (req, res) => {
-  console.log('request details' + JSON.stringify(req.body));
-  const { promptId } = req.body;  // Assuming the client sends `promptId` that needs the upvote
-
-  const config = {
-    method: 'post',
-    url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/updateOne',
-    headers: {
-      'Content-Type': 'application/json',
-      'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
-    },
-    data: JSON.stringify({
-      collection: 'prompts',
-      database: 'userprompts',
-      dataSource: 'RememberPrompt',
-      filter: { _id: promptId },  // Ensure this ID is correctly formatted if necessary
-      update: {
-        $inc: { upvotes: 1 }  // Increment `upvotes` by 1
-      }
-    })
-  };
-
   try {
-    const response = await axios(config);
-    if (response.data.matchedCount === 0) {
-      return res.status(404).send('Prompt not found');
-    }
-    res.json({ message: "Upvote successful", updatedCount: response.data.modifiedCount });
+      const objectId = req.params.id.$oid;
+      console.log("Upvoting prompt with ObjectID:", objectId);
+
+      // First attempt to update the existing document
+      const updateConfig = {
+          method: 'post',
+          url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/updateOne',
+          headers: {
+              'Content-Type': 'application/json',
+              'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
+          },
+          data: JSON.stringify({
+              collection: 'prompts',
+              database: 'userprompts',
+              dataSource: 'RememberPrompt',
+              filter: { _id: { $oid: objectId } }, 
+              update: { $inc: { upvotes: 1 } }
+          })
+      };
+
+      const updateResponse = await axios(updateConfig);
+      console.log("MongoDB Update Response:", updateResponse.data);
+
+      // If no document was updated, insert a new one
+      if (updateResponse.data.modifiedCount === 0) {
+          const { email, category, upvotes, downvotes, comments, ...formData } = req.body;
+
+          const document = {
+              ...formData, // Use original data from the request
+              category: sanitizeInput(category),
+              userId: sanitizeInput(email),
+              upvotes: upvotes ? upvotes + 1 : 1, // Start with 1 upvote
+              downvotes: downvotes ? 0 : undefined,
+              comments: comments ? "" : undefined,
+          };
+
+          const insertConfig = {
+              method: 'post',
+              url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/insertOne',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
+              },
+              data: JSON.stringify({
+                  collection: 'prompts',
+                  database: 'userprompts',
+                  dataSource: 'RememberPrompt',
+                  document: document
+              })
+          };
+          
+          console.log("Inserting new prompt as none found with ObjectID:", objectId);
+          const insertResponse = await axios(insertConfig);
+          console.log("MongoDB Insert Response:", insertResponse.data); 
+      } 
+
+      res.json({ success: true, message: 'Upvote processed successfully' }); // Unified success message
+
   } catch (error) {
-    console.error('Error when calling MongoDB API:', error);
-    res.status(500).send('Internal Server Error');
+      console.error('Error processing upvote:', error);
+      if (error.response) {
+          console.error("MongoDB API Error Response:", error.response.data);
+      }
+      res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
+
 
 // Handle comments
 app.post('/comments/:id', async (req, res) => {

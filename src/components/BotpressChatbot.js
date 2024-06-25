@@ -231,16 +231,22 @@ function BotpressChatbot() {
     e.preventDefault();
     const newData = prepareCheckboxData(formData); // Process the form data
     setProcessedFormData(newData);
-
     setShowConfirmationModal(true);
   };
   const prepareCheckboxData = (formData) => {
-    const processedData = { ...formData }; // Create a copy
+    const processedData = {formData}; // Create a copy
     for (const key of ['upvotes', 'downvotes', 'comments']) {
-      if (processedData[key]) {
-        processedData[key] = key === 'comments' ? "" : 0;
-      } else {
-        delete processedData[key]; // Remove unchecked checkboxes from the payload
+      if (formData[key]) {
+        if ([key] === 'upvotes' && formData['upvotes']) {
+          formData['upvotes'] = 0;
+        }
+        if ([key] === 'downvotes' && formData['downvotes']) {
+          formData['downvotes'] = 0;
+        }
+        if ([key] === 'comments' && formData['comments']) {
+          formData['comments'] = "";
+        }
+        processedData[key] = formData[key]; // If checked, add to processed data
       }
     }
     return processedData;
@@ -250,14 +256,22 @@ function BotpressChatbot() {
   // Confirm form submission
   const handleConfirmSubmit = async () => {
     try {
+      const payload = {
+        ...formData,
+        ...processedFormData,
+        category,
+        userEmail: user.email
+      };
+  
       const response = await fetch('http://localhost:5001/insert-prompts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData,  ...processedFormData, category, userEmail: user.email }),
+        body: JSON.stringify(payload),
       });
       if (response.ok) {
         setShowSuccessModal(true);
         setFormData({});
+        setProcessedFormData({});
         setFormErrors({});
       } else {
         console.error("Form submission failed:", response.status);
