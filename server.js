@@ -96,70 +96,62 @@ app.post("/insert-prompts", async (req, res) => {
 
 app.post('/upvote/:id', async (req, res) => {
   try {
-      const objectId = req.params.id.$oid;
-      console.log("Upvoting prompt with ObjectID:", objectId);
+    const objectId = req.params.id;
+    console.log("Upvoting prompt with ObjectID:", objectId);
+    
+    // Retrieve existing upvotes to increment 
+    const existingPromptConfig = {
+      method: 'post',
+      url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/findOne',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
+      },
+      data: JSON.stringify({
+        collection: 'prompts',
+        database: 'userprompts',
+        dataSource: 'RememberPrompt',
+        filter: { _id: objectId }
+      })
+    };
 
-      // First attempt to update the existing document
-      const updateConfig = {
-          method: 'post',
-          url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/updateOne',
-          headers: {
-              'Content-Type': 'application/json',
-              'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
-          },
-          data: JSON.stringify({
-              collection: 'prompts',
-              database: 'userprompts',
-              dataSource: 'RememberPrompt',
-              filter: { _id: { $oid: objectId } }, 
-              update: { $inc: { upvotes: 1 } }
-          })
-      };
+    const existingPromptResponse = await axios(existingPromptConfig);
+    console.log("Existing Prompt Response:", existingPromptResponse.data);
+    
+    const existingUpvotes = existingPromptResponse.data.document ? existingPromptResponse.data.document.upvotes || 0 : 0;
+    const updateConfig = {
+      method: 'post',
+      url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/updateOne',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
+      },
+      data: JSON.stringify({
+        collection: 'prompts',
+        database: 'userprompts',
+        dataSource: 'RememberPrompt',
+        filter: { _id: objectId },
+        update: { $set: { upvotes: existingUpvotes + 1 } }, // Directly set the incremented upvote count
+        upsert: true
+      })
+    };
 
-      const updateResponse = await axios(updateConfig);
-      console.log("MongoDB Update Response:", updateResponse.data);
-
-      // If no document was updated, insert a new one
-      if (updateResponse.data.modifiedCount === 0) {
-          const { email, category, upvotes, downvotes, comments, ...formData } = req.body;
-
-          const document = {
-              ...formData, // Use original data from the request
-              category: sanitizeInput(category),
-              userId: sanitizeInput(email),
-              upvotes: upvotes ? upvotes + 1 : 1, // Start with 1 upvote
-              downvotes: downvotes ? 0 : undefined,
-              comments: comments ? "" : undefined,
-          };
-
-          const insertConfig = {
-              method: 'post',
-              url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/insertOne',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
-              },
-              data: JSON.stringify({
-                  collection: 'prompts',
-                  database: 'userprompts',
-                  dataSource: 'RememberPrompt',
-                  document: document
-              })
-          };
-          
-          console.log("Inserting new prompt as none found with ObjectID:", objectId);
-          const insertResponse = await axios(insertConfig);
-          console.log("MongoDB Insert Response:", insertResponse.data); 
-      } 
-
-      res.json({ success: true, message: 'Upvote processed successfully' }); // Unified success message
+    const updateResponse = await axios(updateConfig);
+    console.log("Update Response:", updateResponse.data);
+    
+    if (updateResponse.data.modifiedCount === 1 || updateResponse.data.upsertedId) { // Check for upsert as well
+      res.json({ success: true, message: 'Upvote processed successfully' });
+      return;
+    }
+    
+    res.status(404).json({ success: false, message: 'Prompt not found.' });
 
   } catch (error) {
-      console.error('Error processing upvote:', error);
-      if (error.response) {
-          console.error("MongoDB API Error Response:", error.response.data);
-      }
-      res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error('Error when processing upvote:', error);
+    if (error.response) {
+      console.error("MongoDB API Error Response:", error.response.data);
+    }
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
 

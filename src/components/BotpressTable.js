@@ -119,21 +119,22 @@ const BotpressTable = () => {
   const handleUpvote = useCallback(async (id) => {  
     if (!userUpvotes.has(id)) {
       setUserUpvotes(prevUpvotes => new Set(prevUpvotes).add(id));
-
-      // Find the correct row based on the id (not index)
+  
+      // Find the correct row based on the id
       const rowToUpdate = originalData.find(item => item.id === id);
-      console.log('row to update ' + JSON.stringify(id));
       if (!rowToUpdate) {
         console.error("Error: Row not found for upvote");
         return; 
       }
-
+  
+      const newUpvotes = parseInt(rowToUpdate.upvotes) + 1;  // Ensure upvotes are handled as integers
+  
       const payload = {
         userEmail: user.email,
         id: id,
-        upvotes: rowToUpdate.upvotes + 1, // Increment upvotes immediately 
+        upvotes: newUpvotes,  // Send incremented upvote count as an integer
       };
-
+  
       try {
         const response = await fetch(`http://localhost:5001/upvote/${id}`, {
           method: 'POST',
@@ -142,25 +143,23 @@ const BotpressTable = () => {
           },
           body: JSON.stringify(payload),
         });
-
+  
         if (!response.ok) {
           throw new Error('Failed to upvote');
         }
-
-        // Optimistically update the tableData and originalData
-        setTableData(prevData => prevData.map(item => 
-          item.id === id ? { ...item, upvotes: payload.upvotes } : item
-        ));
-        setOriginalData(prevData => prevData.map(item =>
-          item.id === id ? { ...item, upvotes: payload.upvotes } : item
-        ));
-
+  
+        // Update tableData and originalData to reflect new upvotes count
+        const updateData = data => data.map(item => item.id === id ? { ...item, upvotes: newUpvotes } : item);
+        setTableData(updateData);
+        setOriginalData(updateData);
+  
       } catch (error) {
         console.error('Error upvoting:', error);
-        // Handle the error (e.g., revert the upvote in the UI)
+        // Optionally revert UI upvote count if necessary
       }
     }
-  }, [userUpvotes, user.email, originalData]); 
+  }, [userUpvotes, user.email, originalData]);
+  
   
   
   
