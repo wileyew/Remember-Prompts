@@ -38,39 +38,62 @@ const BotpressTable = () => {
         }
         const data = await response.json();
         const dataArray = Array.isArray(data) ? data : data.documents || [];
-        const transformedData = dataArray.map(data => ({
-          ...data,
-          chatbotPlatform: removeQuotesAndSlashes(data.chatbotPlatform),
-          versionChatbotHallucinationAnswer: removeQuotesAndSlashes(data.versionChatbot),
-          prompt: removeQuotesAndSlashes(data.prompt),
-          infringementPrompt: removeQuotesAndSlashes(data.infringementPrompt),
-          hallucinationAnswer: removeQuotesAndSlashes(data.hallucinationAnswer),
-          answerUpdated: removeQuotesAndSlashes(data.updatedPromptAnswer),
-          updatedPromptAnswer: removeQuotesAndSlashes(data.updatedPromptAnswer),
-          promptTrigger: removeQuotesAndSlashes(data.promptTrigger),
-          privacy: removeQuotesAndSlashes(data.privacy || '').toLowerCase().includes("public") ? "Public" : "Private",
-          email: cleanEmail(data.email),
-          name: removeQuotesAndSlashes(data.name),
-          copyrightAnswer: removeQuotesAndSlashes(data.copyrightAnswer),
-          dataSource: removeQuotesAndSlashes(data.dataSource),
-          securityImpact: removeQuotesAndSlashes(data.security_impact),
-          securityIncidentRisk: removeQuotesAndSlashes(data.security_incident_risk),
-          privacyRequested: removeQuotesAndSlashes(data.privacyRequested),
-          category: removeQuotesAndSlashes(data.category || '').toLowerCase(),
-          upvotes: data.upvotes || 0,
-          id: data._id  // assuming each data entry has a unique identifier
+        
+        const idToMaxUpvotesMap = {};
+        const transformedData = dataArray.map(data => {
+          const cleanedData = {
+            ...data,
+            chatbotPlatform: removeQuotesAndSlashes(data.chatbotPlatform),
+            versionChatbotHallucinationAnswer: removeQuotesAndSlashes(data.versionChatbot),
+            prompt: removeQuotesAndSlashes(data.prompt),
+            infringementPrompt: removeQuotesAndSlashes(data.infringementPrompt),
+            hallucinationAnswer: removeQuotesAndSlashes(data.hallucinationAnswer),
+            answerUpdated: removeQuotesAndSlashes(data.updatedPromptAnswer),
+            updatedPromptAnswer: removeQuotesAndSlashes(data.updatedPromptAnswer),
+            promptTrigger: removeQuotesAndSlashes(data.promptTrigger),
+            privacy: removeQuotesAndSlashes(data.privacy || '').toLowerCase().includes("public") ? "Public" : "Private",
+            email: cleanEmail(data.email),
+            name: removeQuotesAndSlashes(data.name),
+            copyrightAnswer: removeQuotesAndSlashes(data.copyrightAnswer),
+            dataSource: removeQuotesAndSlashes(data.dataSource),
+            securityImpact: removeQuotesAndSlashes(data.security_impact),
+            securityIncidentRisk: removeQuotesAndSlashes(data.security_incident_risk),
+            privacyRequested: removeQuotesAndSlashes(data.privacyRequested),
+            category: removeQuotesAndSlashes(data.category || '').toLowerCase(),
+            upvotes: data.upvotes || 0,
+            id: data._id
+          };
+          
+          // Aggregate maximum upvotes
+          if (idToMaxUpvotesMap[cleanedData.id]) {
+            if (cleanedData.upvotes > idToMaxUpvotesMap[cleanedData.id]) {
+              idToMaxUpvotesMap[cleanedData.id] = cleanedData.upvotes;
+            }
+          } else {
+            idToMaxUpvotesMap[cleanedData.id] = cleanedData.upvotes;
+          }
+  
+          return cleanedData;
+        });
+  
+        // Update each item with the max upvotes found
+        const finalData = transformedData.map(item => ({
+          ...item,
+          upvotes: idToMaxUpvotesMap[item.id]
         }));
-        setTableData(transformedData);
-        setOriginalData(transformedData);
+  
+        setTableData(finalData);
+        setOriginalData(finalData);
       } catch (error) {
         setError(error.message);
       } finally {
         setIsLoading(false);
       }
     };
-
+  
     fetchDataFromDatabase();
   }, []);
+  
 
   useEffect(() => {
     const filteredData = originalData.filter(item => {
@@ -116,23 +139,22 @@ const BotpressTable = () => {
   
   
 
-  const handleUpvote = useCallback(async (id) => {  
+  const handleUpvote = useCallback(async (id) => {
     if (!userUpvotes.has(id)) {
       setUserUpvotes(prevUpvotes => new Set(prevUpvotes).add(id));
   
-      // Find the correct row based on the id
       const rowToUpdate = originalData.find(item => item.id === id);
       if (!rowToUpdate) {
         console.error("Error: Row not found for upvote");
         return; 
       }
   
-      const newUpvotes = parseInt(rowToUpdate.upvotes) + 1;  // Ensure upvotes are handled as integers
+      const newUpvotes = parseInt(rowToUpdate.upvotes) + 1;
   
       const payload = {
         userEmail: user.email,
-        id: id,
-        upvotes: newUpvotes,  // Send incremented upvote count as an integer
+        id: id, // Send the ID as is
+        upvotes: newUpvotes,
       };
   
       try {
@@ -148,18 +170,16 @@ const BotpressTable = () => {
           throw new Error('Failed to upvote');
         }
   
-        // Update tableData and originalData to reflect new upvotes count
         const updateData = data => data.map(item => item.id === id ? { ...item, upvotes: newUpvotes } : item);
         setTableData(updateData);
         setOriginalData(updateData);
   
       } catch (error) {
         console.error('Error upvoting:', error);
-        // Optionally revert UI upvote count if necessary
+        // Handle the error (e.g., display an error message to the user)
       }
     }
   }, [userUpvotes, user.email, originalData]);
-  
   
   
   

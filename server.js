@@ -11,6 +11,8 @@ app.use(morgan("dev"));
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json());
 app.use(express.static(join(__dirname, "build")));
+const { ObjectId } = require('mongodb');  // Import ObjectId from MongoDB driver if needed
+
 
 const port = 5001;
 
@@ -95,65 +97,50 @@ app.post("/insert-prompts", async (req, res) => {
 
 
 app.post('/upvote/:id', async (req, res) => {
+  const objectId = req.params.id;
+  console.log("Upvoting prompt with ObjectID:", objectId);
+  // const intObject = objectId.toString(24);
+
+  // Validate the ID format
+  // if (!ObjectId.isValid(objectId)) {
+  //   return res.status(400).send("Invalid ID format. ID must be a 24 character hex string.");
+  // }
+
+  // Define the update configuration
+  const updateConfig = {
+    method: 'post',
+    url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/updateOne',
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
+    },
+    data: JSON.stringify({
+      collection: 'prompts',
+      database: 'userprompts',
+      dataSource: 'RememberPrompt',
+      filter: { _id: objectId }, // Use ObjectId constructor only if id is valid
+      update: { $inc: { upvotes: 1 } },
+      upsert: true
+    })
+  };
+
   try {
-    const objectId = req.params.id;
-    console.log("Upvoting prompt with ObjectID:", objectId);
-    
-    // Retrieve existing upvotes to increment 
-    const existingPromptConfig = {
-      method: 'post',
-      url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/findOne',
-      headers: {
-        'Content-Type': 'application/json',
-        'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
-      },
-      data: JSON.stringify({
-        collection: 'prompts',
-        database: 'userprompts',
-        dataSource: 'RememberPrompt',
-        filter: { _id: objectId }
-      })
-    };
-
-    const existingPromptResponse = await axios(existingPromptConfig);
-    console.log("Existing Prompt Response:", existingPromptResponse.data);
-    
-    const existingUpvotes = existingPromptResponse.data.document ? existingPromptResponse.data.document.upvotes || 0 : 0;
-    const updateConfig = {
-      method: 'post',
-      url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/updateOne',
-      headers: {
-        'Content-Type': 'application/json',
-        'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
-      },
-      data: JSON.stringify({
-        collection: 'prompts',
-        database: 'userprompts',
-        dataSource: 'RememberPrompt',
-        filter: { _id: objectId },
-        update: { $set: { upvotes: existingUpvotes + 1 } }, // Directly set the incremented upvote count
-        upsert: true
-      })
-    };
-
     const updateResponse = await axios(updateConfig);
-    console.log("Update Response:", updateResponse.data);
-    
-    if (updateResponse.data.modifiedCount === 1 || updateResponse.data.upsertedId) { // Check for upsert as well
-      res.json({ success: true, message: 'Upvote processed successfully' });
-      return;
-    }
-    
-    res.status(404).json({ success: false, message: 'Prompt not found.' });
+    console.log("Update response:", updateResponse.data);
 
+    // if (updateResponse.data.modifiedCount === 1) {
+    //   res.status(200).send("Upvote successfully incremented.");
+    // } else {
+    //   res.status(404).send("No such prompt found.");
+    // }
   } catch (error) {
-    console.error('Error when processing upvote:', error);
-    if (error.response) {
-      console.error("MongoDB API Error Response:", error.response.data);
-    }
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error("Error during the upvote operation:", error);
+    res.status(500).send("Error while upvoting the prompt.");
   }
 });
+
+
+
 
 
 // Handle comments
