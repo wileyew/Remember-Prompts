@@ -145,9 +145,51 @@ app.post('/upvote/:id', async (req, res) => {
 
 // Handle comments
 app.post('/comments/:id', async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.params.id;
   const { username, comment, userEmail } = req.body;
-  // Insert logic to store comments in MongoDB
+
+  // Sanitize input
+  const safeComment = sanitizeInput(comment);
+  const safeUsername = sanitizeInput(username);
+
+  // Create comment object to be appended
+  const commentObject = {
+    username: safeUsername,
+    comment: safeComment,
+    userEmail: sanitizeInput(userEmail), // Assuming you want to save userEmail after sanitizing
+    timestamp: new Date() // Store the time when the comment was added
+  };
+
+  const updateConfig = {
+    method: 'post',
+    url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/updateOne',
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
+    },
+    data: JSON.stringify({
+      collection: 'prompts',
+      database: 'userprompts',
+      dataSource: 'RememberPrompt',
+      filter: { _id: id },  // Ensure correct conversion to ObjectId
+      update: {
+        $push: { comments: commentObject }  // Push new comment into the comments array
+      }
+    })
+  };
+
+  try {
+    const response = await axios(updateConfig);
+    if (response.data.modifiedCount === 1) {
+      console.log('id ' + id);
+      res.status(200).send("Comment added successfully.");
+    } else {
+      res.status(404).send("No prompt found with the given ID.");
+    }
+  } catch (error) {
+    console.error("Error while adding comment:", error);
+    res.status(500).send("Failed to add comment due to server error.");
+  }
 });
 
 // Serve SPA

@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { useTable } from 'react-table';
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
 import "../../src/index.css"; // Import the CSS file for styling
+import { comment } from 'postcss';
 
 const cleanEmail = (email) => {
   if (!email) return '';
@@ -188,12 +189,38 @@ const BotpressTable = () => {
   
   
 
-  const handleAddComment = useCallback((id, comment) => {
-    setComments((prevComments) => ({
-      ...prevComments,
-      [id]: [...(prevComments[id] || []), { username, comment }],
-    }));
-  }, [username]);
+  const handleAddComment = useCallback(async (id, commentText) => {
+    const commentData = {
+      username: username,  // Ensure 'username' is managed in the state
+      comment: commentText,
+      userEmail: user.email  // Assuming 'user.email' contains the email of the logged-in user
+    };
+  
+    try {
+      const response = await fetch(`http://localhost:5001/comments/${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(commentData)
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      // Update local comments state if the server updates successfully
+      setComments((prevComments) => ({
+        ...prevComments,
+        [id]: [...(prevComments[id] || []), { username: username, comment: commentText }],
+      }));
+  
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      // Optionally handle errors, e.g., show an error message to the user
+    }
+  }, [username, user.email]);
+  
 
   const columns = useMemo(() => {
     const baseColumns = [
