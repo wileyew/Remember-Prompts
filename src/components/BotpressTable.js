@@ -1,8 +1,9 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { useTable } from 'react-table';
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
+import { Disclosure } from '@headlessui/react';
+import { ChevronUpIcon } from '@heroicons/react/20/solid';
 import "../../src/index.css"; // Import the CSS file for styling
-import { comment } from 'postcss';
 
 const cleanEmail = (email) => {
   if (!email) return '';
@@ -25,9 +26,9 @@ const BotpressTable = () => {
   const [activeTab, setActiveTab] = useState('allReports');
   const [highlightedRow, setHighlightedRow] = useState(null);
   const [category, setCategory] = useState('hallucinations');
-  const [userUpvotes, setUserUpvotes] = useState(new Set()); // Store IDs of upvoted rows by the user
-  const [comments, setComments] = useState({}); // Store comments for each row
-  const [username, setUsername] = useState(''); // Store the username for comments
+  const [userUpvotes, setUserUpvotes] = useState(new Set());
+  const [comments, setComments] = useState({});
+  const [username, setUsername] = useState('');
 
   useEffect(() => {
     const fetchDataFromDatabase = async () => {
@@ -39,7 +40,8 @@ const BotpressTable = () => {
         }
         const data = await response.json();
         const dataArray = Array.isArray(data) ? data : data.documents || [];
-        
+
+        const commentsByRowId = {};
         const idToMaxUpvotesMap = {};
         const transformedData = dataArray.map(data => {
           const cleanedData = {
@@ -62,10 +64,12 @@ const BotpressTable = () => {
             privacyRequested: removeQuotesAndSlashes(data.privacyRequested),
             category: removeQuotesAndSlashes(data.category || '').toLowerCase(),
             upvotes: data.upvotes || 0,
+            comments: Array.isArray(data.comments) ? data.comments : [],
             id: data._id
           };
-          
-          // Aggregate maximum upvotes
+
+          commentsByRowId[cleanedData.id] = cleanedData.comments;
+
           if (idToMaxUpvotesMap[cleanedData.id]) {
             if (cleanedData.upvotes > idToMaxUpvotesMap[cleanedData.id]) {
               idToMaxUpvotesMap[cleanedData.id] = cleanedData.upvotes;
@@ -73,28 +77,27 @@ const BotpressTable = () => {
           } else {
             idToMaxUpvotesMap[cleanedData.id] = cleanedData.upvotes;
           }
-  
+
           return cleanedData;
         });
-  
-        // Update each item with the max upvotes found
+
         const finalData = transformedData.map(item => ({
           ...item,
           upvotes: idToMaxUpvotesMap[item.id]
         }));
-  
+
         setTableData(finalData);
         setOriginalData(finalData);
+        setComments(commentsByRowId);
       } catch (error) {
         setError(error.message);
       } finally {
         setIsLoading(false);
       }
     };
-  
+
     fetchDataFromDatabase();
   }, []);
-  
 
   useEffect(() => {
     const filteredData = originalData.filter(item => {
@@ -115,49 +118,25 @@ const BotpressTable = () => {
   const handleSearchChange = useCallback((e) => {
     setSearchQuery(e.target.value);
   }, []);
-  function getCircularReplacer() {
-    const seen = new WeakSet();
-    return (key, value) => {
-      if (typeof value === "object" && value !== null) {
-        if (seen.has(value)) {
-          return; // If circular reference is detected, return undefined or some other value
-        }
-        seen.add(value);
-      }
-      return value;
-    };
-  }
-  
-  // Use the replacer function with JSON.stringify
-  const safeStringify = (obj) => {
-    try {
-      return JSON.stringify(obj, getCircularReplacer());
-    } catch (error) {
-      console.error("Failed to stringify object:", error);
-      return '{}'; // Return a default object if stringification fails
-    }
-  };
-  
-  
 
   const handleUpvote = useCallback(async (id) => {
     if (!userUpvotes.has(id)) {
       setUserUpvotes(prevUpvotes => new Set(prevUpvotes).add(id));
-  
+
       const rowToUpdate = originalData.find(item => item.id === id);
       if (!rowToUpdate) {
         console.error("Error: Row not found for upvote");
-        return; 
+        return;
       }
-  
+
       const newUpvotes = parseInt(rowToUpdate.upvotes) + 1;
-  
+
       const payload = {
         userEmail: user.email,
-        id: id, // Send the ID as is
+        id: id,
         upvotes: newUpvotes,
       };
-  
+
       try {
         const response = await fetch(`http://localhost:5001/upvote/${id}`, {
           method: 'POST',
@@ -166,36 +145,28 @@ const BotpressTable = () => {
           },
           body: JSON.stringify(payload),
         });
-  
+
         if (!response.ok) {
           throw new Error('Failed to upvote');
         }
-  
+
         const updateData = data => data.map(item => item.id === id ? { ...item, upvotes: newUpvotes } : item);
         setTableData(updateData);
         setOriginalData(updateData);
-  
+
       } catch (error) {
         console.error('Error upvoting:', error);
-        // Handle the error (e.g., display an error message to the user)
       }
     }
   }, [userUpvotes, user.email, originalData]);
-  
-  
-  
-
-  
-  
-  
 
   const handleAddComment = useCallback(async (id, commentText) => {
     const commentData = {
-      username: username,  // Ensure 'username' is managed in the state
+      username: username,
       comment: commentText,
-      userEmail: user.email  // Assuming 'user.email' contains the email of the logged-in user
+      userEmail: user.email
     };
-  
+
     try {
       const response = await fetch(`http://localhost:5001/comments/${id}`, {
         method: 'POST',
@@ -204,50 +175,59 @@ const BotpressTable = () => {
         },
         body: JSON.stringify(commentData)
       });
-  
+
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-  
-      // Update local comments state if the server updates successfully
+
       setComments((prevComments) => ({
         ...prevComments,
         [id]: [...(prevComments[id] || []), { username: username, comment: commentText }],
       }));
-  
+
     } catch (error) {
       console.error('Error adding comment:', error);
-      // Optionally handle errors, e.g., show an error message to the user
     }
   }, [username, user.email]);
-  
 
   const columns = useMemo(() => {
     const baseColumns = [
       { Header: 'Category', accessor: 'category' },
-      { Header: 'Upvotes', accessor: 'upvotes', Cell: ({ row }) => ( 
+      { Header: 'Upvotes', accessor: 'upvotes', Cell: ({ row }) => (
         <button onClick={() => handleUpvote(row.original.id)} disabled={userUpvotes.has(row.original.id)}>
           {row.values.upvotes}
         </button>
       )},
-      
       { Header: 'Comments', accessor: 'comments', Cell: ({ row }) => (
-          <div>
-            {comments[row.original.id] && comments[row.original.id].map((comment, index) => (
-              <div key={index}><strong>{comment.username}</strong>: {comment.comment}</div>
-            ))}
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const comment = e.target.elements.comment.value;
-              handleAddComment(row.original.id, comment);
-              e.target.reset();
-            }}>
-              <input type="text" name="comment" placeholder="Add a comment" required />
-              <button type="submit">Add</button>
-            </form>
-          </div>
-        )
-      }
+        <div>
+          <Disclosure>
+            {({ open }) => (
+              <>
+                <Disclosure.Button className="flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-left text-gray-900 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75">
+                  <span>Comments ({comments[row.original.id]?.length || 0})</span>
+                  <ChevronUpIcon
+                    className={`${open ? 'transform rotate-180' : ''} w-5 h-5 text-gray-500`}
+                  />
+                </Disclosure.Button>
+                <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
+                  {comments[row.original.id] && comments[row.original.id].map((comment, index) => (
+                    <div key={index}><strong>{comment.username}</strong>: {comment.comment}</div>
+                  ))}
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    const comment = e.target.elements.comment.value;
+                    handleAddComment(row.original.id, comment);
+                    e.target.reset();
+                  }}>
+                    <input type="text" name="comment" placeholder="Add a comment" required />
+                    <button type="submit">Add</button>
+                  </form>
+                </Disclosure.Panel>
+              </>
+            )}
+          </Disclosure>
+        </div>
+      )}
     ];
 
     if (category === 'hallucinations') {
@@ -285,16 +265,16 @@ const BotpressTable = () => {
       return [...baseColumns, ...securityColumns];
     }
 
-if (category === 'other') {
-  const otherColumns = [
-   { Header: 'Prompt', accessor: 'prompt' },
-    { Header: 'Platform', accessor: 'chatbotPlatform' },
-    { Header: 'Version', accessor: 'versionChatbot' },
-    { Header: 'Answer', accessor: 'promptAnswer'},
-    { Header: 'Explanation', accessor: 'other'},
-  ];
-  return [...baseColumns, ...otherColumns];
-}
+    if (category === 'other') {
+      const otherColumns = [
+        { Header: 'Prompt', accessor: 'prompt' },
+        { Header: 'Platform', accessor: 'chatbotPlatform' },
+        { Header: 'Version', accessor: 'versionChatbot' },
+        { Header: 'Answer', accessor: 'promptAnswer' },
+        { Header: 'Explanation', accessor: 'other' },
+      ];
+      return [...baseColumns, ...otherColumns];
+    }
 
     if (category === 'memory') {
       const memoryColumns = [
