@@ -203,7 +203,7 @@ const BotpressTable = () => {
           <Disclosure>
             {({ open }) => (
               <>
-                <Disclosure.Button className="flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-left text-gray-900 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75">
+                <Disclosure.Button  className="disclosure-button">
                   <span>Comments ({comments[row.original.id]?.length || 0})</span>
                   <ChevronUpIcon
                     className={`${open ? 'transform rotate-180' : ''} w-5 h-5 text-gray-500`}
