@@ -1,9 +1,10 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
-import { useTable } from 'react-table';
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
 import { Disclosure } from '@headlessui/react';
 import { ChevronUpIcon } from '@heroicons/react/20/solid';
 import "../../src/index.css"; // Import the CSS file for styling
+import { useTable, usePagination } from 'react-table';
+
 
 const cleanEmail = (email) => {
   if (!email) return '';
@@ -29,6 +30,8 @@ const BotpressTable = () => {
   const [userUpvotes, setUserUpvotes] = useState(new Set());
   const [comments, setComments] = useState({});
   const [username, setUsername] = useState('');
+  // const [pageIndex, setPageIndex] = useState(0);
+  // const [pageSize, setPageSize] = useState(10);  // Default page size
 
   useEffect(() => {
     const fetchDataFromDatabase = async () => {
@@ -287,15 +290,34 @@ const BotpressTable = () => {
     return baseColumns;
   }, [handleUpvote, userUpvotes, category, comments, handleAddComment]);
 
-  const tableInstance = useTable({ columns, data: tableData });
-
+ 
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
-    rows,
     prepareRow,
-  } = tableInstance;
+    page,
+    canPreviousPage,
+    canNextPage,
+    pageCount,
+    gotoPage,
+    nextPage,
+    previousPage,
+    setPageSize,
+    state: { pageIndex, pageSize }
+  } = useTable({
+    columns,
+    data: tableData,
+    initialState: { pageIndex: 0, pageSize: 10 }
+  }, usePagination);
+
+  const paginationStyle = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '10px'
+  };
+
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -304,16 +326,15 @@ const BotpressTable = () => {
     <div className="botpress-table-container" style={{ marginTop: '20px', maxWidth: '98%', margin: '20px auto', overflowX: 'auto' }}>
       <h2>Reported Prompts</h2>
       <div className="tab-buttons">
-        <button className={activeTab === 'allReports' ? 'active' : ''} onClick={() => setActiveTab('allReports')}>
+        <button onClick={() => setActiveTab('allReports')} className={activeTab === 'allReports' ? 'active' : ''}>
           All Public Reports
         </button>
-        <button className={activeTab === 'myReports' ? 'active' : ''} onClick={() => setActiveTab('myReports')}>
+        <button onClick={() => setActiveTab('myReports')} className={activeTab === 'myReports' ? 'active' : ''}>
           My Reports
         </button>
       </div>
-      <br />
       <div>
-        <select onChange={handleCategoryChange} value={category}>
+        <select onChange={(e) => setCategory(e.target.value)} value={category}>
           <option value="hallucinations">Hallucinations</option>
           <option value="copyright">Copyright</option>
           <option value="security">Security Issues</option>
@@ -321,16 +342,7 @@ const BotpressTable = () => {
           <option value="other">Other</option>
         </select>
       </div>
-      <br />
-      <input type="text" placeholder="Search..." value={searchQuery} onChange={handleSearchChange} />
-      <br /><br />
-      <div>
-        <label>
-          Username for Comments:
-          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Enter your username" required />
-        </label>
-      </div>
-      <br /><br />
+      <input type="text" placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
       <table {...getTableProps()}>
         <thead>
           {headerGroups.map(headerGroup => (
@@ -342,10 +354,10 @@ const BotpressTable = () => {
           ))}
         </thead>
         <tbody {...getTableBodyProps()}>
-          {rows.map((row, index) => {
+          {page.map(row => {
             prepareRow(row);
             return (
-              <tr {...row.getRowProps()} onClick={() => setHighlightedRow(index)} style={{ backgroundColor: highlightedRow === index ? '#EEE' : 'inherit' }}>
+              <tr {...row.getRowProps()}>
                 {row.cells.map(cell => (
                   <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                 ))}
@@ -354,6 +366,22 @@ const BotpressTable = () => {
           })}
         </tbody>
       </table>
+      <div style={paginationStyle}>
+        <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>{"<<"}</button>
+        <button onClick={() => previousPage()} disabled={!canPreviousPage}>{"<"}</button>
+        <button onClick={() => nextPage()} disabled={!canNextPage}>{">"}</button>
+        <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>{">>"}</button>
+        <select
+          value={pageSize}
+          onChange={e => {
+            setPageSize(Number(e.target.value));
+          }}
+        >
+          {[10, 20, 30, 40, 50].map(size => (
+            <option key={size} value={size}>Show {size}</option>
+          ))}
+        </select>
+      </div>
     </div>
   );
 };
