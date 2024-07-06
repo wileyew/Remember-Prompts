@@ -33,7 +33,7 @@ app.get("/reported-prompts", async (req, res) => {
       url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/find',
       headers: {
         'Content-Type': 'application/json',
-        'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
+        'api-key': process.env.MONGO_API_KEY
       },
       data: {
         collection: "prompts",
@@ -77,7 +77,7 @@ app.post("/insert-prompts", async (req, res) => {
       url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/insertOne',
       headers: {
           'Content-Type': 'application/json',
-          'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
+          'api-key': process.env.MONGO_API_KEY
       },
       data: JSON.stringify({
           collection: 'prompts',
@@ -113,7 +113,7 @@ app.post('/upvote/:id', async (req, res) => {
     url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/updateOne',
     headers: {
       'Content-Type': 'application/json',
-      'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
+      'api-key': process.env.MONGO_API_KEY
     },
     data: JSON.stringify({
       collection: 'prompts',
@@ -166,7 +166,7 @@ app.post('/comments/:id', async (req, res) => {
     url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/updateOne',
     headers: {
       'Content-Type': 'application/json',
-      'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
+      'api-key': process.env.MONGO_API_KEY
     },
     data: JSON.stringify({
       collection: 'prompts',
