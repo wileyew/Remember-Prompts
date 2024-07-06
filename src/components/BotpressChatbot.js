@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import botpress from "../botpress.json";
 import "../index.css";
+import { jsPDF } from "jspdf";
 import DOMPurify from 'dompurify';
 
 const botpressid = botpress.botId;
@@ -17,7 +18,9 @@ function BotpressChatbot() {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showCertificateSuccessModal, setShowCertificateSuccessModal] = useState(false);
   const [requestCertificate, setRequestCertificate] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Effect to load and manage the Botpress chat widget script
   useEffect(() => {
@@ -189,16 +192,6 @@ function BotpressChatbot() {
       {name: 'downvotes', label: 'Allow for downvotes by other users?', type:'checkbox' },
       {name: 'comments', label: 'Allow for comments by other users?', type:'checkbox' }
     ],
-    memory: [
-      { name: 'prompt', label: 'Prompt', tooltip: 'The prompt that created the need to remember the answer'  },
-      { name: 'chatbotPlatform', label: 'Platform', tooltip: 'The platform where the hallucination occurred' },
-      { name: 'versionChatbot', label: 'Version',  tooltip: 'The version of the chatbot used' },
-      { name: 'promptAnswer', label: 'Prompt Answer', tooltip: 'The answer given by the chatbot which  needs memory recall' },
-      { name: 'promptTrigger', label: 'Trigger for Recall', tooltip: 'Think of a creative answer to help remember a fact. ' },
-      {name: 'upvotes', label: 'Allow for upvotes by other users?', type:'checkbox' },
-      {name: 'downvotes', label: 'Allow for downvotes by other users?', type:'checkbox' },
-      {name: 'comments', label: 'Allow for comments by other users?', type:'checkbox' }
-    ],
     other: [
       { name: 'prompt', label: 'Prompt', tooltip: 'The prompt that created the need to remember the answer'  },
       { name: 'chatbotPlatform', label: 'Platform', tooltip: 'The platform where the hallucination occurred' },
@@ -233,6 +226,18 @@ function BotpressChatbot() {
     setProcessedFormData(newData);
     setShowConfirmationModal(true);
   };
+
+  const createAndDownloadPdf = () => {
+    const certificateNumber = Math.floor(Math.random() * 90000) + 10000;
+    const doc = new jsPDF();
+    doc.text("Overflow Prompts Certification", 20, 20);
+    doc.text(`Name: ${user.name}`, 20, 30);  
+    doc.text(`Certificate Number: ${certificateNumber}`, 20, 40);
+    doc.text("This certificate acknowledges that you are an AI evangelist! By submitting this report today, you are helping build a community of like minded individuals that are helping cultivate crowd sourced data modeling feedback. Thank you!", 20, 50);
+    doc.save("certificate.pdf");
+    setShowCertificateSuccessModal(true);
+  };
+
   const prepareCheckboxData = (formData) => {
     const processedData = {formData}; // Create a copy
     for (const key of ['upvotes', 'downvotes', 'comments']) {
@@ -270,10 +275,18 @@ function BotpressChatbot() {
       });
       if (response.ok) {
         setShowSuccessModal(true);
+        if (requestCertificate) {
+          createAndDownloadPdf();
+        }
         setFormData({});
         setProcessedFormData({});
         setFormErrors({});
-      } else {
+      }  else if (response.status === 400) {
+      setErrorMessage('Bad Request: Please check your data.');
+    } else if (response.status === 500) {
+      setErrorMessage('Server Error: Please try again later.');
+    } 
+      else {
         console.error("Form submission failed:", response.status);
       }
     } catch (error) {
@@ -285,11 +298,13 @@ function BotpressChatbot() {
   return (
     <div>
       <h1>Submit a Report</h1>
+      {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
       <label className={`switch ${sliderChecked ? 'active' : ''}`}>
         <input type="checkbox" checked={sliderChecked} onChange={() => setSliderChecked(!sliderChecked)} />
         <span className="slider round"></span>
       </label>
       <br></br>
+      <h5>Want to use the chatbot instead? Click on the icon in the lower right corner of the screen and type anything to get started! Turn off chatbot by clicking slider.</h5>
 
       <form onSubmit={handleSubmit}>
         <br></br>
@@ -299,7 +314,6 @@ function BotpressChatbot() {
       <option value="hallucinations">Hallucinations</option>
       <option value="copyright">Copyright</option>
       <option value="security">Security Issues</option>
-      <option value="memory">Memory Recall</option>
       <option value="other">Other</option>
     </select>
   </label>
@@ -333,7 +347,7 @@ function BotpressChatbot() {
   </div>
 ))}
 <br></br>
-  <button type="submit">Submit</button>
+  <button type="submit" style={{ marginBottom: '20px' }}>Submit</button>
   <br></br>
   <br></br>
 
@@ -344,6 +358,7 @@ function BotpressChatbot() {
           <p>Are you sure you want to submit the form?</p>
           <button onClick={handleConfirmSubmit}>Confirm</button>
           <button onClick={() => setShowConfirmationModal(false)}>Cancel</button>
+          <br></br>
         </div>
       )}
       {showSuccessModal && (
@@ -353,9 +368,17 @@ function BotpressChatbot() {
             Request Certificate
             <input type="checkbox" checked={requestCertificate} onChange={e => setRequestCertificate(e.target.checked)} />
           </label>
-          <button disabled={!requestCertificate}>Download Certificate</button>
+          <button onClick={createAndDownloadPdf} disabled={!requestCertificate}>Download Certificate</button>
+          <button onClick={() => setShowSuccessModal(false)}>Close</button>
         </div>
       )}
+{showCertificateSuccessModal && (
+        <div className="modal">
+          <p>Certificate generated successfully!</p>
+          <button onClick={() => setShowCertificateSuccessModal(false)}>Close</button>
+        </div>
+      )}
+
     </div>
   );
 }
