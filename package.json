@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "react-app-rewired start",
-    "build": "react-app-rewired build && npm run server",
+    "build": "react-app-rewired build",
+    "postbuild": "node server.js",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "spa": "react-scripts start",
@@ -13,7 +14,7 @@
     "api-server": "node api-server.js",
     "api-server:dev": "nodemon api-server.js",
     "dev": "npm-run-all --parallel spa api-server:dev",
-    "prod": "npm-run-all --parallel server api-server"
+    "prod": "npm-run-all --parallel build server"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.2.0",
