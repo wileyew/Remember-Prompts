@@ -36,10 +36,12 @@ function BotpressChatbot() {
       script.onload = () => {
         window.botpressWebChat.init({
           botId: botpressid,
+          composerPlaceholder: "Say anything to start the conversation! If you are revisiting an old session, you will need to start a new one. Click three box icon and then click plus icon.",
+          botConversationDescription: "assists with reporting hallucinations, copyrights, memory aid for prompts, or security issues",
           hostUrl: "https://cdn.botpress.cloud/webchat/v0",
           messagingUrl: "https://messaging.botpress.cloud",
           clientId: clientId,
-          botName: "Remember Prompts",
+          botName: "Overflow Prompts",
           // Set the width of the WebChat container and layout to 100% (Full Screen)
           containerWidth: "100%25",
           layoutWidth: "100%25",

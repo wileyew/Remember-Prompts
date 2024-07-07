@@ -262,9 +262,7 @@ const BotpressTable = () => {
         { Header: 'Security Impact', accessor: 'securityImpact' },
         { Header: 'Security Incident Risk', accessor: 'securityIncidentRisk' },
         { Header: 'Data Source', accessor: 'dataSource' },
-        { Header: 'Platform', accessor: 'chatbotPlatform' },
-        { Header: 'Keyword Search', accessor: 'keywordSearch' },
-      ];
+        { Header: 'Platform', accessor: 'chatbotPlatform' },      ];
       return [...baseColumns, ...securityColumns];
     }
 
