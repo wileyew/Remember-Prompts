@@ -7,13 +7,21 @@ const axios = require("axios");
 const cors = require("cors");
 
 const app = express();
-app.use(cors());
+
+// Configure CORS to allow access from Vercel
+const corsOptions = {
+  origin: ["https://your-vercel-domain.vercel.app"], // Replace with your actual Vercel domain
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
 app.use(morgan("dev"));
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json());
 app.use(express.static(join(__dirname, "build")));
 const { ObjectId } = require('mongodb');  // Import ObjectId from MongoDB driver if needed
-
 
 const port = 5001;
 
@@ -23,7 +31,7 @@ const sanitizeInput = (input) => {
                       .replace(/<[\/\!]*?[^<>]*?>/gi, '')
                       .replace(/<style.*?>.*?<\/style>/gi, '')
                       .replace(/<![\s\S]*?--[ \t\n\r]*>/gi, '');
-                    };
+};
 
 // Fetch prompts from MongoDB with updated upvotes
 app.get("/reported-prompts", async (req, res) => {
@@ -53,61 +61,52 @@ app.post("/insert-prompts", async (req, res) => {
   const { email, category, upvotes, downvotes, comments, ...formData } = req.body;
 
   const document = {
-      category: sanitizeInput(category),
-      userId: sanitizeInput(email),
-      upvotes: upvotes ? 0 : undefined,  
-      downvotes: downvotes ? 0 : undefined,
-      comments: comments ? "" : undefined,
+    category: sanitizeInput(category),
+    userId: sanitizeInput(email),
+    upvotes: upvotes ? 0 : undefined,
+    downvotes: downvotes ? 0 : undefined,
+    comments: comments ? "" : undefined,
   };
 
   // Only add unique keys from formData that are not already defined in the document
   const filteredFormData = Object.keys(formData)
-      .filter(key => !document.hasOwnProperty(key))
-      .reduce((acc, key) => {
-          acc[key] = sanitizeInput(formData[key]);
-          return acc; // No need to modify upvotes, downvotes, comments here
-      }, {});
+    .filter(key => !document.hasOwnProperty(key))
+    .reduce((acc, key) => {
+      acc[key] = sanitizeInput(formData[key]);
+      return acc;
+    }, {});
 
   // Combine document and filteredFormData
   const finalDocument = { ...document, ...filteredFormData };
 
-
   const config = {
-      method: 'post',
-      url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/insertOne',
-      headers: {
-          'Content-Type': 'application/json',
-          'api-key': process.env.MONGO_API_KEY
-      },
-      data: JSON.stringify({
-          collection: 'prompts',
-          database: 'userprompts',
-          dataSource: 'RememberPrompt',
-          document: finalDocument  // Use the final, combined document
-      })
+    method: 'post',
+    url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/insertOne',
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': process.env.MONGO_API_KEY
+    },
+    data: JSON.stringify({
+      collection: 'prompts',
+      database: 'userprompts',
+      dataSource: 'RememberPrompt',
+      document: finalDocument
+    })
   };
 
   try {
-      const response = await axios(config);
-      res.json(response.data);
+    const response = await axios(config);
+    res.json(response.data);
   } catch (error) {
-      console.error('Error when calling MongoDB API:', error);
-      res.status(500).send('Internal Server Error');
+    console.error('Error when calling MongoDB API:', error);
+    res.status(500).send('Internal Server Error');
   }
 });
-
 
 app.post('/upvote/:id', async (req, res) => {
   const objectId = req.params.id;
   console.log("Upvoting prompt with ObjectID:", objectId);
-  // const intObject = objectId.toString(24);
 
-  // Validate the ID format
-  // if (!ObjectId.isValid(objectId)) {
-  //   return res.status(400).send("Invalid ID format. ID must be a 24 character hex string.");
-  // }
-
-  // Define the update configuration
   const updateConfig = {
     method: 'post',
     url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/updateOne',
@@ -119,7 +118,7 @@ app.post('/upvote/:id', async (req, res) => {
       collection: 'prompts',
       database: 'userprompts',
       dataSource: 'RememberPrompt',
-      filter: { _id: objectId }, // Use ObjectId constructor only if id is valid
+      filter: { _id: objectId },
       update: { $inc: { upvotes: 1 } },
       upsert: true
     })
@@ -128,25 +127,15 @@ app.post('/upvote/:id', async (req, res) => {
   try {
     const updateResponse = await axios(updateConfig);
     console.log("Update response:", updateResponse.data);
-
-    // if (updateResponse.data.modifiedCount === 1) {
-    //   res.status(200).send("Upvote successfully incremented.");
-    // } else {
-    //   res.status(404).send("No such prompt found.");
-    // }
   } catch (error) {
     console.error("Error during the upvote operation:", error);
     res.status(500).send("Error while upvoting the prompt.");
   }
 });
 
-
-
-
-
 // Handle comments
 app.post('/comments/:id', async (req, res) => {
-  const { id } = req.params.id;
+  const { id } = req.params;
   const { username, comment, userEmail } = req.body;
 
   // Sanitize input
@@ -157,7 +146,7 @@ app.post('/comments/:id', async (req, res) => {
   const commentObject = {
     username: safeUsername,
     comment: safeComment,
-    userEmail: sanitizeInput(userEmail), // Assuming you want to save userEmail after sanitizing
+    userEmail: sanitizeInput(userEmail),
     timestamp: new Date() // Store the time when the comment was added
   };
 
@@ -172,9 +161,9 @@ app.post('/comments/:id', async (req, res) => {
       collection: 'prompts',
       database: 'userprompts',
       dataSource: 'RememberPrompt',
-      filter: { _id: id },  // Ensure correct conversion to ObjectId
+      filter: { _id: ObjectId(id) },
       update: {
-        $push: { comments: commentObject }  // Push new comment into the comments array
+        $push: { comments: commentObject }
       }
     })
   };

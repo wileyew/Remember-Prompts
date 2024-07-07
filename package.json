@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
+    "build": "react-app-rewired build && npm run server",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "spa": "react-scripts start",
