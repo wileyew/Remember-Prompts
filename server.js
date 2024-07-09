@@ -8,8 +8,8 @@ const cors = require("cors");
 
 const app = express();
 
-// Use PORT from environment variables or default to 5001
-const port = process.env.PORT || 5001;
+// Use PORT from environment variables or default to 3000
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(morgan("dev"));
@@ -61,7 +61,6 @@ app.post("/insert-prompts", async (req, res) => {
     comments: comments ? "" : undefined,
   };
 
-  // Only add unique keys from formData that are not already defined in the document
   const filteredFormData = Object.keys(formData)
     .filter(key => !document.hasOwnProperty(key))
     .reduce((acc, key) => {
@@ -69,7 +68,6 @@ app.post("/insert-prompts", async (req, res) => {
       return acc;
     }, {});
 
-  // Combine document and filteredFormData
   const finalDocument = { ...document, ...filteredFormData };
 
   const config = {
@@ -131,16 +129,14 @@ app.post('/comments/:id', async (req, res) => {
   const { id } = req.params;
   const { username, comment, userEmail } = req.body;
 
-  // Sanitize input
   const safeComment = sanitizeInput(comment);
   const safeUsername = sanitizeInput(username);
 
-  // Create comment object to be appended
   const commentObject = {
     username: safeUsername,
     comment: safeComment,
     userEmail: sanitizeInput(userEmail),
-    timestamp: new Date() // Store the time when the comment was added
+    timestamp: new Date()
   };
 
   const updateConfig = {

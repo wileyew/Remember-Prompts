@@ -5,15 +5,13 @@
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
-    "postbuild": "node server.js",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
-    "spa": "react-scripts start",
     "server": "node server.js",
     "server:dev": "nodemon server.js",
     "api-server": "node api-server.js",
     "api-server:dev": "nodemon api-server.js",
-    "dev": "npm-run-all --parallel spa api-server:dev",
+    "dev": "npm-run-all --parallel start api-server:dev",
     "prod": "npm-run-all --parallel build server"
   },
   "dependencies": {
