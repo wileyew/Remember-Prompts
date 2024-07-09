@@ -8,22 +8,15 @@ const cors = require("cors");
 
 const app = express();
 
-// Configure CORS to allow access from Vercel
-const corsOptions = {
-  origin: ["https://your-vercel-domain.vercel.app"], // Replace with your actual Vercel domain
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true,
-  optionsSuccessStatus: 204
-};
+// Use PORT from environment variables or default to 5001
+const port = process.env.PORT || 5001;
 
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(morgan("dev"));
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json());
 app.use(express.static(join(__dirname, "build")));
 const { ObjectId } = require('mongodb');  // Import ObjectId from MongoDB driver if needed
-
-const port = 5001;
 
 // Function to sanitize input
 const sanitizeInput = (input) => {
