@@ -1,13 +1,11 @@
 {
   "version": 2,
   "builds": [
-    { "src": "server.js", "use": "@vercel/node" }
+    { "src": "package.json", "use": "@vercel/node" },
+    { "src": "build/**", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "server.js" }
-  ],
-  "build": {
-    "command": "npm run build:prod",
-    "output": "build"
-  }
+    { "src": "/api/(.*)", "dest": "server.js" },
+    { "src": "/(.*)", "dest": "/build/$1" }
+  ]
 }
