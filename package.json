@@ -13,8 +13,10 @@
     "api-server": "node api-server.js",
     "api-server:dev": "nodemon api-server.js",
     "dev": "npm-run-all --parallel start api-server:dev",
-    "prod": "npm-run-all --parallel build server"
+    "prod": "npm-run-all --parallel build server",
+    "build:prod": "react-app-rewired build"
   },
+  
   "dependencies": {
     "@auth0/auth0-react": "^2.2.0",
     "@babel/plugin-syntax-flow": "^7.23",
