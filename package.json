@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "react-app-rewired start",
+    "start": "node server.js",
     "build": "react-app-rewired build",
     "postbuild": "node server.js",
     "test": "react-app-rewired test",
