@@ -1,12 +1,13 @@
 {
   "name": "auth0-react-sample",
   "version": "0.1.0",
+  "proxy": "http://localhost:5000",
   "private": true,
   "homepage": "./",
   "scripts": {
-    "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
-    "test": "react-app-rewired test",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "server": "node server.js",
     "server:dev": "nodemon server.js",
