@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(express.static(join(__dirname, "build")));
 const { ObjectId } = require('mongodb');  // Import ObjectId from MongoDB driver if needed
 
-const port = 5001;
+const port = process.env.PORT || 5001;
 
 // Function to sanitize input
 const sanitizeInput = (input) => {
