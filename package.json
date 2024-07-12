@@ -1,20 +1,21 @@
 {
   "name": "auth0-react-sample",
   "version": "0.1.0",
+  "proxy": "http://localhost:5000",
   "private": true,
+  "homepage": "./",
   "scripts": {
     "start": "react-scripts start",
-  "build": "react-scripts build",
-  "postbuild": "node replacePublicUrl.js",
-  "test": "react-scripts test",
-  "eject": "react-scripts eject",
-    "spa": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
     "server": "node server.js",
     "server:dev": "nodemon server.js",
     "api-server": "node api-server.js",
     "api-server:dev": "nodemon api-server.js",
-    "dev": "concurrently \"yarn start\" \"yarn start-api\"",
-    "prod": "npm-run-all --parallel build server"
+    "dev": "npm-run-all --parallel start api-server:dev",
+    "prod": "npm-run-all --parallel build server",
+    "build:prod": "react-app-rewired build"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.2.0",
@@ -31,6 +32,7 @@
     "cors": "^2.8",
     "crypto": "^1.0.1",
     "crypto-js": "^3.1.9-1",
+    "detect-port": "^1.6.1",
     "dompurify": "^3.1.5",
     "dotenv": "^16.4.5",
     "express": "^4.18.3",

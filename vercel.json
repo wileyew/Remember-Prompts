@@ -1,5 +1,9 @@
 {
     "version": 2,
+    "scripts": {
+      "build": "react-scripts build",
+      "start": "node server.js"
+    },
     "routes": [
       {
         "src": "/(.*)",

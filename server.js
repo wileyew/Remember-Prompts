@@ -1,29 +1,26 @@
 require('dotenv').config();
-const express = require("express");
-const morgan = require("morgan");
-const helmet = require("helmet");
-const { join } = require("path");
-const axios = require("axios");
-const cors = require("cors");
+const express = require('express');
+const morgan = require('morgan');
+const helmet = require('helmet');
+const path = require('path');
+const axios = require('axios');
+const cors = require('cors');
 
 const app = express();
-
-// Configure CORS to allow access from Vercel
+const port = process.env.PORT || 5000; // Change the port to avoid conflict with the React development server
 const corsOptions = {
-  origin: ["https://your-vercel-domain.vercel.app"], // Replace with your actual Vercel domain
+  origin: "*", // Update this to match your Vercel deployment URL or use '*' for wide open access (not recommended for production)
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 204
 };
 
-app.use(cors(corsOptions));
-app.use(morgan("dev"));
+app.use(corsOptions);
+app.use(morgan('dev'));
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json());
-app.use(express.static(join(__dirname, "build")));
+app.use(express.static(path.join(__dirname, 'build'))); // Serve React build files
 const { ObjectId } = require('mongodb');  // Import ObjectId from MongoDB driver if needed
-
-const port = process.env.PORT || 5001;
 
 // Function to sanitize input
 const sanitizeInput = (input) => {
@@ -34,7 +31,7 @@ const sanitizeInput = (input) => {
 };
 
 // Fetch prompts from MongoDB with updated upvotes
-app.get("/reported-prompts", async (req, res) => {
+app.get('/reported-prompts', async (req, res) => {
   try {
     const response = await axios({
       method: 'post',
@@ -44,9 +41,9 @@ app.get("/reported-prompts", async (req, res) => {
         'api-key': process.env.MONGO_API_KEY
       },
       data: {
-        collection: "prompts",
-        database: "userprompts",
-        dataSource: "RememberPrompt",
+        collection: 'prompts',
+        database: 'userprompts',
+        dataSource: 'RememberPrompt',
         filter: {}
       }
     });
@@ -57,7 +54,7 @@ app.get("/reported-prompts", async (req, res) => {
   }
 });
 
-app.post("/insert-prompts", async (req, res) => {
+app.post('/insert-prompts', async (req, res) => {
   const { email, category, upvotes, downvotes, comments, ...formData } = req.body;
 
   const document = {
@@ -65,18 +62,16 @@ app.post("/insert-prompts", async (req, res) => {
     userId: sanitizeInput(email),
     upvotes: upvotes ? 0 : undefined,
     downvotes: downvotes ? 0 : undefined,
-    comments: comments ? "" : undefined,
+    comments: comments ? '' : undefined
   };
 
-  // Only add unique keys from formData that are not already defined in the document
   const filteredFormData = Object.keys(formData)
-    .filter(key => !document.hasOwnProperty(key))
+    .filter((key) => !document.hasOwnProperty(key))
     .reduce((acc, key) => {
       acc[key] = sanitizeInput(formData[key]);
       return acc;
     }, {});
 
-  // Combine document and filteredFormData
   const finalDocument = { ...document, ...filteredFormData };
 
   const config = {
@@ -105,7 +100,7 @@ app.post("/insert-prompts", async (req, res) => {
 
 app.post('/upvote/:id', async (req, res) => {
   const objectId = req.params.id;
-  console.log("Upvoting prompt with ObjectID:", objectId);
+  console.log('Upvoting prompt with ObjectID:', objectId);
 
   const updateConfig = {
     method: 'post',
@@ -118,7 +113,7 @@ app.post('/upvote/:id', async (req, res) => {
       collection: 'prompts',
       database: 'userprompts',
       dataSource: 'RememberPrompt',
-      filter: { _id: objectId },
+      filter: { _id: ObjectId(objectId) },
       update: { $inc: { upvotes: 1 } },
       upsert: true
     })
@@ -126,10 +121,10 @@ app.post('/upvote/:id', async (req, res) => {
 
   try {
     const updateResponse = await axios(updateConfig);
-    console.log("Update response:", updateResponse.data);
+    console.log('Update response:', updateResponse.data);
   } catch (error) {
-    console.error("Error during the upvote operation:", error);
-    res.status(500).send("Error while upvoting the prompt.");
+    console.error('Error during the upvote operation:', error);
+    res.status(500).send('Error while upvoting the prompt.');
   }
 });
 
@@ -138,16 +133,14 @@ app.post('/comments/:id', async (req, res) => {
   const { id } = req.params;
   const { username, comment, userEmail } = req.body;
 
-  // Sanitize input
   const safeComment = sanitizeInput(comment);
   const safeUsername = sanitizeInput(username);
 
-  // Create comment object to be appended
   const commentObject = {
     username: safeUsername,
     comment: safeComment,
     userEmail: sanitizeInput(userEmail),
-    timestamp: new Date() // Store the time when the comment was added
+    timestamp: new Date()
   };
 
   const updateConfig = {
@@ -172,19 +165,19 @@ app.post('/comments/:id', async (req, res) => {
     const response = await axios(updateConfig);
     if (response.data.modifiedCount === 1) {
       console.log('id ' + id);
-      res.status(200).send("Comment added successfully.");
+      res.status(200).send('Comment added successfully.');
     } else {
-      res.status(404).send("No prompt found with the given ID.");
+      res.status(404).send('No prompt found with the given ID.');
     }
   } catch (error) {
-    console.error("Error while adding comment:", error);
-    res.status(500).send("Failed to add comment due to server error.");
+    console.error('Error while adding comment:', error);
+    res.status(500).send('Failed to add comment due to server error.');
   }
 });
 
-// Serve SPA
+// All other GET requests not handled will return the React app
 app.get('*', (req, res) => {
-  res.sendFile(join(__dirname, 'build', 'index.html'));
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 app.listen(port, () => {
