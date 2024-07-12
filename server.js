@@ -5,10 +5,25 @@ const helmet = require('helmet');
 const path = require('path');
 const axios = require('axios');
 const cors = require('cors');
+const net = require('net');
+
 
 const app = express();
-const port = process.env.PORT || 5000; // Change the port to avoid conflict with the React development server
+function findAvailablePort(startingPort, callback) {
+  const port = startingPort;
+  const server = net.createServer();
 
+  server.listen(port, () => {
+    server.once('close', () => {
+      callback(port);
+    });
+    server.close();
+  });
+
+  server.on('error', () => {
+    findAvailablePort(port + 1, callback);
+  });
+}
 app.use(cors());
 app.use(morgan('dev'));
 app.use(helmet({ contentSecurityPolicy: false }));
@@ -174,6 +189,9 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+const basePort = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
+findAvailablePort(basePort, (availablePort) => {
+  app.listen(availablePort, () => {
+    console.log(`Server listening on port ${availablePort}`);
+  });
 });
