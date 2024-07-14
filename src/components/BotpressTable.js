@@ -37,7 +37,7 @@ const BotpressTable = () => {
     const fetchDataFromDatabase = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch('https://workingwebserver.d1gjum1suik77t.amplifyapp.com/reported-prompts');
+        const response = await fetch('/reported-prompts');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -141,7 +141,7 @@ const BotpressTable = () => {
       };
 
       try {
-        const response = await fetch(`https://workingwebserver.d1gjum1suik77t.amplifyapp.com//upvote/${id}`, {
+        const response = await fetch(`/upvote/${id}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -171,7 +171,7 @@ const BotpressTable = () => {
     };
 
     try {
-      const response = await fetch(`http://localhost:5001/comments/${id}`, {
+      const response = await fetch(`/comments/${id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

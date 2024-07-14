@@ -241,21 +241,20 @@ function BotpressChatbot() {
   };
 
   const prepareCheckboxData = (formData) => {
-    const processedData = {formData}; // Create a copy
-    for (const key of ['upvotes', 'downvotes', 'comments']) {
-      if (formData[key]) {
-        if ([key] === 'upvotes' && formData['upvotes']) {
-          formData['upvotes'] = 0;
+    const processedData = { ...formData }; // Create a copy
+  
+    formFields[category].forEach(field => {
+      if (field.type === 'checkbox' && formData[field.name]) {
+        if (field.name === 'upvotes') {
+          processedData['upvotes'] = 0;
+        } else if (field.name === 'downvotes') {
+          processedData['downvotes'] = 0;
+        } else if (field.name === 'comments') {
+          processedData['comments'] = '';
         }
-        if ([key] === 'downvotes' && formData['downvotes']) {
-          formData['downvotes'] = 0;
-        }
-        if ([key] === 'comments' && formData['comments']) {
-          formData['comments'] = "";
-        }
-        processedData[key] = formData[key]; // If checked, add to processed data
       }
-    }
+    });
+  
     return processedData;
   };
 
@@ -270,7 +269,7 @@ function BotpressChatbot() {
         userEmail: user.email
       };
   
-      const response = await fetch('http://localhost:5001/insert-prompts', {
+      const response = await fetch('/insert-prompts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

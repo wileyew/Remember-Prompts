@@ -121,7 +121,7 @@ const DynamicForm = ({ onSave }) => {
         comments: comments, 
         category: DOMPurify.sanitize(category) // Include category in the form data
       };
-      fetch('http://localhost:5001/insert-prompts', {
+      fetch('/insert-prompts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

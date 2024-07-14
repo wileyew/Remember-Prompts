@@ -139,7 +139,7 @@ function BotpressChatbot() {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5001/insert-prompts', {
+      const response = await fetch('/insert-prompts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
