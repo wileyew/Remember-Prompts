@@ -106,19 +106,13 @@ const DynamicForm = ({ onSave }) => {
           sanitizedDataToSubmit[key] = DOMPurify.sanitize(formData[key]);
         }
       }
-      // Add the upvotes field with a value of 0
-      sanitizedDataToSubmit.upvotes = 0;
-      sanitizedDataToSubmit.comments = "";
-
-
-    
-
+      // Add the upvotes field with a value of 0 and comments as an empty string
+      sanitizedDataToSubmit.upvotes = 0; // This ensures default value
+      sanitizedDataToSubmit.comments = ""; // This ensures default value
 
       const dataToSubmit = {
         ...sanitizedDataToSubmit,
         userEmail: DOMPurify.sanitize(userEmail), // Include user email in the form data
-        upvotes: upvotes,
-        comments: comments, 
         category: DOMPurify.sanitize(category) // Include category in the form data
       };
       fetch('/insert-prompts', {
@@ -128,16 +122,16 @@ const DynamicForm = ({ onSave }) => {
         },
         body: JSON.stringify(dataToSubmit),
       })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log('Form data submitted successfully:', data);
-          setIsSubmitting(false);
-          setFormData({});
-        })
-        .catch((error) => {
-          console.error('Error submitting form data:', error);
-          setIsSubmitting(false);
-        });
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Form data submitted successfully:', data);
+        setIsSubmitting(false);
+        setFormData({});
+      })
+      .catch((error) => {
+        console.error('Error submitting form data:', error);
+        setIsSubmitting(false);
+      });
     } else {
       console.log('Form has errors. Not submitting.');
     }
