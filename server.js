@@ -30,6 +30,10 @@ const sanitizeInput = (input) => {
                       .replace(/<![\s\S]*?--[ \t\n\r]*>/gi, '');
 };
 
+app.get("/*", function(req, res) {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
 // Fetch prompts from MongoDB with updated upvotes
 app.get('/reported-prompts', async (req, res) => {
   try {
