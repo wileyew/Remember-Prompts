@@ -25,6 +25,11 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'build')));
 
+app.use((req, res, next) => {
+  console.log(`Received ${req.method} request for ${req.url}`);
+  next();
+});
+
 const { ObjectId } = require('mongodb');
 
 const sanitizeInput = (input) => {
