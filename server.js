@@ -7,22 +7,26 @@ const axios = require('axios');
 const cors = require('cors');
 
 const app = express();
-const port = process.env.PORT || 5000; // Change the port to avoid conflict with the React development server
+const port = process.env.PORT || 5000;
+
+// Define CORS options
 const corsOptions = {
-  origin: "*", // Update this to match your Vercel deployment URL or use '*' for wide open access (not recommended for production)
+  origin: "*", // Adjust as needed for production
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 204
 };
 
-app.use(corsOptions);
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(cors(corsOptions)); // Correct usage of CORS with options
 app.use(morgan('dev'));
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'build'))); // Serve React build files
-const { ObjectId } = require('mongodb');  // Import ObjectId from MongoDB driver if needed
+app.use(express.static(path.join(__dirname, 'build')));
 
-// Function to sanitize input
+const { ObjectId } = require('mongodb');
+
 const sanitizeInput = (input) => {
   return String(input).replace(/<script.*?>.*?<\/script>/gi, '')
                       .replace(/<[\/\!]*?[^<>]*?>/gi, '')
@@ -34,7 +38,6 @@ app.get("/*", function(req, res) {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// Fetch prompts from MongoDB with updated upvotes
 app.get('/reported-prompts', async (req, res) => {
   try {
     const response = await axios({
@@ -60,7 +63,6 @@ app.get('/reported-prompts', async (req, res) => {
 
 app.post('/insert-prompts', async (req, res) => {
   const { email, category, upvotes, downvotes, comments, ...formData } = req.body;
-
   const document = {
     category: sanitizeInput(category),
     userId: sanitizeInput(email),
@@ -132,7 +134,6 @@ app.post('/upvote/:id', async (req, res) => {
   }
 });
 
-// Handle comments
 app.post('/comments/:id', async (req, res) => {
   const { id } = req.params;
   const { username, comment, userEmail } = req.body;
@@ -168,7 +169,7 @@ app.post('/comments/:id', async (req, res) => {
   try {
     const response = await axios(updateConfig);
     if (response.data.modifiedCount === 1) {
-      console.log('id ' + id);
+      console.log('ID: ' + id);
       res.status(200).send('Comment added successfully.');
     } else {
       res.status(404).send('No prompt found with the given ID.');
@@ -179,7 +180,6 @@ app.post('/comments/:id', async (req, res) => {
   }
 });
 
-// All other GET requests not handled will return the React app
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
