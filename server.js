@@ -1,4 +1,3 @@
-import { getConfig } from "../config";
 require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
@@ -10,7 +9,6 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 5000;
 
-const { apiOrigin = "https://workingwebserver.d1gjum1suik77t.amplifyapp.com", audience } = getConfig();
 
 
 // Define CORS options
