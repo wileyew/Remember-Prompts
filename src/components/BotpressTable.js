@@ -39,7 +39,7 @@ const BotpressTable = () => {
 
       setIsLoading(true);
       try {
-        const response = await fetch(`${apiOrigin}/api/external`);
+        const response = await fetch(`${apiOrigin}/api/reported-prompts`);
         
         if (!response.ok) {
           throw new Error('Network response was not ok');
