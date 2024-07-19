@@ -30,6 +30,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(cors({
+  origin: 'https://workingwebserver.d1gjum1suik77t.amplifyapp.com'
+}));
+
 const { ObjectId } = require('mongodb');
 
 const sanitizeInput = (input) => {
