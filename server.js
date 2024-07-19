@@ -9,12 +9,10 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 5000;
 
-
-
 // Define CORS options
 const corsOptions = {
-  origin: "*", // Adjust as needed for production
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  origin: 'https://workingwebserver.d1gjum1suik77t.amplifyapp.com', // Specific origin
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
   optionsSuccessStatus: 204
 };
@@ -27,17 +25,15 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'build')));
 
+// Logging middleware for debugging
 app.use((req, res, next) => {
   console.log(`Received ${req.method} request for ${req.url}`);
   next();
 });
 
-app.use(cors({
-  origin: 'https://workingwebserver.d1gjum1suik77t.amplifyapp.com'
-}));
-
 const { ObjectId } = require('mongodb');
 
+// Function to sanitize input
 const sanitizeInput = (input) => {
   return String(input).replace(/<script.*?>.*?<\/script>/gi, '')
                       .replace(/<[\/\!]*?[^<>]*?>/gi, '')
@@ -45,9 +41,7 @@ const sanitizeInput = (input) => {
                       .replace(/<![\s\S]*?--[ \t\n\r]*>/gi, '');
 };
 
-app.get("/*", function(req, res) {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
+// API routes
 
 app.get('/api/reported-prompts', async (req, res) => {
   try {
@@ -72,7 +66,7 @@ app.get('/api/reported-prompts', async (req, res) => {
   }
 });
 
-app.post('/insert-prompts', async (req, res) => {
+app.post('/api/insert-prompts', async (req, res) => {
   const { email, category, upvotes, downvotes, comments, ...formData } = req.body;
   const document = {
     category: sanitizeInput(category),
@@ -115,7 +109,7 @@ app.post('/insert-prompts', async (req, res) => {
   }
 });
 
-app.post('/upvote/:id', async (req, res) => {
+app.post('/api/upvote/:id', async (req, res) => {
   const objectId = req.params.id;
   console.log('Upvoting prompt with ObjectID:', objectId);
 
@@ -139,13 +133,14 @@ app.post('/upvote/:id', async (req, res) => {
   try {
     const updateResponse = await axios(updateConfig);
     console.log('Update response:', updateResponse.data);
+    res.json(updateResponse.data);
   } catch (error) {
     console.error('Error during the upvote operation:', error);
     res.status(500).send('Error while upvoting the prompt.');
   }
 });
 
-app.post('/comments/:id', async (req, res) => {
+app.post('/api/comments/:id', async (req, res) => {
   const { id } = req.params;
   const { username, comment, userEmail } = req.body;
 
@@ -191,6 +186,7 @@ app.post('/comments/:id', async (req, res) => {
   }
 });
 
+// Serve React build files
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
