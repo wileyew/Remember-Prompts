@@ -59,7 +59,8 @@ app.get('/api/reported-prompts', async (req, res) => {
         filter: {}
       }
     });
-    res.json(response.data);
+    const text = res.text(response.data);
+    console.log('response from MongoDB API in server js:', text);
   } catch (error) {
     console.error('Error calling MongoDB API:', error);
     res.status(500).send('Internal Server Error');
