@@ -4,7 +4,7 @@ import { Disclosure } from '@headlessui/react';
 import { ChevronUpIcon } from '@heroicons/react/20/solid';
 import "../../src/index.css"; // Import the CSS file for styling
 import { useTable, usePagination } from 'react-table';
-import { getConfig } from "..config";
+import { getConfig } from "../config";
 
 const cleanEmail = (email) => {
   if (!email) return '';
@@ -35,7 +35,7 @@ const BotpressTable = () => {
 
   useEffect(() => {
     const fetchDataFromDatabase = async () => {
-      const { apiOrigin = "http://localhost:3001", audience } = getConfig();
+      const { apiOrigin = "https://workingwebserver.d1gjum1suik77t.amplifyapp.com", audience } = getConfig();
 
       setIsLoading(true);
       try {
