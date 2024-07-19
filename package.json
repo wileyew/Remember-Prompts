@@ -1,7 +1,6 @@
 {
   "name": "auth0-react-sample",
   "version": "0.1.0",
-  "proxy": "http://localhost:5000",
   "private": true,
   "homepage": ".",
   "scripts": {
