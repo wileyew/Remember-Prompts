@@ -4,7 +4,7 @@ import { Disclosure } from '@headlessui/react';
 import { ChevronUpIcon } from '@heroicons/react/20/solid';
 import "../../src/index.css"; // Import the CSS file for styling
 import { useTable, usePagination } from 'react-table';
-
+import { getConfig } from "..config";
 
 const cleanEmail = (email) => {
   if (!email) return '';
@@ -35,9 +35,12 @@ const BotpressTable = () => {
 
   useEffect(() => {
     const fetchDataFromDatabase = async () => {
+      const { apiOrigin = "http://localhost:3001", audience } = getConfig();
+
       setIsLoading(true);
       try {
-        const response = await fetch('/reported-prompts');
+        const response = await fetch(`${apiOrigin}/api/external`);
+        
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -169,6 +172,7 @@ const BotpressTable = () => {
       comment: commentText,
       userEmail: user.email
     };
+    
 
     try {
       const response = await fetch(`/comments/${id}`, {

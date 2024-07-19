@@ -40,7 +40,7 @@ app.get("/api/external", checkJwt, (req, res) => {
   });
 });
 
-app.get('/reported-prompts', async (req, res) => {
+app.get('/api/reported-prompts', async (req, res) => {
   try {
     const response = await axios({
       method: 'post',
