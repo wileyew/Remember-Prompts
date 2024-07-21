@@ -5,7 +5,6 @@ const helmet = require('helmet');
 const path = require('path');
 const axios = require('axios');
 const cors = require('cors');
-
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -33,6 +32,7 @@ app.use((req, res, next) => {
 
 const { ObjectId } = require('mongodb');
 
+
 // Function to sanitize input
 const sanitizeInput = (input) => {
   return String(input).replace(/<script.*?>.*?<\/script>/gi, '')
@@ -44,6 +44,7 @@ const sanitizeInput = (input) => {
 // API routes
 
 app.get('/api/reported-prompts', async (req, res) => {
+
   try {
     const response = await axios({
       method: 'post',
@@ -67,7 +68,8 @@ app.get('/api/reported-prompts', async (req, res) => {
   }
 });
 
-app.post('/api/insert-prompts', async (req, res) => {
+
+app.post('/insert-prompts', async (req, res) => {
   const { email, category, upvotes, downvotes, comments, ...formData } = req.body;
   const document = {
     category: sanitizeInput(category),
@@ -135,6 +137,7 @@ app.post('/api/upvote/:id', async (req, res) => {
     const updateResponse = await axios(updateConfig);
     console.log('Update response:', updateResponse.data);
     res.json(updateResponse.data);
+
   } catch (error) {
     console.error('Error during the upvote operation:', error);
     res.status(500).send('Error while upvoting the prompt.');
@@ -177,6 +180,7 @@ app.post('/api/comments/:id', async (req, res) => {
     const response = await axios(updateConfig);
     if (response.data.modifiedCount === 1) {
       console.log('ID: ' + id);
+
       res.status(200).send('Comment added successfully.');
     } else {
       res.status(404).send('No prompt found with the given ID.');
@@ -187,11 +191,13 @@ app.post('/api/comments/:id', async (req, res) => {
   }
 });
 
-// Serve React build files
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+const basePort = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
+findAvailablePort(basePort, (availablePort) => {
+  app.listen(availablePort, () => {
+    console.log(`Server listening on port ${availablePort}`);
+  });
 });
