@@ -4,7 +4,7 @@ import { Disclosure } from '@headlessui/react';
 import { ChevronUpIcon } from '@heroicons/react/20/solid';
 import "../../src/index.css"; // Import the CSS file for styling
 import { useTable, usePagination } from 'react-table';
-
+import { getConfig } from "../config";
 
 const cleanEmail = (email) => {
   if (!email) return '';
@@ -35,9 +35,12 @@ const BotpressTable = () => {
 
   useEffect(() => {
     const fetchDataFromDatabase = async () => {
+      const { apiOrigin = "https://workingwebserver.d1gjum1suik77t.amplifyapp.com", audience } = getConfig();
+
       setIsLoading(true);
       try {
-        const response = await fetch('http://localhost:5001/reported-prompts');
+        const response = await fetch(`${apiOrigin}/api/reported-prompts`);
+        
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -141,7 +144,7 @@ const BotpressTable = () => {
       };
 
       try {
-        const response = await fetch(`http://localhost:5001/upvote/${id}`, {
+        const response = await fetch(`/upvote/${id}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -169,9 +172,10 @@ const BotpressTable = () => {
       comment: commentText,
       userEmail: user.email
     };
+    
 
     try {
-      const response = await fetch(`http://localhost:5001/comments/${id}`, {
+      const response = await fetch(`/comments/${id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -5,31 +5,33 @@ const helmet = require('helmet');
 const path = require('path');
 const axios = require('axios');
 const cors = require('cors');
-const net = require('net');
-
-
 const app = express();
-function findAvailablePort(startingPort, callback) {
-  const port = startingPort;
-  const server = net.createServer();
+const port = process.env.PORT || 5000;
 
-  server.listen(port, () => {
-    server.once('close', () => {
-      callback(port);
-    });
-    server.close();
-  });
+// Define CORS options
+const corsOptions = {
+  origin: 'https://workingwebserver.d1gjum1suik77t.amplifyapp.com', // Specific origin
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  optionsSuccessStatus: 204
+};
 
-  server.on('error', () => {
-    findAvailablePort(port + 1, callback);
-  });
-}
-app.use(cors());
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(cors(corsOptions)); // Correct usage of CORS with options
 app.use(morgan('dev'));
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'build'))); // Serve React build files
-const { ObjectId } = require('mongodb');  // Import ObjectId from MongoDB driver if needed
+app.use(express.static(path.join(__dirname, 'build')));
+
+// Logging middleware for debugging
+app.use((req, res, next) => {
+  console.log(`Received ${req.method} request for ${req.url}`);
+  next();
+});
+
+const { ObjectId } = require('mongodb');
+
 
 // Function to sanitize input
 const sanitizeInput = (input) => {
@@ -39,8 +41,10 @@ const sanitizeInput = (input) => {
                       .replace(/<![\s\S]*?--[ \t\n\r]*>/gi, '');
 };
 
-// Fetch prompts from MongoDB with updated upvotes
-app.get('/reported-prompts', async (req, res) => {
+// API routes
+
+app.get('/api/reported-prompts', async (req, res) => {
+
   try {
     const response = await axios({
       method: 'post',
@@ -56,16 +60,17 @@ app.get('/reported-prompts', async (req, res) => {
         filter: {}
       }
     });
-    res.json(response.data);
+    const text = res.text(response.data);
+    console.log('response from MongoDB API in server js:', text);
   } catch (error) {
     console.error('Error calling MongoDB API:', error);
     res.status(500).send('Internal Server Error');
   }
 });
 
+
 app.post('/insert-prompts', async (req, res) => {
   const { email, category, upvotes, downvotes, comments, ...formData } = req.body;
-
   const document = {
     category: sanitizeInput(category),
     userId: sanitizeInput(email),
@@ -107,7 +112,7 @@ app.post('/insert-prompts', async (req, res) => {
   }
 });
 
-app.post('/upvote/:id', async (req, res) => {
+app.post('/api/upvote/:id', async (req, res) => {
   const objectId = req.params.id;
   console.log('Upvoting prompt with ObjectID:', objectId);
 
@@ -131,14 +136,15 @@ app.post('/upvote/:id', async (req, res) => {
   try {
     const updateResponse = await axios(updateConfig);
     console.log('Update response:', updateResponse.data);
+    res.json(updateResponse.data);
+
   } catch (error) {
     console.error('Error during the upvote operation:', error);
     res.status(500).send('Error while upvoting the prompt.');
   }
 });
 
-// Handle comments
-app.post('/comments/:id', async (req, res) => {
+app.post('/api/comments/:id', async (req, res) => {
   const { id } = req.params;
   const { username, comment, userEmail } = req.body;
 
@@ -173,7 +179,8 @@ app.post('/comments/:id', async (req, res) => {
   try {
     const response = await axios(updateConfig);
     if (response.data.modifiedCount === 1) {
-      console.log('id ' + id);
+      console.log('ID: ' + id);
+
       res.status(200).send('Comment added successfully.');
     } else {
       res.status(404).send('No prompt found with the given ID.');
@@ -184,7 +191,6 @@ app.post('/comments/:id', async (req, res) => {
   }
 });
 
-// All other GET requests not handled will return the React app
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
