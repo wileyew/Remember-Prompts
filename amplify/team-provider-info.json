@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-overflowprompts-dev-4bac9-authRole",
+      "UnauthRoleArn": "arn:aws:iam::730335394822:role/amplify-overflowprompts-dev-4bac9-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::730335394822:role/amplify-overflowprompts-dev-4bac9-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-overflowprompts-dev-4bac9-deployment",
+      "UnauthRoleName": "amplify-overflowprompts-dev-4bac9-unauthRole",
+      "StackName": "amplify-overflowprompts-dev-4bac9",
+      "StackId": "arn:aws:cloudformation:us-east-1:730335394822:stack/amplify-overflowprompts-dev-4bac9/fd1a2a70-4af8-11ef-abf5-0e521048e2cb",
+      "AmplifyAppId": "d3bvol1g5hpk38"
+    },
+    "categories": {
+      "function": {
+        "reportedPrompts": {
+          "deploymentBucketName": "amplify-overflowprompts-dev-4bac9-deployment",
+          "s3Key": "amplify-builds/reportedPrompts-5652526e6b4876656c69-build.zip"
+        }
+      }
+    }
+  }
+}

@@ -30,8 +30,6 @@ const BotpressTable = () => {
   const [userUpvotes, setUserUpvotes] = useState(new Set());
   const [comments, setComments] = useState({});
   const [username, setUsername] = useState('');
-  // const [pageIndex, setPageIndex] = useState(0);
-  // const [pageSize, setPageSize] = useState(10);  // Default page size
 
   useEffect(() => {
     const fetchDataFromDatabase = async () => {

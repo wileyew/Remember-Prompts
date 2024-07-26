@@ -1,0 +1,27 @@
+{
+  "function": {
+    "reportedPrompts": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_reportedPrompts_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "reportedPrompts"
+        }
+      ]
+    },
+    "AMPLIFY_function_reportedPrompts_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "reportedPrompts"
+        }
+      ]
+    }
+  }
+}
