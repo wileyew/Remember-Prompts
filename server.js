@@ -196,8 +196,8 @@ app.get('*', (req, res) => {
 });
 
 const basePort = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
-findAvailablePort(basePort, (availablePort) => {
-  app.listen(availablePort, () => {
-    console.log(`Server listening on port ${availablePort}`);
-  });
+
+
+app.listen(basePort, () => {
+  console.log(`Server is running on port ${basePort}`);
 });
