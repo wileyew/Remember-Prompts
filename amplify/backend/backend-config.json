@@ -1,4 +1,20 @@
 {
+  "api": {
+    "reportedPromptsApi": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "reportedPrompts"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
   "function": {
     "reportedPrompts": {
       "build": true,

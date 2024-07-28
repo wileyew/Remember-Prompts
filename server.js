@@ -10,7 +10,7 @@ const port = process.env.PORT || 5000;
 
 // Define CORS options
 const corsOptions = {
-  origin: 'https://workingwebserver.d1gjum1suik77t.amplifyapp.com', // Specific origin
+  origin: 'https://www.overflowprompts.net', // Specific origin
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
   optionsSuccessStatus: 204
@@ -43,7 +43,7 @@ const sanitizeInput = (input) => {
 
 // API routes
 
-app.get('/api/reported-prompts', async (req, res) => {
+app.get('/reported-prompts', async (req, res) => {
 
   try {
     const response = await axios({

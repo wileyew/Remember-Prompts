@@ -33,11 +33,11 @@ const BotpressTable = () => {
 
   useEffect(() => {
     const fetchDataFromDatabase = async () => {
-      const { apiOrigin = "https://workingwebserver.d1gjum1suik77t.amplifyapp.com", audience } = getConfig();
+      const { apiOrigin = "https://www.overflowprompts.net", audience } = getConfig();
 
       setIsLoading(true);
       try {
-        const response = await fetch(`${apiOrigin}/api/reported-prompts`);
+        const response = await fetch(`${apiOrigin}/reported-prompts`);
         
         if (!response.ok) {
           throw new Error('Network response was not ok');
