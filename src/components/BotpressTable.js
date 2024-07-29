@@ -37,7 +37,7 @@ const BotpressTable = () => {
 
       setIsLoading(true);
       try {
-        const response = await fetch(`${apiOrigin}/api/reported-prompts`, {
+        const response = await fetch(`${apiOrigin}`, {
           headers: {
             'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
             'Content-Type': 'application/json' // Ensure this matches the middleware check
