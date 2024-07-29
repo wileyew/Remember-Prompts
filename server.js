@@ -43,30 +43,30 @@ const sanitizeInput = (input) => {
 
 // API routes
 
-// app.get('/reported-prompts', async (req, res) => {
+app.get('/api/reported-prompts', async (req, res) => {
 
-//   try {
-//     const response = await axios({
-//       method: 'post',
-//       url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/find',
-//       headers: {
-//         'Content-Type': 'application/json',
-//         'api-key': process.env.MONGO_API_KEY
-//       },
-//       data: {
-//         collection: 'prompts',
-//         database: 'userprompts',
-//         dataSource: 'RememberPrompt',
-//         filter: {}
-//       }
-//     });
-//     const text = res.text(response.data);
-//     console.log('response from MongoDB API in server js:', text);
-//   } catch (error) {
-//     console.error('Error calling MongoDB API:', error);
-//     res.status(500).send('Internal Server Error');
-//   }
-// });
+  try {
+    const response = await axios({
+      method: 'post',
+      url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/find',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': process.env.MONGO_API_KEY
+      },
+      data: {
+        collection: 'prompts',
+        database: 'userprompts',
+        dataSource: 'RememberPrompt',
+        filter: {}
+      }
+    });
+    const text = res.text(response.data);
+    console.log('response from MongoDB API in server js:', text);
+  } catch (error) {
+    console.error('Error calling MongoDB API:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 exports.handler = async (event) => {
   try {
