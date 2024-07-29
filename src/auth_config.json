@@ -1,6 +1,6 @@
 {
     "domain": "dev-ypza21y2pn8n2krs.us.auth0.com",
-    "clientId": "6ynAiNXKC15tyy6XdHZNQ0mXACIKWcQx"
-    
+    "clientId": "6ynAiNXKC15tyy6XdHZNQ0mXACIKWcQx",
+    "apiOrigin": "https://8cixave2lk.execute-api.us-east-1.amazonaws.com/dev/"
     
   }
