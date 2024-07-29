@@ -9,6 +9,14 @@
           ],
           "category": "function",
           "resourceName": "reportedPrompts"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "report"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -16,6 +24,12 @@
     }
   },
   "function": {
+    "report": {
+      "build": true,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "reportedPrompts": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -23,6 +37,38 @@
     }
   },
   "parameters": {
+    "AMPLIFY_function_report_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "report"
+        }
+      ]
+    },
+    "AMPLIFY_function_report_mongoApiKey": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "report"
+        }
+      ]
+    },
+    "AMPLIFY_function_report_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "report"
+        }
+      ]
+    },
+    "AMPLIFY_function_report_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "report"
+        }
+      ]
+    },
     "AMPLIFY_function_reportedPrompts_deploymentBucketName": {
       "usedBy": [
         {

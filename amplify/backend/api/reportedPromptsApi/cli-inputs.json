@@ -7,6 +7,13 @@
       "permissions": {
         "setting": "open"
       }
+    },
+    "/reported-prompts": {
+      "name": "/reported-prompts",
+      "lambdaFunction": "report",
+      "permissions": {
+        "setting": "open"
+      }
     }
   }
 }

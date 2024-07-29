@@ -3,7 +3,13 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const app = express();
 app.use(bodyParser.json());
-
+app.use((req, res, next) => {
+  const apiKey = req.headers['x-api-key'];
+  if (!apiKey || apiKey !== 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  next();
+});
 app.get('/api/reported-prompts', async (req, res) => {
   try {
     const response = await axios({
@@ -11,7 +17,7 @@ app.get('/api/reported-prompts', async (req, res) => {
       url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/find',
       headers: {
         'Content-Type': 'application/json',
-        'api-key': process.env.MONGO_API_KEY
+        'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
       },
       data: {
         collection: 'prompts',

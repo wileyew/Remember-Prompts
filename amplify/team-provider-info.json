@@ -15,8 +15,17 @@
       "function": {
         "reportedPrompts": {
           "deploymentBucketName": "amplify-overflowprompts-dev-4bac9-deployment",
-          "s3Key": "amplify-builds/reportedPrompts-5652526e6b4876656c69-build.zip"
+          "s3Key": "amplify-builds/reportedPrompts-7a6e4e30594344797a72-build.zip"
+        },
+        "report": {
+          "mongoApiKey": "rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE",
+          "secretsPathAmplifyAppId": "d3bvol1g5hpk38",
+          "deploymentBucketName": "amplify-overflowprompts-dev-4bac9-deployment",
+          "s3Key": "amplify-builds/report-6969595741354b4e6a79-build.zip"
         }
+      },
+      "api": {
+        "reportedPromptsApi": {}
       }
     }
   }

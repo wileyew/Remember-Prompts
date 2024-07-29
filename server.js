@@ -43,15 +43,39 @@ const sanitizeInput = (input) => {
 
 // API routes
 
-app.get('/reported-prompts', async (req, res) => {
+// app.get('/reported-prompts', async (req, res) => {
 
+//   try {
+//     const response = await axios({
+//       method: 'post',
+//       url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/find',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'api-key': process.env.MONGO_API_KEY
+//       },
+//       data: {
+//         collection: 'prompts',
+//         database: 'userprompts',
+//         dataSource: 'RememberPrompt',
+//         filter: {}
+//       }
+//     });
+//     const text = res.text(response.data);
+//     console.log('response from MongoDB API in server js:', text);
+//   } catch (error) {
+//     console.error('Error calling MongoDB API:', error);
+//     res.status(500).send('Internal Server Error');
+//   }
+// });
+
+exports.handler = async (event) => {
   try {
     const response = await axios({
       method: 'post',
       url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/find',
       headers: {
         'Content-Type': 'application/json',
-        'api-key': process.env.MONGO_API_KEY
+        'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
       },
       data: {
         collection: 'prompts',
@@ -60,13 +84,22 @@ app.get('/reported-prompts', async (req, res) => {
         filter: {}
       }
     });
-    const text = res.text(response.data);
-    console.log('response from MongoDB API in server js:', text);
+    return {
+      statusCode: 200,
+      body: JSON.stringify(response.data),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
   } catch (error) {
     console.error('Error calling MongoDB API:', error);
-    res.status(500).send('Internal Server Error');
+    return {
+      statusCode: 500,
+      body: 'Internal Server Error'
+    };
   }
-});
+};
+
 
 
 app.post('/insert-prompts', async (req, res) => {

@@ -30,6 +30,7 @@ Amplify Params - DO NOT EDIT */
 const express = require('express')
 const bodyParser = require('body-parser')
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
+const axios = require('axios');
 
 // declare a new express app
 const app = express()
@@ -49,8 +50,38 @@ app.use(function(req, res, next) {
  **********************/
 
 app.get('/reported-prompts', function(req, res) {
-  // Add your code here
-  res.json({success: 'get call succeed!', url: req.url});
+  exports.handler = async (event) => {
+    try {
+      const response = await axios({
+        method: 'post',
+        url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/find',
+        headers: {
+          'Content-Type': 'application/json',
+          'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
+        },
+        data: {
+          collection: 'prompts',
+          database: 'userprompts',
+          dataSource: 'RememberPrompt',
+          filter: {}
+        }
+      });
+      return {
+        statusCode: 200,
+        body: JSON.stringify(response.data),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      };
+    } catch (error) {
+      console.error('Error calling MongoDB API:', error);
+      return {
+        statusCode: 500,
+        body: 'Internal Server Error'
+      };
+    }
+  };
+  
 });
 
 app.get('/reported-prompts/*', function(req, res) {
