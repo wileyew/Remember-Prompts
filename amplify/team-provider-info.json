@@ -15,7 +15,7 @@
       "function": {
         "reportedPrompts": {
           "deploymentBucketName": "amplify-overflowprompts-dev-4bac9-deployment",
-          "s3Key": "amplify-builds/reportedPrompts-7a6e4e30594344797a72-build.zip"
+          "s3Key": "amplify-builds/reportedPrompts-2f425969464654724352-build.zip"
         },
         "report": {
           "mongoApiKey": "rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE",
