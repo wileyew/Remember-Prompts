@@ -68,39 +68,6 @@ app.get('/api/reported-prompts', async (req, res) => {
   }
 });
 
-exports.handler = async (event) => {
-  try {
-    const response = await axios({
-      method: 'post',
-      url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/find',
-      headers: {
-        'Content-Type': 'application/json',
-        'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE'
-      },
-      data: {
-        collection: 'prompts',
-        database: 'userprompts',
-        dataSource: 'RememberPrompt',
-        filter: {}
-      }
-    });
-    return {
-      statusCode: 200,
-      body: JSON.stringify(response.data),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    };
-  } catch (error) {
-    console.error('Error calling MongoDB API:', error);
-    return {
-      statusCode: 500,
-      body: 'Internal Server Error'
-    };
-  }
-};
-
-
 
 app.post('/insert-prompts', async (req, res) => {
   const { email, category, upvotes, downvotes, comments, ...formData } = req.body;
