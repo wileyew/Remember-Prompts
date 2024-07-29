@@ -1,0 +1,13 @@
+{
+  "permissions": {},
+  "lambdaLayers": [],
+  "environmentVariableList": [
+    {
+      "cloudFormationParameterName": "mongoApiKey",
+      "environmentVariableName": "MONGO_API_KEY"
+    }
+  ],
+  "secretNames": [
+    "MONGOAPIKEY"
+  ]
+}
