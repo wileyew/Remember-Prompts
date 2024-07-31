@@ -5,8 +5,30 @@ const helmet = require('helmet');
 const path = require('path');
 const axios = require('axios');
 const cors = require('cors');
+const crypto = require('crypto');
+
 const app = express();
 const port = process.env.PORT || 5000;
+
+const algorithm = 'aes-256-cbc'; // Encryption algorithm
+const secretKey = process.env.ENCRYPTION_KEY; // Ensure this key is 32 characters
+const iv = crypto.randomBytes(16); // Initialization vector
+
+// Function to encrypt data
+const encrypt = (text) => {
+  const cipher = crypto.createCipheriv(algorithm, Buffer.from(secretKey), iv);
+  let encrypted = cipher.update(text);
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+  return iv.toString('hex') + ':' + encrypted.toString('hex');
+};
+
+// Function to sanitize input
+const sanitizeInput = (input) => {
+  return String(input).replace(/<script.*?>.*?<\/script>/gi, '')
+                      .replace(/<[\/\!]*?[^<>]*?>/gi, '')
+                      .replace(/<style.*?>.*?<\/style>/gi, '')
+                      .replace(/<![\s\S]*?--[ \t\n\r]*>/gi, '');
+};
 
 // Define CORS options
 const corsOptions = {
@@ -32,19 +54,9 @@ app.use((req, res, next) => {
 
 const { ObjectId } = require('mongodb');
 
-
-// Function to sanitize input
-const sanitizeInput = (input) => {
-  return String(input).replace(/<script.*?>.*?<\/script>/gi, '')
-                      .replace(/<[\/\!]*?[^<>]*?>/gi, '')
-                      .replace(/<style.*?>.*?<\/style>/gi, '')
-                      .replace(/<![\s\S]*?--[ \t\n\r]*>/gi, '');
-};
-
 // API routes
 
 app.get('/api/reported-prompts', async (req, res) => {
-
   try {
     const response = await axios({
       method: 'post',
@@ -60,20 +72,19 @@ app.get('/api/reported-prompts', async (req, res) => {
         filter: {}
       }
     });
-    const text = res.text(response.data);
-    console.log('response from MongoDB API in server js:', text);
+    res.json(response.data); // Ensure that email addresses are not exposed in the response
   } catch (error) {
     console.error('Error calling MongoDB API:', error);
     res.status(500).send('Internal Server Error');
   }
 });
 
-
 app.post('/insert-prompts', async (req, res) => {
   const { email, category, upvotes, downvotes, comments, ...formData } = req.body;
+  const encryptedEmail = encrypt(sanitizeInput(email)); // Encrypt and sanitize email
   const document = {
     category: sanitizeInput(category),
-    userId: sanitizeInput(email),
+    userId: encryptedEmail, // Store encrypted email
     upvotes: upvotes ? 0 : undefined,
     downvotes: downvotes ? 0 : undefined,
     comments: comments ? '' : undefined
@@ -137,7 +148,6 @@ app.post('/api/upvote/:id', async (req, res) => {
     const updateResponse = await axios(updateConfig);
     console.log('Update response:', updateResponse.data);
     res.json(updateResponse.data);
-
   } catch (error) {
     console.error('Error during the upvote operation:', error);
     res.status(500).send('Error while upvoting the prompt.');
@@ -154,7 +164,7 @@ app.post('/api/comments/:id', async (req, res) => {
   const commentObject = {
     username: safeUsername,
     comment: safeComment,
-    userEmail: sanitizeInput(userEmail),
+    userEmail: encrypt(sanitizeInput(userEmail)), // Encrypt and sanitize email
     timestamp: new Date()
   };
 
@@ -180,7 +190,6 @@ app.post('/api/comments/:id', async (req, res) => {
     const response = await axios(updateConfig);
     if (response.data.modifiedCount === 1) {
       console.log('ID: ' + id);
-
       res.status(200).send('Comment added successfully.');
     } else {
       res.status(404).send('No prompt found with the given ID.');
@@ -196,7 +205,6 @@ app.get('*', (req, res) => {
 });
 
 const basePort = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
-
 
 app.listen(basePort, () => {
   console.log(`Server is running on port ${basePort}`);
