@@ -17,6 +17,22 @@
           ],
           "category": "function",
           "resourceName": "report"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "reportingprompts"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "insertPrompts"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -24,6 +40,12 @@
     }
   },
   "function": {
+    "insertPrompts": {
+      "build": true,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "report": {
       "build": true,
       "dependsOn": [],
@@ -34,9 +56,23 @@
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+    },
+    "reportingprompts": {
+      "build": true,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   },
   "parameters": {
+    "AMPLIFY_function_insertPrompts_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "insertPrompts"
+        }
+      ]
+    },
     "AMPLIFY_function_report_deploymentBucketName": {
       "usedBy": [
         {
@@ -82,6 +118,30 @@
         {
           "category": "function",
           "resourceName": "reportedPrompts"
+        }
+      ]
+    },
+    "AMPLIFY_function_reportingprompts_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "reportingprompts"
+        }
+      ]
+    },
+    "AMPLIFY_function_reportingprompts_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "reportingprompts"
+        }
+      ]
+    },
+    "AMPLIFY_function_reportingprompts_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "reportingprompts"
         }
       ]
     }
