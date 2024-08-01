@@ -26,6 +26,7 @@ See the License for the specific language governing permissions and limitations 
 	ENV
 	REGION
 Amplify Params - DO NOT EDIT */
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 
 const express = require('express')
 const axios = require('axios')
@@ -60,6 +61,21 @@ const sanitizeInput = (input) => {
                       .replace(/<![\s\S]*?--[ \t\n\r]*>/gi, '');
 };
 
+// Initialize the AWS Secrets Manager client
+const sm = new SecretsManagerClient({ region: 'us-east-1' });
+
+const getSecretValue = async (secretName, secretKey) => {
+    try {
+        const command = new GetSecretValueCommand({ SecretId: secretName });
+        const response = await sm.send(command);
+        const secret = JSON.parse(response.SecretString);
+        return secret[secretKey]; // Return the value associated with the secret key
+    } catch (err) {
+        console.error('Error retrieving secrets:', err);
+        throw err;
+    }
+  }
+
 
 /**********************
  * Example get method *
@@ -89,6 +105,20 @@ app.post('/insert-prompts/*', async function(req, res) {
     downvotes: downvotes ? 0 : undefined,
     comments: comments ? '' : undefined
   };
+  getSecretValue('MongoDBAPIKey', 'MONGO_API_KEY').then(apiKey => {
+    // Ensure event.options is defined
+    const options = {
+        hostname: 'us-east-1.aws.data.mongodb-api.com', // Correct hostname without the protocol
+        port: 443,
+        path: '/app/data-todpo/endpoint/data/v1/action/find', // Replace with the path for your request
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'api-key': apiKey,
+            ...event.options?.headers // Merge with any headers passed in the event
+        },
+        ...event.options,
+    };
 
   const filteredFormData = Object.keys(formData)
     .filter((key) => !document.hasOwnProperty(key))
@@ -104,7 +134,7 @@ app.post('/insert-prompts/*', async function(req, res) {
     url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/insertOne',
     headers: {
       'Content-Type': 'application/json',
-      'api-key': process.env.MONGO_API_KEY
+      'api-key': getSecretValue('MongoDBAPIKey', 'MONGO_API_KEY')
     },
     data: JSON.stringify({
       collection: 'prompts',
@@ -115,13 +145,14 @@ app.post('/insert-prompts/*', async function(req, res) {
   };
 
   try {
-    const response = await axios(config);
+    const response =  axios(config);
     res.json(response.data);
   } catch (error) {
     console.error('Error when calling MongoDB API:', error);
     res.status(500).send('Internal Server Error');
   }
   res.json({success: 'post call succeed!', url: req.url, body: req.body})
+});
 });
 
 /****************************
