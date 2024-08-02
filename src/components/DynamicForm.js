@@ -115,6 +115,8 @@ const DynamicForm = ({ onSave }) => {
         userEmail: DOMPurify.sanitize(userEmail), // Include user email in the form data
         category: DOMPurify.sanitize(category) // Include category in the form data
       };
+
+      
       fetch('/insert-prompts', {
         method: 'POST',
         headers: {
