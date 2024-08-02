@@ -5,7 +5,6 @@ import "../index.css";
 import { jsPDF } from "jspdf";
 import DOMPurify from 'dompurify';
 import { getConfig } from "../config";
-import { post } from "../../amplify/backend/function/reportingprompts/src/app";
 
 
 const botpressid = botpress.botId;
