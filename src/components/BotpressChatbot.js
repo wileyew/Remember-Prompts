@@ -271,9 +271,9 @@ function BotpressChatbot() {
         category,
         userEmail: user.email
       };
-      const { apiOrigin, audience } = getConfig();
+      const { apiUrlOrigin, audience } = getConfig();
 
-      const response = await fetch(`${apiOrigin}/reported-prompts`, {
+      const response = await fetch(`${apiUrlOrigin}/reported-prompts`, {
         method: 'POST',
         headers: {  'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
           'Content-Type': 'application/json' },
