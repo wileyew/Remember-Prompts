@@ -270,9 +270,9 @@ function BotpressChatbot() {
         category,
         userEmail: user.email
       };
-      const { apiUrlOrigin, audience } = getConfig();
+      const { apiOrigin, audience } = getConfig();
 
-      const response = await fetch(`${apiUrlOrigin}`, {
+      const response = await fetch(`${apiOrigin}`, {
         method: 'POST',
         headers: {  'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
           'Content-Type': 'application/json' },
