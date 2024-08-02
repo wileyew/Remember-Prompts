@@ -274,7 +274,8 @@ function BotpressChatbot() {
 
       const response = await fetch(`${apiOrigin}/reported-prompts`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {  'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
+          'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       if (response.ok) {
