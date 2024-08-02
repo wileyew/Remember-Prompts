@@ -4,6 +4,8 @@ import botpress from "../botpress.json";
 import "../index.css";
 import { jsPDF } from "jspdf";
 import DOMPurify from 'dompurify';
+import { getConfig } from "../config";
+
 
 const botpressid = botpress.botId;
 const clientId = botpress.clientId;// Destructuring for easier access
@@ -268,8 +270,9 @@ function BotpressChatbot() {
         category,
         userEmail: user.email
       };
-  
-      const response = await fetch('/insert-prompts', {
+      const { apiOrigin, audience } = getConfig();
+
+      const response = await fetch(`${apiOrigin}/reported-prompts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

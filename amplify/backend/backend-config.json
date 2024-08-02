@@ -65,6 +65,22 @@
     }
   },
   "parameters": {
+    "AMPLIFY_function_insertPrompts_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "insertPrompts"
+        }
+      ]
+    },
+    "AMPLIFY_function_insertPrompts_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "insertPrompts"
+        }
+      ]
+    },
     "AMPLIFY_function_insertPrompts_secretsPathAmplifyAppId": {
       "usedBy": [
         {

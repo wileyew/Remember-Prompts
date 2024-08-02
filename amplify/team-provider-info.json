@@ -29,7 +29,9 @@
           "s3Key": "amplify-builds/reportingprompts-3950562f566b5a415478-build.zip"
         },
         "insertPrompts": {
-          "secretsPathAmplifyAppId": "d3bvol1g5hpk38"
+          "secretsPathAmplifyAppId": "d3bvol1g5hpk38",
+          "deploymentBucketName": "amplify-overflowprompts-dev-4bac9-deployment",
+          "s3Key": "amplify-builds/insertPrompts-554255316a316b66506f-build.zip"
         }
       },
       "api": {
