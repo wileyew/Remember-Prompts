@@ -272,7 +272,7 @@ function BotpressChatbot() {
       };
       const { apiOrigin, audience } = getConfig();
 
-      const response = await fetch(`${apiOrigin}`, {
+      const response = await fetch(`${apiOrigin}/remember-prompts`, {
         method: 'POST',
         headers: {  'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
           'Content-Type': 'application/json' },
