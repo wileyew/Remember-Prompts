@@ -21,7 +21,9 @@ const encryptEmail = async (email) => {
 
   try {
     const data = await kms.encrypt(params).promise();
+    console.log('Encrypted Data:', data.CiphertextBlob.toString('base64'));
     return data.CiphertextBlob.toString('base64');
+
   } catch (err) {
     console.error('Encryption error:', err);
   }
