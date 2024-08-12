@@ -5,6 +5,7 @@ import { ChevronUpIcon } from '@heroicons/react/20/solid';
 import "../../src/index.css"; // Import the CSS file for styling
 import { useTable, usePagination } from 'react-table';
 import { getConfig } from "../config";
+import AWS from 'aws-sdk';
 
 const cleanEmail = (email) => {
   if (!email) return '';
@@ -32,6 +33,22 @@ const BotpressTable = () => {
   const [username, setUsername] = useState('');
 
   useEffect(() => {
+    const decryptEmail = async (encryptedEmail) => {
+      const kms = new AWS.KMS({ region: 'us-east-1' }); // Replace with your region
+      const params = {
+        KeyId: 'alias/overflowpromptsemailencryption',
+        CiphertextBlob: Buffer.from(encryptedEmail, 'base64')
+      };
+    
+      try {
+        const data = await kms.decrypt(params).promise();
+        return data.Plaintext.toString('utf-8');
+      } catch (err) {
+        console.error('Decryption error:', err);
+        return encryptedEmail; // Fallback to the encrypted value if decryption fails
+      }
+    };
+    
     const fetchDataFromDatabase = async () => {
       const { apiOrigin, audience } = getConfig();
 
@@ -52,9 +69,12 @@ const BotpressTable = () => {
 
         const commentsByRowId = {};
         const idToMaxUpvotesMap = {};
-        const transformedData = dataArray.map(data => {
+
+        const transformedData = await Promise.all(dataArray.map(async (data) => {
+          const decryptedEmail = await decryptEmail(data.email);
           const cleanedData = {
             ...data,
+            email: cleanEmail(decryptedEmail), // Decrypt and clean the email
             chatbotPlatform: removeQuotesAndSlashes(data.chatbotPlatform),
             versionChatbotHallucinationAnswer: removeQuotesAndSlashes(data.versionChatbot),
             prompt: removeQuotesAndSlashes(data.prompt),
@@ -64,7 +84,6 @@ const BotpressTable = () => {
             updatedPromptAnswer: removeQuotesAndSlashes(data.updatedPromptAnswer),
             promptTrigger: removeQuotesAndSlashes(data.promptTrigger),
             privacy: removeQuotesAndSlashes(data.privacy || '').toLowerCase().includes("public") ? "Public" : "Private",
-            email: cleanEmail(data.email),
             name: removeQuotesAndSlashes(data.name),
             copyrightAnswer: removeQuotesAndSlashes(data.copyrightAnswer),
             dataSource: removeQuotesAndSlashes(data.dataSource),
@@ -88,7 +107,7 @@ const BotpressTable = () => {
           }
 
           return cleanedData;
-        });
+        }));
 
         const finalData = transformedData.map(item => ({
           ...item,
@@ -113,7 +132,7 @@ const BotpressTable = () => {
       const matchesSearchQuery = searchQuery === '' || Object.values(item).some(value =>
         (value ? value.toString().toLowerCase().includes(searchQuery.toLowerCase()) : false));
       const matchesCategory = category === 'all' || item.category === category;
-      const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' && cleanEmail(item.userEmail).includes(cleanEmail(user.email)));
+      const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' && cleanEmail(item.email) === cleanEmail(user.email));
       return matchesSearchQuery && matchesCategory && matchesTab;
     });
 

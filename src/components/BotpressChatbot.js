@@ -5,10 +5,27 @@ import "../index.css";
 import { jsPDF } from "jspdf";
 import DOMPurify from 'dompurify';
 import { getConfig } from "../config";
+import AWS from 'aws-sdk';
 
 
 const botpressid = botpress.botId;
 const clientId = botpress.clientId;// Destructuring for easier access
+
+
+const encryptEmail = async (email) => {
+  const kms = new AWS.KMS({ region: 'us-east-1' }); // Replace with your region
+  const params = {
+    KeyId: 'alias/overflowpromptsemailencryption', // Replace with your KMS key alias or ID
+    Plaintext: email
+  };
+
+  try {
+    const data = await kms.encrypt(params).promise();
+    return data.CiphertextBlob.toString('base64');
+  } catch (err) {
+    console.error('Encryption error:', err);
+  }
+};
 
 function BotpressChatbot() {
   const { user } = useAuth0();
@@ -260,13 +277,14 @@ function BotpressChatbot() {
 
   // Confirm form submission
   const handleConfirmSubmit = async () => {
-    try {
-      const payload = {
-        ...formData,
-        ...processedFormData,
-        category,
-        userEmail: user.email
-      };
+      try {
+        const encryptedEmail = await encryptEmail(user.email);
+        const payload = {
+          ...formData,
+          ...processedFormData,
+          category,
+          userEmail: encryptedEmail
+        };
       const { apiOrigin, audience } = getConfig();
 
       const response = await fetch(`${apiOrigin}/reported-prompts`, {
