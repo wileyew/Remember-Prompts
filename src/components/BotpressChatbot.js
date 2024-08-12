@@ -13,6 +13,7 @@ const clientId = botpress.clientId;// Destructuring for easier access
 
 
 const encryptEmail = async (email) => {
+  console.log('Email:', email);
   const kms = new AWS.KMS({ region: 'us-east-1' }); // Replace with your region
   const params = {
     KeyId: 'alias/overflowpromptsemailencryption', // Replace with your KMS key alias or ID

@@ -6,6 +6,8 @@ import "../../src/index.css"; // Import the CSS file for styling
 import { useTable, usePagination } from 'react-table';
 import { getConfig } from "../config";
 import AWS from 'aws-sdk';
+import { Buffer } from 'buffer';
+
 
 const cleanEmail = (email) => {
   if (!email) return '';
@@ -48,6 +50,7 @@ const BotpressTable = () => {
         return encryptedEmail; // Fallback to the encrypted value if decryption fails
       }
     };
+    
     
     const fetchDataFromDatabase = async () => {
       const { apiOrigin, audience } = getConfig();
