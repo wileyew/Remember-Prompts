@@ -18,7 +18,6 @@ function BotpressChatbot() {
   const [category, setCategory] = useState('hallucinations');
   const [sliderChecked, setSliderChecked] = useState(true);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [formErrors, setFormErrors] = useState({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showCertificateSuccessModal, setShowCertificateSuccessModal] = useState(false);
   const [requestCertificate, setRequestCertificate] = useState(false);
@@ -154,10 +153,8 @@ function BotpressChatbot() {
     const { name, type, checked, value } = e.target;
     const inputValue = type === 'checkbox' ? checked : value;
     const sanitizedValue = DOMPurify.sanitize(inputValue);
-    const error = validateInput(sanitizedValue);
 
     setFormData(prev => ({ ...prev, [name]: sanitizedValue }));
-    setFormErrors(prev => ({ ...prev, [name]: error }));
   };
   const formFields = {
     hallucinations: [
@@ -285,7 +282,6 @@ function BotpressChatbot() {
         }
         setFormData({});
         setProcessedFormData({});
-        setFormErrors({});
       }  else if (response.status === 400) {
       setErrorMessage('Bad Request: Please check your data.');
     } else if (response.status === 500) {
@@ -348,7 +344,6 @@ function BotpressChatbot() {
         <span style={{ marginLeft: '0.5rem' }}>{field.label}</span>
       </div>
     )}
-    {formErrors[field.name] && <div style={{ color: 'red' }}>{formErrors[field.name]}</div>}
   </div>
 ))}
 <br></br>
