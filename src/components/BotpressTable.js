@@ -36,6 +36,11 @@ const BotpressTable = () => {
 
   useEffect(() => {
     const decryptEmail = async (encryptedEmail) => {
+      if (!encryptedEmail || typeof encryptedEmail !== 'string') {
+        console.error('Invalid encrypted email:', encryptedEmail);
+        return encryptedEmail; // Fallback to the original value
+      }
+    
       const kms = new AWS.KMS({ region: 'us-east-1' }); // Replace with your region
       const params = {
         KeyId: 'alias/overflowpromptsemailencryption',

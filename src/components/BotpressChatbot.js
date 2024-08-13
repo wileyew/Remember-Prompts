@@ -281,12 +281,12 @@ function BotpressChatbot() {
   // Confirm form submission
   const handleConfirmSubmit = async () => {
       try {
-        const encryptedEmail = await encryptEmail(user.email);
+        //const encryptedEmail = await encryptEmail(user.email);
         const payload = {
           ...formData,
           ...processedFormData,
           category,
-          userEmail: encryptedEmail
+          userEmail: user.email,
         };
       const { apiOrigin, audience } = getConfig();
 
