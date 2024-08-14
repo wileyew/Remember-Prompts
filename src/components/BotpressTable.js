@@ -361,9 +361,9 @@ const BotpressTable = () => {
         <button onClick={() => setActiveTab('allReports')} className={activeTab === 'allReports' ? 'active' : ''}>
           All Public Reports
         </button>
-        <button onClick={() => setActiveTab('myReports')} className={activeTab === 'myReports' ? 'active' : ''}>
+        {/* <button onClick={() => setActiveTab('myReports')} className={activeTab === 'myReports' ? 'active' : ''}>
           My Reports
-        </button>
+        </button> */}
       </div>
       <div>
         <select onChange={(e) => setCategory(e.target.value)} value={category}>
