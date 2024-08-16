@@ -187,7 +187,6 @@ function BotpressChatbot() {
       { name: 'justification', label: 'Reason for Hallucination (if not known then leave empty)', tooltip: 'Explanation for why the hallucination occurred' },
       { name: 'toxicity', label: 'Was this a toxic hallucination (if not leave blank)? ', tooltip: 'Give a brief explanation of why this is a toxic response, which can contain comments or messages that contain harmful, offensive, or inappropriate content. These can include harassment, insults, or any language that could make others feel unwelcome or unsafe (otherwise leave blank.)'},
       {name: 'upvotes', label: 'Allow for upvotes by other users?', type:'checkbox' },
-      {name: 'downvotes', label: 'Allow for downvotes by other users?', type:'checkbox' },
       {name: 'comments', label: 'Allow for comments by other users?', type:'checkbox' }
     ],
     copyright: [
@@ -198,7 +197,6 @@ function BotpressChatbot() {
       { name: 'dataSource', label: 'Data Source', tooltip: 'The source of the original copyrighted material' },
       { name: 'justification', label: 'Reason for Copyright Infringement', tooltip: 'Explanation for why the infringement occurred' },
       {name: 'upvotes', label: 'Allow for upvotes by other users?', type:'checkbox' },
-      {name: 'downvotes', label: 'Allow for downvotes by other users?', type:'checkbox' },
       {name: 'comments', label: 'Allow for comments by other users?', type:'checkbox' }
     ],
     security: [
@@ -210,7 +208,6 @@ function BotpressChatbot() {
       { name: 'dataSource', label: 'Data Source', tooltip: 'The source of the data involved in the security issue'  },
       { name: 'justification', label: 'Why is this a security issue?', tooltip: 'Explanation for why this is a security issue' },
       {name: 'upvotes', label: 'Allow for upvotes by other users?', type:'checkbox' },
-      {name: 'downvotes', label: 'Allow for downvotes by other users?', type:'checkbox' },
       {name: 'comments', label: 'Allow for comments by other users?', type:'checkbox' }
     ],
     other: [
@@ -220,7 +217,6 @@ function BotpressChatbot() {
       { name: 'promptAnswer', label: 'Prompt Answer', tooltip: 'The answer given by the chatbot which  needs memory recall' },
       { name: 'other', label: 'Give a brief explanation of the issue faced', tooltip: 'Give a brief explanation of the issue faced. This will help us understand why this does not fit into the any other category.' },
       {name: 'upvotes', label: 'Allow for upvotes by other users?', type:'checkbox' },
-      {name: 'downvotes', label: 'Allow for downvotes by other users?', type:'checkbox' },
       {name: 'comments', label: 'Allow for comments by other users?', type:'checkbox' }
     ]
   };
@@ -254,7 +250,10 @@ function BotpressChatbot() {
     doc.text("Overflow Prompts Certification", 20, 20);
     doc.text(`Name: ${user.name}`, 20, 30);  
     doc.text(`Certificate Number: ${certificateNumber}`, 20, 40);
-    doc.text("This certificate acknowledges that you are an AI evangelist! By submitting this report today, you are helping build a community of like minded individuals that are helping cultivate crowd sourced data modeling feedback. Thank you!", 20, 50);
+    doc.text("This certificate acknowledges that you are an AI evangelist!", 20, 50);
+    doc.text("By submitting this report today, you are helping build a community", 20, 65);
+    doc.text("of like-minded individuals that are helping cultivate crowd-sourced", 20, 80);
+    doc.text("data modeling feedback. Thank you!", 20, 95);
     doc.save("certificate.pdf");
     setShowCertificateSuccessModal(true);
   };
