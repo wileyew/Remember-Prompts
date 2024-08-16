@@ -244,7 +244,7 @@ function BotpressChatbot() {
     setShowConfirmationModal(true);
   };
   const createAndDownloadPdf = () => {
-    convertSvgToBase64('../assets/rememberprompts_dark_mode.svg', function(base64String) {
+    // convertSvgToBase64('../assets/rememberprompts_dark_mode.svg', function(base64String) {
       const certificateNumber = Math.floor(Math.random() * 90000) + 10000;
       const doc = new jsPDF();
   
@@ -258,12 +258,12 @@ function BotpressChatbot() {
       doc.text("data modeling feedback. Thank you!", 20, 95);
   
       // Adding overflow prompts icon (for SVG)
-      doc.addImage(base64String, 'SVG', 180, 10, 10, 10); // Adjust as needed
+      // doc.addImage(base64String, 'SVG', 180, 10, 10, 10); // Adjust as needed
   
       // Saving the PDF
       doc.save("certificate.pdf");
       setShowCertificateSuccessModal(true);
-    });
+    // });
   };
   
   function convertSvgToBase64(svgUrl, callback) {
