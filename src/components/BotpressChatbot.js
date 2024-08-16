@@ -243,20 +243,47 @@ function BotpressChatbot() {
     setProcessedFormData(newData);
     setShowConfirmationModal(true);
   };
-
   const createAndDownloadPdf = () => {
-    const certificateNumber = Math.floor(Math.random() * 90000) + 10000;
-    const doc = new jsPDF();
-    doc.text("Overflow Prompts Certification", 20, 20);
-    doc.text(`Name: ${user.name}`, 20, 30);  
-    doc.text(`Certificate Number: ${certificateNumber}`, 20, 40);
-    doc.text("This certificate acknowledges that you are an AI evangelist!", 20, 50);
-    doc.text("By submitting this report today, you are helping build a community", 20, 65);
-    doc.text("of like-minded individuals that are helping cultivate crowd-sourced", 20, 80);
-    doc.text("data modeling feedback. Thank you!", 20, 95);
-    doc.save("certificate.pdf");
-    setShowCertificateSuccessModal(true);
+    convertSvgToBase64('../assets/rememberprompts_dark_mode.svg', function(base64String) {
+      const certificateNumber = Math.floor(Math.random() * 90000) + 10000;
+      const doc = new jsPDF();
+  
+      // Adding text content
+      doc.text("Overflow Prompts Certification", 20, 20);
+      doc.text(`Name: ${user.name}`, 20, 30);  
+      doc.text(`Certificate Number: ${certificateNumber}`, 20, 40);
+      doc.text("This certificate acknowledges that you are an AI evangelist!", 20, 50);
+      doc.text("By submitting this report today, you are helping build a community", 20, 65);
+      doc.text("of like-minded individuals that are helping cultivate crowd-sourced", 20, 80);
+      doc.text("data modeling feedback. Thank you!", 20, 95);
+  
+      // Adding overflow prompts icon (for SVG)
+      doc.addImage(base64String, 'SVG', 180, 10, 10, 10); // Adjust as needed
+  
+      // Saving the PDF
+      doc.save("certificate.pdf");
+      setShowCertificateSuccessModal(true);
+    });
   };
+  
+  function convertSvgToBase64(svgUrl, callback) {
+    fetch(svgUrl)
+        .then(response => response.text())
+        .then(svgText => {
+            const encodedData = window.btoa(unescape(encodeURIComponent(svgText)));
+            const base64String = `data:image/svg+xml;base64,${encodedData}`;
+            callback(base64String);
+        })
+        .catch(error => console.error('Error converting SVG to Base64:', error));
+}
+
+// Usage
+convertSvgToBase64('path/to/your/icon.svg', function(base64String) {
+    console.log(base64String); // You can now use this base64 string in your PDF creation
+});
+
+
+  
 
   const prepareCheckboxData = (formData) => {
     const processedData = { ...formData }; // Create a copy
