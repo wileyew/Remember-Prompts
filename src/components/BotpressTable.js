@@ -8,16 +8,12 @@ import { getConfig } from "../config";
 import AWS from 'aws-sdk';
 import { Buffer } from 'buffer';
 
-
-const cleanEmail = (email) => {
-  if (!email) return '';
-  const trimmedEmail = email.trim();
-  const emailMatch = trimmedEmail.match(/^[^@\s]+@[^@\s]+\.[^@\s]+/);
-  return emailMatch ? emailMatch[0].toLowerCase() : '';
-};
-
-const removeQuotesAndSlashes = (text) => {
-  return typeof text === 'string' ? text.replace(/[\\"]/g, '') : 'N/A';
+// Function to replace HTML entities
+const replaceHtmlEntities = (text) => {
+  if (typeof text !== 'string') return text;
+  return text
+    .replace(/&#x2F;/g, '//')
+    .replace(/&quot;/g, '"');
 };
 
 const BotpressTable = () => {
@@ -56,7 +52,6 @@ const BotpressTable = () => {
       }
     };
     
-    
     const fetchDataFromDatabase = async () => {
       const { apiOrigin, audience } = getConfig();
 
@@ -82,25 +77,25 @@ const BotpressTable = () => {
           const decryptedEmail = await decryptEmail(data.email);
           const cleanedData = {
             ...data,
-            email: cleanEmail(decryptedEmail), // Decrypt and clean the email
-            chatbotPlatform: removeQuotesAndSlashes(data.chatbotPlatform),
-            versionChatbotHallucinationAnswer: removeQuotesAndSlashes(data.versionChatbot),
-            prompt: removeQuotesAndSlashes(data.prompt),
-            infringementPrompt: removeQuotesAndSlashes(data.infringementPrompt),
-            hallucinationAnswer: removeQuotesAndSlashes(data.hallucinationAnswer),
-            answerUpdated: removeQuotesAndSlashes(data.updatedPromptAnswer),
-            updatedPromptAnswer: removeQuotesAndSlashes(data.updatedPromptAnswer),
-            promptTrigger: removeQuotesAndSlashes(data.promptTrigger),
-            privacy: removeQuotesAndSlashes(data.privacy || '').toLowerCase().includes("public") ? "Public" : "Private",
-            name: removeQuotesAndSlashes(data.name),
-            copyrightAnswer: removeQuotesAndSlashes(data.copyrightAnswer),
-            dataSource: removeQuotesAndSlashes(data.dataSource),
-            securityImpact: removeQuotesAndSlashes(data.security_impact),
-            securityIncidentRisk: removeQuotesAndSlashes(data.security_incident_risk),
-            privacyRequested: removeQuotesAndSlashes(data.privacyRequested),
-            category: removeQuotesAndSlashes(data.category || '').toLowerCase(),
+            email: replaceHtmlEntities(decryptedEmail), // Decrypt, then replace HTML entities
+            chatbotPlatform: replaceHtmlEntities(data.chatbotPlatform),
+            versionChatbotHallucinationAnswer: replaceHtmlEntities(data.versionChatbot),
+            prompt: replaceHtmlEntities(data.prompt),
+            infringementPrompt: replaceHtmlEntities(data.infringementPrompt),
+            hallucinationAnswer: replaceHtmlEntities(data.hallucinationAnswer),
+            answerUpdated: replaceHtmlEntities(data.updatedPromptAnswer),
+            updatedPromptAnswer: replaceHtmlEntities(data.updatedPromptAnswer),
+            promptTrigger: replaceHtmlEntities(data.promptTrigger),
+            privacy: data.privacy.toLowerCase().includes("public") ? "Public" : "Private",
+            name: replaceHtmlEntities(data.name),
+            copyrightAnswer: replaceHtmlEntities(data.copyrightAnswer),
+            dataSource: replaceHtmlEntities(data.dataSource),
+            securityImpact: replaceHtmlEntities(data.security_impact),
+            securityIncidentRisk: replaceHtmlEntities(data.security_incident_risk),
+            privacyRequested: replaceHtmlEntities(data.privacyRequested),
+            category: replaceHtmlEntities(data.category.toLowerCase()),
             upvotes: data.upvotes || 0,
-            comments: Array.isArray(data.comments) ? data.comments : [],
+            comments: Array.isArray(data.comments) ? data.comments.map(comment => replaceHtmlEntities(comment)) : [],
             id: data._id
           };
 
@@ -140,7 +135,7 @@ const BotpressTable = () => {
       const matchesSearchQuery = searchQuery === '' || Object.values(item).some(value =>
         (value ? value.toString().toLowerCase().includes(searchQuery.toLowerCase()) : false));
       const matchesCategory = category === 'all' || item.category === category;
-      const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' && cleanEmail(item.email) === cleanEmail(user.email));
+      const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' && item.email === user.email);
       return matchesSearchQuery && matchesCategory && matchesTab;
     });
 
@@ -199,11 +194,10 @@ const BotpressTable = () => {
   const handleAddComment = useCallback(async (id, commentText) => {
     const commentData = {
       username: username,
-      comment: commentText,
+      comment: replaceHtmlEntities(commentText), // Replace HTML entities in the comment
       userEmail: user.email
     };
     
-
     try {
       const response = await fetch(`/comments/${id}`, {
         method: 'POST',
@@ -219,7 +213,7 @@ const BotpressTable = () => {
 
       setComments((prevComments) => ({
         ...prevComments,
-        [id]: [...(prevComments[id] || []), { username: username, comment: commentText }],
+        [id]: [...(prevComments[id] || []), { username: username, comment: replaceHtmlEntities(commentText) }],
       }));
 
     } catch (error) {
@@ -248,7 +242,7 @@ const BotpressTable = () => {
                 </Disclosure.Button>
                 <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
                   {comments[row.original.id] && comments[row.original.id].map((comment, index) => (
-                    <div key={index}><strong>{comment.username}</strong>: {comment.comment}</div>
+                    <div key={index}><strong>{replaceHtmlEntities(comment.username)}</strong>: {replaceHtmlEntities(comment.comment)}</div>
                   ))}
                   <form onSubmit={(e) => {
                     e.preventDefault();
@@ -296,7 +290,8 @@ const BotpressTable = () => {
         { Header: 'Security Impact', accessor: 'securityImpact' },
         { Header: 'Security Incident Risk', accessor: 'securityIncidentRisk' },
         { Header: 'Data Source', accessor: 'dataSource' },
-        { Header: 'Platform', accessor: 'chatbotPlatform' },      ];
+        { Header: 'Platform', accessor: 'chatbotPlatform' },
+      ];
       return [...baseColumns, ...securityColumns];
     }
 
