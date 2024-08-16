@@ -400,31 +400,31 @@ function BotpressChatbot() {
 
 </form>
 
-      {showConfirmationModal && (
-        <div className="modal">
-          <p>Are you sure you want to submit the form?</p>
-          <button onClick={handleConfirmSubmit}>Confirm</button>
-          <button onClick={() => setShowConfirmationModal(false)}>Cancel</button>
-          <br></br>
-        </div>
-      )}
-      {showSuccessModal && (
-        <div className="modal">
-          <p>Form submitted successfully!</p>
-          <label>
-            Request Certificate
-            <input type="checkbox" checked={requestCertificate} onChange={e => setRequestCertificate(e.target.checked)} />
-          </label>
-          <button onClick={createAndDownloadPdf} disabled={!requestCertificate}>Download Certificate</button>
-          <button onClick={() => setShowSuccessModal(false)}>Close</button>
-        </div>
-      )}
+{showConfirmationModal && (
+  <div className="modal">
+    <p>Are you sure you want to submit the form?</p>
+    <button onClick={handleConfirmSubmit}>Confirm</button>
+    <button onClick={() => setShowConfirmationModal(false)}>Cancel</button>
+    <br></br>
+  </div>
+)}
+{showSuccessModal && (
+  <div className="modal">
+    <p>Form submitted successfully!</p>
+    <label>
+      Request Certificate
+      <input type="checkbox" checked={requestCertificate} onChange={e => setRequestCertificate(e.target.checked)} />
+    </label>
+    <button onClick={createAndDownloadPdf} disabled={!requestCertificate}>Download Certificate</button>
+    <button onClick={() => setShowSuccessModal(false)}>Close</button>
+  </div>
+)}
 {showCertificateSuccessModal && (
-        <div className="modal">
-          <p>Certificate generated successfully!</p>
-          <button onClick={() => setShowCertificateSuccessModal(false)}>Close</button>
-        </div>
-      )}
+  <div className="modal">
+    <p>Certificate generated successfully!</p>
+    <button onClick={() => setShowCertificateSuccessModal(false)}>Close</button>
+  </div>
+)}
 
     </div>
   );
