@@ -266,21 +266,21 @@ function BotpressChatbot() {
     // });
   };
   
-  function convertSvgToBase64(svgUrl, callback) {
-    fetch(svgUrl)
-        .then(response => response.text())
-        .then(svgText => {
-            const encodedData = window.btoa(unescape(encodeURIComponent(svgText)));
-            const base64String = `data:image/svg+xml;base64,${encodedData}`;
-            callback(base64String);
-        })
-        .catch(error => console.error('Error converting SVG to Base64:', error));
-}
+//   function convertSvgToBase64(svgUrl, callback) {
+//     fetch(svgUrl)
+//         .then(response => response.text())
+//         .then(svgText => {
+//             const encodedData = window.btoa(unescape(encodeURIComponent(svgText)));
+//             const base64String = `data:image/svg+xml;base64,${encodedData}`;
+//             callback(base64String);
+//         })
+//         .catch(error => console.error('Error converting SVG to Base64:', error));
+// }
 
-// Usage
-convertSvgToBase64('path/to/your/icon.svg', function(base64String) {
-    console.log(base64String); // You can now use this base64 string in your PDF creation
-});
+// // Usage
+// convertSvgToBase64('path/to/your/icon.svg', function(base64String) {
+//     console.log(base64String); // You can now use this base64 string in your PDF creation
+// });
 
 
   
