@@ -13,6 +13,10 @@ const replaceHtmlEntities = (text) => {
   if (typeof text !== 'string') return text;
   return text
     .replace(/&#x2F;/g, '//')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&#x27;/g, '"')
     .replace(/&quot;/g, '"');
 };
 
