@@ -249,30 +249,31 @@ function BotpressChatbot() {
       <h5>Want to use the chatbot instead? Click on the icon in the lower right corner of the screen and type anything to get started! Turn off chatbot by clicking slider.</h5>
 
       <form onSubmit={handleSubmit} className="form-container">
-        <label>
-          Category:
-          <select value={category} onChange={e => setCategory(e.target.value)}>
-            <option value="hallucinations">Hallucinations</option>
-            <option value="copyright">Copyright</option>
-            <option value="security">Security Issues</option>
-            <option value="other">Other</option>
-          </select>
-        </label>
+        <div className="category-row">
+          <label>
+            Category:
+            <select value={category} onChange={e => setCategory(e.target.value)}>
+              <option value="hallucinations">Hallucinations</option>
+              <option value="copyright">Copyright</option>
+              <option value="security">Security Issues</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+        </div>
+
         {formFields[category].map(field => (
           <div key={field.name} className="form-group">
+            <label title={field.tooltip}>{field.label}:</label>
             {field.type !== 'checkbox' ? (
-              <>
-                <label title={field.tooltip}>{field.label}:</label>
-                <textarea 
-                  name={field.name} 
-                  value={formData[field.name] || ''} 
-                  onChange={handleChange} 
-                  rows="2"
-                  cols="30"
-                />
-              </>
+              <textarea 
+                name={field.name} 
+                value={formData[field.name] || ''} 
+                onChange={handleChange} 
+                rows="2"
+                cols="30"
+              />
             ) : (
-              <div>
+              <div className="checkbox-group">
                 <input 
                   type="checkbox" 
                   name={field.name} 
@@ -284,7 +285,10 @@ function BotpressChatbot() {
             )}
           </div>
         ))}
-        <button type="submit" style={{ marginBottom: '20px' }}>Submit</button>
+
+        <div className="submit-row">
+          <button type="submit">Submit</button>
+        </div>
       </form>
 
       {showConfirmationModal && (
