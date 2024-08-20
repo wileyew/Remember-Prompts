@@ -33,72 +33,155 @@ const encryptEmail = async (email) => {
 function BotpressChatbot() {
   const { user } = useAuth0();
   const [processedFormData, setProcessedFormData] = useState({}); // New state for processed form data
-  const [showChatbot, setShowChatbot] = useState(false);
+  const [showChatbot, setShowChatbot] = useState(true);
   const [formData, setFormData] = useState({});
   const [category, setCategory] = useState('hallucinations');
   const [sliderChecked, setSliderChecked] = useState(true);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);   
-
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showCertificateSuccessModal, setShowCertificateSuccessModal] = useState(false);
   const [requestCertificate, setRequestCertificate] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   // Effect to load and manage the Botpress chat widget script
-  useEffect(() => {
-    const fetchAdditionalUserData = async () => {
-      // Simulate fetching additional data
-      return new Promise(resolve => setTimeout(() => resolve({ extraData: 'Extra Value' }), 1000));
-    };
-    const initBotpressChat = async () => {
-      const additionalUserData = await fetchAdditionalUserData(); // Await the mock async call
-      console.log('Additional user data:', additionalUserData); // Example usage of fetched data
+  // useEffect(() => {
+  //   const widgetContainer = document.getElementById('bp-web-widget-container');
+  //   if (widgetContainer) {
+  //     widgetContainer.style.display = sliderChecked ? 'block' : 'none'; 
+  //   }
+  
+  //   if (sliderChecked) {
+  //     const script = document.createElement("script");
+  //     script.src = "https://cdn.botpress.cloud/webchat/v0/inject.js";
+  //     script.async = true;
+  //     script.onload = () => {
+  //       window.botpressWebChat.init({
+  //         botId: botpressid,
+  //         composerPlaceholder: "Say anything to start the conversation! If you are revisiting an old session, you will need to start a new one. Click three box icon and then click plus icon.",
+  //         botConversationDescription: "assists with reporting hallucinations, copyrights, memory aid for prompts, or security issues",
+  //         hostUrl: "https://cdn.botpress.cloud/webchat/v0",
+  //         messagingUrl: "https://messaging.botpress.cloud",
+  //         clientId: clientId,
+  //         botName: "Overflow Prompts",
+  //         // Set the width of the WebChat container and layout to 100% (Full Screen)
+  //         containerWidth: "100%25",
+  //         layoutWidth: "100%25",
+  //         outerHeight: "50%25",
+  //         innerHeight: "50%25",
+  //         // Hide the widget and disable animations
+  //         hideWidget: false, // Change to false to show the widget
+  //         disableAnimations: true,
+  //         // stylesheet: 'https://style-.....a.vercel.app/bot.css',
+  //       });
+  //       window.botpressWebChat.onEvent(() => {
+  //         window.botpressWebChat.sendEvent({ type: "show" });
+  //       }, ["LIFECYCLE.LOADED"]);
+  //       window.botpressWebChat.init({
+  //         type: "text",
+  //         channel: "web",
+  //         payload: {
+  //           // Ensure this structure matches what your Botpress bot expects
+  //           text: 'SET_USER_DATA', // Assuming 'text' is how you distinguish payload types in your Botpress setup
+  //           userData: {
+  //             email: user.email,
+  //             name: user.name,
+  //           },
+  //         },
+  //       });
+  //       window.botpressWebChat.onEvent(() => {
+  //         setShowChatbot(false);
+  //       }, ["LIFECYCLE.UNLOADED"]);
 
+      
+  //       const btnConvoAdd = document.getElementById('btn-convo-add');
+  //       if (btnConvoAdd) {
+  //         console.log('button clicked');
+  //         btnConvoAdd.addEventListener('click', () => {
+  //           setTimeout(() => {
+  //             window.botpressWebChat.sendPayload({
+  //               type: 'text',
+  //               text: 'Hello, ' + user.name + ',' + ' ' + 'starting your session associated with the email ' + user.email + '.',
+  //             });
+  //           }, 2000);
+  //         });
+  //       }
+  //     };
+
+  //     document.body.appendChild(script);
+
+  //     return () => {
+  //       document.body.removeChild(script);
+  //     };
+  //   }
+  //   if (sliderChecked) {
+  //     loadBotpressScript();
+  //   }
+  //   return () => {
+  //     const script = document.getElementById("botpress-script");
+  //     if (script) document.body.removeChild(script);
+  //   };
+  // }, [sliderChecked, user]);
+  useEffect(() => {
+    const widgetContainer = document.getElementById('bp-web-widget-container');
+    if (widgetContainer) {
+      widgetContainer.style.display = sliderChecked ? 'block' : 'none'; 
+    }
+  
+    if (sliderChecked) {
       const script = document.createElement("script");
       script.src = "https://cdn.botpress.cloud/webchat/v0/inject.js";
       script.async = true;
-      script.onload   
- = async () => {
+      script.onload = () => {
         window.botpressWebChat.init({
           botId: botpressid,
+          composerPlaceholder: "Say anything to start the conversation! If you are revisiting an old session, you will need to start a new one. Click three box icon and then click plus icon.",
+          botConversationDescription: "assists with reporting hallucinations, copyrights, memory aid for prompts, or security issues",
           hostUrl: "https://cdn.botpress.cloud/webchat/v0",
           messagingUrl: "https://messaging.botpress.cloud",
           clientId: clientId,
-          botName: "Remember Prompts",
-          containerWidth: "100%",
-          layoutWidth: "100%",
-          outerHeight: "50%",
-          hideWidget: true,
+          botName: "Overflow Prompts",
+          // Set the width of the WebChat container and layout to 100% (Full Screen)
+          containerWidth: "100%25",
+          layoutWidth: "100%25",
+          outerHeight: "50%25",
+          innerHeight: "50%25",
+          // Hide the widget and disable animations
+          hideWidget: false, // Change to false to show the widget
           disableAnimations: true,
-          userData: {
-            email: user.email,
-            name: user.name,
-          },
-          stylesheet: 'https://style-.....a.vercel.app/bot.css',
+          // stylesheet: 'https://style-.....a.vercel.app/bot.css',
         });
+        window.botpressWebChat.onEvent(() => {
+          window.botpressWebChat.sendEvent({ type: "show" });
+        }, ["LIFECYCLE.LOADED"]);
+        window.botpressWebChat.init({
+          type: "text",
+          channel: "web",
+          payload: {
+            // Ensure this structure matches what your Botpress bot expects
+            text: 'SET_USER_DATA', // Assuming 'text' is how you distinguish payload types in your Botpress setup
+            userData: {
+              email: user.email,
+              name: user.name,
+            },
+          },
+        });
+        window.botpressWebChat.onEvent(() => {
+          setShowChatbot(false);
+        }, ["LIFECYCLE.UNLOADED"]);
 
-        window.botpressWebChat.onEvent((event) => {
-          if (event.type === "webchatLoaded") {
-            console.log("Botpress chatbot loaded.");
-
-            // Delay sending the payload by 6000 milliseconds (6 seconds)
+      
+        const btnConvoAdd = document.getElementById('btn-convo-add');
+        if (btnConvoAdd) {
+          console.log('button clicked');
+          btnConvoAdd.addEventListener('click', () => {
             setTimeout(() => {
               window.botpressWebChat.sendPayload({
-                type: 'event',
-                name: 'SET_USER_DATA',
-                data: {
-                  email: user.email,
-                  name: user.name,
-                },
+                type: 'text',
+                text: 'Hello, ' + user.name + ',' + ' ' + 'starting your session associated with the email ' + user.email + '.',
               });
-
-              window.botpressWebChat.sendPayload({
-                type: 'text', 
-                text: `Hello, ${user.name}, starting your session associated with the email ${user.email}.`, 
-              });
-            }, 6000);
-          }
-        }, ["webchatLoaded"]);
+            }, 2000);
+          });
+        }
       };
 
       document.body.appendChild(script);
@@ -106,17 +189,16 @@ function BotpressChatbot() {
       return () => {
         document.body.removeChild(script);
       };
-    };
-
-    if (sliderChecked) {
-      initBotpressChat();
     }
-
+    if (sliderChecked) {
+      loadBotpressScript();
+    }
     return () => {
       const script = document.getElementById("botpress-script");
       if (script) document.body.removeChild(script);
     };
   }, [sliderChecked, user]);
+
   // Function to load the Botpress chat widget
   const loadBotpressScript = () => {
     const existingScript = document.getElementById("botpress-script");
@@ -124,8 +206,7 @@ function BotpressChatbot() {
       const script = document.createElement("script");
       script.src = "https://cdn.botpress.cloud/webchat/v0/inject.js";
       script.async = true;
-      script.id   
- = "botpress-script";
+      script.id = "botpress-script";
       script.onload = () => initializeChatbot();
       document.body.appendChild(script);
     }
@@ -163,6 +244,7 @@ function BotpressChatbot() {
       window.botpressWebChat.sendEvent({ type: "show" });
     }, ["LIFECYCLE.LOADED"]);
   };
+
   // Handle changes to form inputs
   const handleChange = (e) => {
     const { name, type, checked, value } = e.target;
