@@ -420,12 +420,23 @@ input:checked + .slider:before {
   margin-bottom: 5px;
 }
 
-.form-group textarea,
-.form-group input[type="checkbox"] {
+.form-group textarea {
   width: 100%;
-}
-
-textarea {
   resize: none; /* Disable resizing for better layout consistency */
 }
 
+.form-group-checkbox {
+  flex: 1 1 100%; /* Make checkboxes take full width */
+  display: flex;
+  align-items: center;
+}
+
+.category-row {
+  flex: 1 1 100%; /* Make category dropdown take full width */
+}
+
+.submit-row {
+  flex: 1 1 100%; /* Make submit button take full width */
+  text-align: right; /* Align submit button to the right */
+  margin-top: 20px; /* Add some margin above the submit button */
+}
