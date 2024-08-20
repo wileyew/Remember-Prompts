@@ -205,7 +205,7 @@ const BotpressTable = () => {
     const { apiOrigin, audience } = getConfig();
 
     try {
-      const response = await fetch(`/${apiOrigin}/${id}`, {
+      const response = await fetch(`${apiOrigin}/${id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
