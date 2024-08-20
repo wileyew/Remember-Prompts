@@ -13,7 +13,7 @@ const clientId = botpress.clientId;
 const encryptEmail = async (email) => {
   const kms = new AWS.KMS({ region: 'us-east-1' });
   const params = {
-    KeyId: 'alias/overflowpromptsemailencryption', // Replace with your KMS key alias or ID
+    KeyId: 'alias/overflowpromptsemailencryption',
     Plaintext: email
   };
 
@@ -26,37 +26,10 @@ const encryptEmail = async (email) => {
   }
 };
 
-const formFields = {
-  hallucinations: [
-    { name: 'description', label: 'Description', type: 'textarea', tooltip: 'Describe the hallucination' },
-    { name: 'upvotes', label: 'Upvotes', type: 'checkbox' },
-    { name: 'downvotes', label: 'Downvotes', type: 'checkbox' },
-    { name: 'comments', label: 'Comments', type: 'textarea', tooltip: 'Any additional comments' }
-  ],
-  copyright: [
-    { name: 'description', label: 'Description', type: 'textarea', tooltip: 'Describe the copyright issue' },
-    { name: 'upvotes', label: 'Upvotes', type: 'checkbox' },
-    { name: 'downvotes', label: 'Downvotes', type: 'checkbox' },
-    { name: 'comments', label: 'Comments', type: 'textarea', tooltip: 'Any additional comments' }
-  ],
-  security: [
-    { name: 'description', label: 'Description', type: 'textarea', tooltip: 'Describe the security issue' },
-    { name: 'upvotes', label: 'Upvotes', type: 'checkbox' },
-    { name: 'downvotes', label: 'Downvotes', type: 'checkbox' },
-    { name: 'comments', label: 'Comments', type: 'textarea', tooltip: 'Any additional comments' }
-  ],
-  other: [
-    { name: 'description', label: 'Description', type: 'textarea', tooltip: 'Describe the issue' },
-    { name: 'upvotes', label: 'Upvotes', type: 'checkbox' },
-    { name: 'downvotes', label: 'Downvotes', type: 'checkbox' },
-    { name: 'comments', label: 'Comments', type: 'textarea', tooltip: 'Any additional comments' }
-  ]
-};
-
-const BotpressChatbot = () => {
+function BotpressChatbot() {
   const { user } = useAuth0();
   const [processedFormData, setProcessedFormData] = useState({});
-  const [showChatbot, setShowChatbot] = useState(false);
+  const [showChatbot, setShowChatbot] = useState(true);
   const [formData, setFormData] = useState({});
   const [category, setCategory] = useState('hallucinations');
   const [sliderChecked, setSliderChecked] = useState(true);
@@ -68,60 +41,121 @@ const BotpressChatbot = () => {
 
   // Effect to load and manage the Botpress chat widget script
   useEffect(() => {
-    if (sliderChecked) {
-      initializeChatbot();
+    const widgetContainer = document.getElementById('bp-web-widget-container');
+    if (widgetContainer) {
+      widgetContainer.style.display = sliderChecked ? 'block' : 'none';
     }
-    return () => {
-      const widgetContainer = document.getElementById('bp-web-widget-container');
-      if (widgetContainer) widgetContainer.style.display = 'none';
-    };
+
+    if (sliderChecked) {
+      const script = document.createElement("script");
+      script.src = "https://cdn.botpress.cloud/webchat/v0/inject.js";
+      script.async = true;
+      script.onload = async () => {
+        const encryptedEmail = await encryptEmail(user.email);
+
+        if (!encryptedEmail) {
+          console.error("Failed to encrypt email. Chatbot initialization aborted.");
+          return;
+        }
+
+        window.botpressWebChat.init({
+          botId: botpressid,
+          composerPlaceholder: "Say anything to start the conversation! If you are revisiting an old session, you will need to start a new one. Click three box icon and then click plus icon.",
+          botConversationDescription: "assists with reporting hallucinations, copyrights, memory aid for prompts, or security issues",
+          hostUrl: "https://cdn.botpress.cloud/webchat/v0",
+          messagingUrl: "https://messaging.botpress.cloud",
+          clientId: clientId,
+          botName: "Overflow Prompts",
+          containerWidth: "100%25",
+          layoutWidth: "100%25",
+          outerHeight: "50%25",
+          innerHeight: "50%25",
+          hideWidget: false,
+          disableAnimations: true,
+        });
+
+        window.botpressWebChat.sendEvent({
+          type: "text",
+          channel: "web",
+          payload: {
+            text: 'SET_USER_DATA',
+            userData: {
+              email: encryptedEmail,
+              name: user.name,
+            },
+          },
+        });
+
+        window.botpressWebChat.onEvent(() => {
+          setShowChatbot(false);
+        }, ["LIFECYCLE.UNLOADED"]);
+
+        const btnConvoAdd = document.getElementById('btn-convo-add');
+        if (btnConvoAdd) {
+          btnConvoAdd.addEventListener('click', () => {
+            setTimeout(() => {
+              window.botpressWebChat.sendPayload({
+                type: 'text',
+                text: 'Hello, ' + user.name + ',' + ' ' + 'starting your session associated with the email ' + user.email + '.',
+              });
+            }, 2000);
+          });
+        }
+      };
+
+      document.body.appendChild(script);
+
+      return () => {
+        document.body.removeChild(script);
+      };
+    }
   }, [sliderChecked, user]);
 
-  // Function to initialize the chat widget with user data
-  const initializeChatbot = async () => {
-    const encryptedEmail = await encryptEmail(user.email);
-
-    if (!encryptedEmail) {
-      console.error("Failed to encrypt email. Chatbot initialization aborted.");
-      return;
-    }
-
-    const widgetContainer = document.getElementById('bp-web-widget-container');
-    if (widgetContainer) widgetContainer.style.display = 'block';
-
-    window.botpressWebChat.init({
-      botId: botpressid,
-      hostUrl: "https://cdn.botpress.cloud/webchat/v0",
-      messagingUrl: "https://messaging.botpress.cloud",
-      clientId: clientId,
-      botName: "Overflow Prompts",
-      containerWidth: "100%",
-      layoutWidth: "100%",
-      outerHeight: "50%",
-      innerHeight: "50%",
-      hideWidget: false,
-      disableAnimations: true,
-      composerPlaceholder: "Say anything to start the conversation!",
-    });
-
-    window.botpressWebChat.sendEvent({
-      type: "text",
-      channel: "web",
-      payload: {
-        text: 'SET_USER_DATA',
-        userData: {
-          email: encryptedEmail,
-          name: user.name,
-        },
-      },
-    });
-
-    window.botpressWebChat.onEvent(() => {
-      setShowChatbot(false);
-    }, ["LIFECYCLE.UNLOADED"]);
+  const formFields = {
+    hallucinations: [
+      { name: 'chatbotPlatform', label: 'Platform', tooltip: 'The platform where the hallucination occurred' },
+      { name: 'versionChatbot', label: 'Version', tooltip: 'The version of the chatbot used' },
+      { name: 'prompt', label: 'Prompt', tooltip: 'The input given to the chatbot' },
+      { name: 'hallucinationAnswer', label: 'Hallucination Answer', tooltip: 'The incorrect answer provided by the chatbot' },
+      { name: 'updatedPromptAnswer', label: 'Proposed Correct Answer', tooltip: 'The corrected answer you suggest' },
+      { name: 'dataSource', label: 'Data Source', tooltip: 'The source of the correct data' },
+      { name: 'justification', label: 'Reason for Hallucination (if not known then leave empty)', tooltip: 'Explanation for why the hallucination occurred' },
+      { name: 'toxicity', label: 'Was this a toxic hallucination (if not leave blank)?', tooltip: 'Give a brief explanation of why this is a toxic response.' },
+      { name: 'upvotes', label: 'Allow for upvotes by other users?', type: 'checkbox' },
+      { name: 'comments', label: 'Allow for comments by other users?', type: 'checkbox' }
+    ],
+    copyright: [
+      { name: 'chatbotPlatform', label: 'Platform', tooltip: 'The platform where the hallucination occurred' },
+      { name: 'versionChatbot', label: 'Version', tooltip: 'The version of the chatbot used' },
+      { name: 'infringementPrompt', label: 'Infringement Prompt', tooltip: 'The input that led to copyright infringement' },
+      { name: 'copyrightAnswer', label: 'Copyright Answer', tooltip: 'The infringing content provided by the chatbot' },
+      { name: 'dataSource', label: 'Data Source', tooltip: 'The source of the original copyrighted material' },
+      { name: 'justification', label: 'Reason for Copyright Infringement', tooltip: 'Explanation for why the infringement occurred' },
+      { name: 'upvotes', label: 'Allow for upvotes by other users?', type: 'checkbox' },
+      { name: 'comments', label: 'Allow for comments by other users?', type: 'checkbox' }
+    ],
+    security: [
+      { name: 'chatbotPlatform', label: 'Platform', tooltip: 'The platform where the hallucination occurred' },
+      { name: 'versionChatbot', label: 'Version', tooltip: 'The version of the chatbot used' },
+      { name: 'prompt', label: 'Prompt', tooltip: 'The input given to the chatbot' },
+      { name: 'securityImpact', label: 'Security Impact', tooltip: 'The impact of the security issue' },
+      { name: 'securityIncidentRisk', label: 'Security Incident Risk', tooltip: 'The risk associated with the security incident' },
+      { name: 'dataSource', label: 'Data Source', tooltip: 'The source of the data involved in the security issue' },
+      { name: 'justification', label: 'Why is this a security issue?', tooltip: 'Explanation for why this is a security issue' },
+      { name: 'upvotes', label: 'Allow for upvotes by other users?', type: 'checkbox' },
+      { name: 'comments', label: 'Allow for comments by other users?', type: 'checkbox' }
+    ],
+    other: [
+      { name: 'prompt', label: 'Prompt', tooltip: 'The prompt that created the need to remember the answer' },
+      { name: 'chatbotPlatform', label: 'Platform', tooltip: 'The platform where the hallucination occurred' },
+      { name: 'versionChatbot', label: 'Version', tooltip: 'The version of the chatbot used' },
+      { name: 'promptAnswer', label: 'Prompt Answer', tooltip: 'The answer given by the chatbot which needs memory recall' },
+      { name: 'other', label: 'Give a brief explanation of the issue faced', tooltip: 'Explanation for why this does not fit into any other category.' },
+      { name: 'upvotes', label: 'Allow for upvotes by other users?', type: 'checkbox' },
+      { name: 'comments', label: 'Allow for comments by other users?', type: 'checkbox' }
+    ]
   };
 
-  // Handle changes to form inputs
   const handleChange = (e) => {
     const { name, type, checked, value } = e.target;
     const inputValue = type === 'checkbox' ? checked : value;
@@ -130,22 +164,6 @@ const BotpressChatbot = () => {
     setFormData(prev => ({ ...prev, [name]: sanitizedValue }));
   };
 
-  // Validation function for form inputs
-  const validateInput = (value) => {
-    const patterns = {
-      sqlInjection: /(\b(SELECT|INSERT|DELETE|UPDATE|DROP|CREATE|ALTER|GRANT|REVOKE)\b|--|;|\/\*|\*\/|')/i,
-      xss: /<.*?>/g,
-    };
-    if (patterns.sqlInjection.test(value)) {
-      return "Potential SQL injection detected.";
-    }
-    if (patterns.xss.test(value)) {
-      return "Potential XSS attack detected.";
-    }
-    return null;
-  };
-
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     const newData = prepareCheckboxData(formData);
@@ -157,7 +175,7 @@ const BotpressChatbot = () => {
     const certificateNumber = Math.floor(Math.random() * 90000) + 10000;
     const doc = new jsPDF();
     doc.text("Overflow Prompts Certification", 20, 20);
-    doc.text(`Name: ${user.name}`, 20, 30);  
+    doc.text(`Name: ${user.name}`, 20, 30);
     doc.text(`Certificate Number: ${certificateNumber}`, 20, 40);
     doc.text("This certificate acknowledges that you are an AI evangelist!", 20, 50);
     doc.text("By submitting this report today, you are helping build a community", 20, 65);
@@ -168,7 +186,7 @@ const BotpressChatbot = () => {
   };
 
   const prepareCheckboxData = (formData) => {
-    const processedData = { ...formData }; 
+    const processedData = { ...formData };
     formFields[category].forEach(field => {
       if (field.type === 'checkbox' && formData[field.name]) {
         if (field.name === 'upvotes') {
@@ -183,7 +201,6 @@ const BotpressChatbot = () => {
     return processedData;
   };
 
-  // Confirm form submission
   const handleConfirmSubmit = async () => {
     try {
       const payload = {
@@ -196,9 +213,9 @@ const BotpressChatbot = () => {
 
       const response = await fetch(`${apiOrigin}/reported-prompts`, {
         method: 'POST',
-        headers: {  
+        headers: {
           'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
-          'Content-Type': 'application/json' 
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload),
       });
@@ -267,7 +284,7 @@ const BotpressChatbot = () => {
             )}
           </div>
         ))}
-        <button type="submit">Submit</button>
+        <button type="submit" style={{ marginBottom: '20px' }}>Submit</button>
       </form>
 
       {showConfirmationModal && (
@@ -296,6 +313,6 @@ const BotpressChatbot = () => {
       )}
     </div>
   );
-};
+}
 
 export default BotpressChatbot;
