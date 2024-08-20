@@ -39,76 +39,64 @@ function BotpressChatbot() {
   const [requestCertificate, setRequestCertificate] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Function to initialize the chatbot
+  const initializeChatbot = async () => {
+    const encryptedEmail = await encryptEmail(user.email);
+
+    if (!encryptedEmail) {
+      console.error("Failed to encrypt email. Chatbot initialization aborted.");
+      return;
+    }
+
+    window.botpressWebChat.init({
+      botId: botpressid,
+      composerPlaceholder: "Say anything to start the conversation! If you are revisiting an old session, you will need to start a new one. Click three box icon and then click plus icon.",
+      botConversationDescription: "assists with reporting hallucinations, copyrights, memory aid for prompts, or security issues",
+      hostUrl: "https://cdn.botpress.cloud/webchat/v0",
+      messagingUrl: "https://messaging.botpress.cloud",
+      clientId: clientId,
+      botName: "Overflow Prompts",
+      containerWidth: "100%",
+      layoutWidth: "100%",
+      outerHeight: "50%",
+      innerHeight: "50%",
+      hideWidget: false,
+      disableAnimations: true,
+    });
+
+    window.botpressWebChat.sendEvent({
+      type: "text",
+      channel: "web",
+      payload: {
+        text: 'SET_USER_DATA',
+        userData: {
+          email: encryptedEmail,
+          name: user.name,
+        },
+      },
+    });
+
+    window.botpressWebChat.onEvent(() => {
+      setShowChatbot(false);
+    }, ["LIFECYCLE.UNLOADED"]);
+  };
+
   useEffect(() => {
     const widgetContainer = document.getElementById('bp-web-widget-container');
-    if (widgetContainer) {
-      widgetContainer.style.display = sliderChecked ? 'block' : 'none';
-    }
-
     if (sliderChecked) {
-      const script = document.createElement("script");
-      script.src = "https://cdn.botpress.cloud/webchat/v0/inject.js";
-      script.async = true;
-      script.onload = async () => {
-        const encryptedEmail = await encryptEmail(user.email);
-
-        if (!encryptedEmail) {
-          console.error("Failed to encrypt email. Chatbot initialization aborted.");
-          return;
-        }
-
-        window.botpressWebChat.init({
-          botId: botpressid,
-          composerPlaceholder: "Say anything to start the conversation! If you are revisiting an old session, you will need to start a new one. Click three box icon and then click plus icon.",
-          botConversationDescription: "assists with reporting hallucinations, copyrights, memory aid for prompts, or security issues",
-          hostUrl: "https://cdn.botpress.cloud/webchat/v0",
-          messagingUrl: "https://messaging.botpress.cloud",
-          clientId: clientId,
-          botName: "Overflow Prompts",
-          containerWidth: "100%25",
-          layoutWidth: "100%25",
-          outerHeight: "50%25",
-          innerHeight: "50%25",
-          hideWidget: false,
-          disableAnimations: true,
-        });
-
-        window.botpressWebChat.sendEvent({
-          type: "text",
-          channel: "web",
-          payload: {
-            text: 'SET_USER_DATA',
-            userData: {
-              email: encryptedEmail,
-              name: user.name,
-            },
-          },
-        });
-
-        window.botpressWebChat.onEvent(() => {
-          setShowChatbot(false);
-        }, ["LIFECYCLE.UNLOADED"]);
-
-        const btnConvoAdd = document.getElementById('btn-convo-add');
-        if (btnConvoAdd) {
-          btnConvoAdd.addEventListener('click', () => {
-            setTimeout(() => {
-              window.botpressWebChat.sendPayload({
-                type: 'text',
-                text: 'Hello, ' + user.name + ',' + ' ' + 'starting your session associated with the email ' + user.email + '.',
-              });
-            }, 2000);
-          });
-        }
-      };
-
-      document.body.appendChild(script);
-
-      return () => {
-        document.body.removeChild(script);
-      };
+      if (!widgetContainer) {
+        const script = document.createElement("script");
+        script.src = "https://cdn.botpress.cloud/webchat/v0/inject.js";
+        script.async = true;
+        script.onload = initializeChatbot;
+        document.body.appendChild(script);
+      } else {
+        widgetContainer.style.display = 'block';
+      }
+    } else if (widgetContainer) {
+      widgetContainer.style.display = 'none';
     }
-  }, [sliderChecked, user]);
+  }, [sliderChecked]);
 
   const formFields = {
     hallucinations: [
