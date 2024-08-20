@@ -1,0 +1,17 @@
+{
+  "permissions": {},
+  "lambdaLayers": [],
+  "environmentVariableList": [
+    {
+      "cloudFormationParameterName": "mongoApiKey",
+      "environmentVariableName": "MONGO_API_KEY"
+    },
+    {
+      "cloudFormationParameterName": "awsRegion",
+      "environmentVariableName": "AWS_REGION"
+    }
+  ],
+  "secretNames": [
+    "MONGO_API_KEY"
+  ]
+}
