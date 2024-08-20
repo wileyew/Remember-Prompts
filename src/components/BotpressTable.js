@@ -202,8 +202,10 @@ const BotpressTable = () => {
       userEmail: user.email
     };
     
+    const { apiOrigin, audience } = getConfig();
+
     try {
-      const response = await fetch(`/comments/${id}`, {
+      const response = await fetch(`/${apiOrigin}/${id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
