@@ -208,6 +208,7 @@ const BotpressTable = () => {
       const response = await fetch(`${apiOrigin}/comments/${id}`, {
         method: 'POST',
         headers: {
+          'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(commentData)
