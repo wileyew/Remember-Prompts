@@ -33,12 +33,13 @@ const encryptEmail = async (email) => {
 function BotpressChatbot() {
   const { user } = useAuth0();
   const [processedFormData, setProcessedFormData] = useState({}); // New state for processed form data
-  const [showChatbot, setShowChatbot] = useState(true);
+  const [showChatbot, setShowChatbot] = useState(false);
   const [formData, setFormData] = useState({});
   const [category, setCategory] = useState('hallucinations');
   const [sliderChecked, setSliderChecked] = useState(true);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);   
+
   const [showCertificateSuccessModal, setShowCertificateSuccessModal] = useState(false);
   const [requestCertificate, setRequestCertificate] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -56,7 +57,8 @@ function BotpressChatbot() {
       const script = document.createElement("script");
       script.src = "https://cdn.botpress.cloud/webchat/v0/inject.js";
       script.async = true;
-      script.onload = async () => {
+      script.onload   
+ = async () => {
         window.botpressWebChat.init({
           botId: botpressid,
           hostUrl: "https://cdn.botpress.cloud/webchat/v0",
@@ -122,7 +124,8 @@ function BotpressChatbot() {
       const script = document.createElement("script");
       script.src = "https://cdn.botpress.cloud/webchat/v0/inject.js";
       script.async = true;
-      script.id = "botpress-script";
+      script.id   
+ = "botpress-script";
       script.onload = () => initializeChatbot();
       document.body.appendChild(script);
     }
@@ -160,7 +163,6 @@ function BotpressChatbot() {
       window.botpressWebChat.sendEvent({ type: "show" });
     }, ["LIFECYCLE.LOADED"]);
   };
-
   // Handle changes to form inputs
   const handleChange = (e) => {
     const { name, type, checked, value } = e.target;
