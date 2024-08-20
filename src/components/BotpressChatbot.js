@@ -39,7 +39,6 @@ function BotpressChatbot() {
   const [requestCertificate, setRequestCertificate] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Effect to load and manage the Botpress chat widget script
   useEffect(() => {
     const widgetContainer = document.getElementById('bp-web-widget-container');
     if (widgetContainer) {
@@ -249,7 +248,7 @@ function BotpressChatbot() {
       </label>
       <h5>Want to use the chatbot instead? Click on the icon in the lower right corner of the screen and type anything to get started! Turn off chatbot by clicking slider.</h5>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="form-container">
         <label>
           Category:
           <select value={category} onChange={e => setCategory(e.target.value)}>
@@ -262,7 +261,8 @@ function BotpressChatbot() {
         {formFields[category].map(field => (
           <div key={field.name} className="form-group">
             {field.type !== 'checkbox' ? (
-              <label title={field.tooltip}>{field.label}:
+              <>
+                <label title={field.tooltip}>{field.label}:</label>
                 <textarea 
                   name={field.name} 
                   value={formData[field.name] || ''} 
@@ -270,7 +270,7 @@ function BotpressChatbot() {
                   rows="2"
                   cols="30"
                 />
-              </label>
+              </>
             ) : (
               <div>
                 <input 

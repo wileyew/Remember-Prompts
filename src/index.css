@@ -404,4 +404,28 @@ input:checked + .slider:before {
 .disclosure-button .icon { /* Style the icon within the button */
   margin-right: 5px;  /* Add some space between icon and text */
 }
+.form-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* Adds space between the rows and columns */
+}
+
+.form-group {
+  flex: 1 1 calc(50% - 20px); /* Takes up 50% of the row minus the gap space */
+  box-sizing: border-box;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group textarea,
+.form-group input[type="checkbox"] {
+  width: 100%;
+}
+
+textarea {
+  resize: none; /* Disable resizing for better layout consistency */
+}
 
