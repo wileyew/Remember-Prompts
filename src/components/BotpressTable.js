@@ -201,27 +201,28 @@ const BotpressTable = () => {
       comment: replaceHtmlEntities(commentText), // Replace HTML entities in the comment
       userEmail: user.email
     };
-    
+  
     const { apiOrigin, audience } = getConfig();
-
+  
     try {
-      const response = await fetch(`${apiOrigin}/${id}`, {
+      const response = await fetch(`${apiOrigin}/comments/${id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(commentData)
       });
-
+  
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-
+  
+      const data = await response.json();
       setComments((prevComments) => ({
         ...prevComments,
         [id]: [...(prevComments[id] || []), { username: username, comment: replaceHtmlEntities(commentText) }],
       }));
-
+  
     } catch (error) {
       console.error('Error adding comment:', error);
     }
