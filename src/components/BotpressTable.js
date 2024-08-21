@@ -76,35 +76,27 @@ const BotpressTable = () => {
 
         const commentsByRowId = {};
         const idToMaxUpvotesMap = {};
-
         const transformedData = await Promise.all(dataArray.map(async (data) => {
           const decryptedEmail = await decryptEmail(data.email);
           const cleanedData = {
             ...data,
             email: replaceHtmlEntities(decryptedEmail), // Decrypt, then replace HTML entities
-            chatbotPlatform: replaceHtmlEntities(data.chatbotPlatform),
-            versionChatbotHallucinationAnswer: replaceHtmlEntities(data.versionChatbot),
+            chatbotPlatform: replaceHtmlEntities(data.chatbot_platform),  // Fix incorrect accessor
+            versionChatbotHallucinationAnswer: replaceHtmlEntities(data.version_chatbot_hallucination_answer),  // Fix incorrect accessor
             prompt: replaceHtmlEntities(data.prompt),
-            infringementPrompt: replaceHtmlEntities(data.infringementPrompt),
-            hallucinationAnswer: replaceHtmlEntities(data.hallucinationAnswer),
-            answerUpdated: replaceHtmlEntities(data.updatedPromptAnswer),
-            updatedPromptAnswer: replaceHtmlEntities(data.updatedPromptAnswer),
-            promptTrigger: replaceHtmlEntities(data.promptTrigger),
+            hallucinationAnswer: replaceHtmlEntities(data.hallucination_answer),  // Fix incorrect accessor
+            answerUpdated: replaceHtmlEntities(data.answer_updated),  // Fix incorrect accessor
+            updatedPromptAnswer: replaceHtmlEntities(data.answer_updated), // Ensure correct field used
+            promptTrigger: replaceHtmlEntities(data.prompt_trigger),  // Fix incorrect accessor
             privacy: typeof data.privacy === 'string' && data.privacy.toLowerCase().includes("public") ? "Public" : "Private",
             name: replaceHtmlEntities(data.name),
-            copyrightAnswer: replaceHtmlEntities(data.copyrightAnswer),
-            dataSource: replaceHtmlEntities(data.dataSource),
-            securityImpact: replaceHtmlEntities(data.security_impact),
-            securityIncidentRisk: replaceHtmlEntities(data.security_incident_risk),
-            privacyRequested: replaceHtmlEntities(data.privacyRequested),
-            category: typeof data.category === 'string' ? replaceHtmlEntities(data.category.toLowerCase()) : '',
             upvotes: data.upvotes || 0,
             comments: Array.isArray(data.comments) ? data.comments.map(comment => replaceHtmlEntities(comment)) : [],
             id: data._id
           };
-
+        
           commentsByRowId[cleanedData.id] = cleanedData.comments;
-
+        
           if (idToMaxUpvotesMap[cleanedData.id]) {
             if (cleanedData.upvotes > idToMaxUpvotesMap[cleanedData.id]) {
               idToMaxUpvotesMap[cleanedData.id] = cleanedData.upvotes;
@@ -112,9 +104,10 @@ const BotpressTable = () => {
           } else {
             idToMaxUpvotesMap[cleanedData.id] = cleanedData.upvotes;
           }
-
+        
           return cleanedData;
         }));
+        
 
         const finalData = transformedData.map(item => ({
           ...item,
@@ -199,7 +192,8 @@ const BotpressTable = () => {
     const commentData = {
       username: username,
       comment: replaceHtmlEntities(commentText), // Replace HTML entities in the comment
-      userEmail: user.email
+      userEmail: user.email,
+      id: id
     };
   
     const { apiOrigin, audience } = getConfig();
