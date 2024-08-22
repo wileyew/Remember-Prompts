@@ -195,7 +195,6 @@ const BotpressTable = () => {
   }, [user]);
 
   const handleAddComment = useCallback(async (id, commentText) => {
-    // Make sure that username is not empty before trying to use it
     if (!username) {
         console.error('Username is not set');
         return;
@@ -211,12 +210,12 @@ const BotpressTable = () => {
 
     try {
         const response = await fetch(`${apiOrigin}/comments/${id}`, {
-            method: 'PUT',  // Using PUT for updating the document
+            method: 'PUT',  // Updated to PUT
             headers: {
                 'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ comment: newComment }),  // Send the new comment to be appended
+            body: JSON.stringify({ id, ...newComment }),  // Ensure the body matches what the Lambda expects
         });
 
         if (!response.ok) {
@@ -225,12 +224,13 @@ const BotpressTable = () => {
 
         setComments((prevComments) => ({
             ...prevComments,
-            [id]: [...(prevComments[id] || []), newComment],  // Append the new comment to the existing array
+            [id]: [...(prevComments[id] || []), newComment],
         }));
     } catch (error) {
         console.error('Error adding comment:', error);
     }
 }, [username, user.email, setComments]);
+
 
 
   const columns = useMemo(() => {
