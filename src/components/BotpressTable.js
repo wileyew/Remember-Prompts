@@ -166,6 +166,7 @@ const BotpressTable = () => {
                 const response = await fetch(`${apiOrigin}/upvote/${id}`, {
                     method: 'PUT',
                     headers: {
+                      'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(payload),
