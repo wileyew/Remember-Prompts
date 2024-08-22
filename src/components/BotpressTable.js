@@ -197,41 +197,41 @@ const BotpressTable = () => {
   const handleAddComment = useCallback(async (id, commentText) => {
     // Make sure that username is not empty before trying to use it
     if (!username) {
-      console.error('Username is not set');
-      return;
+        console.error('Username is not set');
+        return;
     }
 
-    const commentData = {
-      username: username,
-      comment: replaceHtmlEntities(commentText), // Replace HTML entities in the comment
-      userEmail: user.email,
-      id: id,
+    const newComment = {
+        username: username,
+        comment: replaceHtmlEntities(commentText), // Replace HTML entities in the comment
+        userEmail: user.email,
     };
-  
+
     const { apiOrigin } = getConfig();
-  
+
     try {
-      const response = await fetch(`${apiOrigin}/comments/${id}`, {
-        method: 'POST',
-        headers: {
-          'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(commentData),
-      });
-  
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-  
-      setComments((prevComments) => ({
-        ...prevComments,
-        [id]: [...(prevComments[id] || []), { username: username, comment: replaceHtmlEntities(commentText) }],
-      }));
+        const response = await fetch(`${apiOrigin}/comments/${id}`, {
+            method: 'PUT',  // Using PUT for updating the document
+            headers: {
+                'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ comment: newComment }),  // Send the new comment to be appended
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        setComments((prevComments) => ({
+            ...prevComments,
+            [id]: [...(prevComments[id] || []), newComment],  // Append the new comment to the existing array
+        }));
     } catch (error) {
-      console.error('Error adding comment:', error);
+        console.error('Error adding comment:', error);
     }
-  }, [username, user.email, setComments]);
+}, [username, user.email, setComments]);
+
 
   const columns = useMemo(() => {
     const baseColumns = [
