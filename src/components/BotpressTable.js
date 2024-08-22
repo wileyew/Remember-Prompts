@@ -201,7 +201,7 @@ const BotpressTable = () => {
     }
 
     const newComment = {
-        username: username,
+        // username: username,
         comment: replaceHtmlEntities(commentText), // Replace HTML entities in the comment
         userEmail: user.email,
     };
