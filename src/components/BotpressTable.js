@@ -163,9 +163,10 @@ const BotpressTable = () => {
         id: id,
         upvotes: newUpvotes,
       };
+      const { apiOrigin } = getConfig();
 
       try {
-        const response = await fetch(`/upvote/${id}`, {
+        const response = await fetch(`${apiOrigin}/upvote/${id}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
