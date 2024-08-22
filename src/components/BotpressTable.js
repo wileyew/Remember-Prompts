@@ -57,7 +57,7 @@ const BotpressTable = () => {
     };
     
     const fetchDataFromDatabase = async () => {
-      const { apiOrigin, audience } = getConfig();
+      const { apiOrigin } = getConfig();
 
       setIsLoading(true);
       try {
@@ -108,7 +108,6 @@ const BotpressTable = () => {
           return cleanedData;
         }));
         
-
         const finalData = transformedData.map(item => ({
           ...item,
           upvotes: idToMaxUpvotesMap[item.id]
@@ -188,15 +187,28 @@ const BotpressTable = () => {
     }
   }, [userUpvotes, user.email, originalData]);
 
+  // Ensure that `username` is correctly set before using it in `handleAddComment`
+  useEffect(() => {
+    if (user && user.name) {
+      setUsername(user.name);
+    }
+  }, [user]);
+
   const handleAddComment = useCallback(async (id, commentText) => {
+    // Make sure that username is not empty before trying to use it
+    if (!username) {
+      console.error('Username is not set');
+      return;
+    }
+
     const commentData = {
       username: username,
       comment: replaceHtmlEntities(commentText), // Replace HTML entities in the comment
       userEmail: user.email,
-      id: id
+      id: id,
     };
   
-    const { apiOrigin, audience } = getConfig();
+    const { apiOrigin } = getConfig();
   
     try {
       const response = await fetch(`${apiOrigin}/comments/${id}`, {
@@ -205,23 +217,21 @@ const BotpressTable = () => {
           'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(commentData)
+        body: JSON.stringify(commentData),
       });
   
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
   
-      const data = await response.json();
       setComments((prevComments) => ({
         ...prevComments,
         [id]: [...(prevComments[id] || []), { username: username, comment: replaceHtmlEntities(commentText) }],
       }));
-  
     } catch (error) {
       console.error('Error adding comment:', error);
     }
-  }, [username, user.email]);
+  }, [username, user.email, setComments]);
 
   const columns = useMemo(() => {
     const baseColumns = [
@@ -231,36 +241,38 @@ const BotpressTable = () => {
           {row.values.upvotes}
         </button>
       )},
-      { Header: 'Comments', accessor: 'comments', Cell: ({ row }) => (
-        <div>
-          <Disclosure>
-            {({ open }) => (
-              <>
-                <Disclosure.Button  className="disclosure-button">
-                  <span>Comments ({comments[row.original.id]?.length || 0})</span>
-                  <ChevronUpIcon
-                    className={`${open ? 'transform rotate-180' : ''} w-5 h-5 text-gray-500`}
-                  />
-                </Disclosure.Button>
-                <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
-                  {comments[row.original.id] && comments[row.original.id].map((comment, index) => (
-                    <div key={index}><strong>{replaceHtmlEntities(comment.username)}</strong>: {replaceHtmlEntities(comment.comment)}</div>
-                  ))}
-                  <form onSubmit={(e) => {
-                    e.preventDefault();
-                    const comment = e.target.elements.comment.value;
-                    handleAddComment(row.original.id, comment);
-                    e.target.reset();
-                  }}>
-                    <input type="text" name="comment" placeholder="Add a comment" required />
-                    <button type="submit">Add</button>
-                  </form>
-                </Disclosure.Panel>
-              </>
-            )}
-          </Disclosure>
-        </div>
-      )}
+      {
+        Header: 'Comments',
+        accessor: 'comments',
+        Cell: ({ row }) => (
+          <div>
+            <Disclosure>
+              {({ open }) => (
+                <>
+                  <Disclosure.Button className="disclosure-button">
+                    <span>Comments ({comments[row.original.id]?.length || 0})</span>
+                    <ChevronUpIcon className={`${open ? 'transform rotate-180' : ''} w-5 h-5 text-gray-500`} />
+                  </Disclosure.Button>
+                  <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
+                    {comments[row.original.id] && comments[row.original.id].map((comment, index) => (
+                      <div key={index}><strong>{replaceHtmlEntities(comment.username)}</strong>: {replaceHtmlEntities(comment.comment)}</div>
+                    ))}
+                    <form onSubmit={(e) => {
+                      e.preventDefault();
+                      const comment = e.target.elements.comment.value;
+                      handleAddComment(row.original.id, comment);
+                      e.target.reset();
+                    }}>
+                      <input type="text" name="comment" placeholder="Add a comment" required />
+                      <button type="submit">Add</button>
+                    </form>
+                  </Disclosure.Panel>
+                </>
+              )}
+            </Disclosure>
+          </div>
+        ),
+      },
     ];
 
     if (category === 'hallucinations') {
@@ -278,12 +290,12 @@ const BotpressTable = () => {
     }
 
     if (category === 'copyright') {
-      const hallucinationColumns = [
+      const copyrightColumns = [
         { Header: 'Infringement Prompt', accessor: 'infringementPrompt' },
         { Header: 'Copyright Answer', accessor: 'copyrightAnswer' },
         { Header: 'Data Source', accessor: 'dataSource' },
       ];
-      return [...baseColumns, ...hallucinationColumns];
+      return [...baseColumns, ...copyrightColumns];
     }
 
     if (category === 'security') {
@@ -319,7 +331,6 @@ const BotpressTable = () => {
     return baseColumns;
   }, [handleUpvote, userUpvotes, category, comments, handleAddComment]);
 
- 
   const {
     getTableProps,
     getTableBodyProps,
@@ -347,7 +358,6 @@ const BotpressTable = () => {
     padding: '10px'
   };
 
-
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -358,9 +368,6 @@ const BotpressTable = () => {
         <button onClick={() => setActiveTab('allReports')} className={activeTab === 'allReports' ? 'active' : ''}>
           All Public Reports
         </button>
-        {/* <button onClick={() => setActiveTab('myReports')} className={activeTab === 'myReports' ? 'active' : ''}>
-          My Reports
-        </button> */}
       </div>
       <div>
         <select onChange={(e) => setCategory(e.target.value)} value={category}>
