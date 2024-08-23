@@ -14,11 +14,6 @@ const Hero = ({ mode }) => (
       <img className="mb-3 app-logo" src={overflowlogo} alt="React logo" width="120" />
     )}
     <h1 className="mb-4">Overflow Prompts </h1>
-    {mode === 'dark' ? (
-      <img className="mb-3 app-logo" src={darkmodelogo} alt="React logo" width="120" />
-    ) : (
-      <img className="mb-3 app-logo" src={logo} alt="React logo" width="120" />
-    )}
     <p className="lead">
       Community Driven AI Accountability, watch an overview about Overflow Prompts, below, and register or login to get started!
     </p>
