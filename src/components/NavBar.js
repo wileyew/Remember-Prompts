@@ -21,26 +21,31 @@ import {
 
 import { useAuth0 } from "@auth0/auth0-react";
 
-const NavBar = () => {
+const NavBar = ({ mode }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const {
-    user,
-    isAuthenticated,
-    loginWithRedirect,
-    logout,
-  } = useAuth0();
+  const { user, isAuthenticated, loginWithRedirect, logout } = useAuth0();
   const toggle = () => setIsOpen(!isOpen);
 
   const logoutWithRedirect = () =>
     logout({
-        logoutParams: {
-          returnTo: window.location.origin,
-        }
+      logoutParams: {
+        returnTo: window.location.origin,
+      },
     });
+
+  // Determine text color based on mode
+  const textColor = mode === "dark" ? "#000" : "#fff";
+  const backgroundColor = mode === "dark" ? "#fff" : "#f8f9fa";
 
   return (
     <div className="nav-container">
-      <Navbar color="light" light expand="md" container={false}>
+      <Navbar
+        style={{ backgroundColor: backgroundColor }}
+        color={mode === "dark" ? "light" : "light"}
+        light
+        expand="md"
+        container={false}
+      >
         <Container>
           <NavbarBrand src="logo" />
           <NavbarToggler onClick={toggle} />
@@ -52,6 +57,7 @@ const NavBar = () => {
                   to="/"
                   exact
                   activeClassName="router-link-exact-active"
+                  style={{ color: textColor }}
                 >
                   Home
                 </NavLink>
@@ -64,6 +70,7 @@ const NavBar = () => {
                       to="/remember-prompts"
                       exact
                       activeClassName="router-link-exact-active"
+                      style={{ color: textColor }}
                     >
                       Create a Report
                     </NavLink>
@@ -74,6 +81,7 @@ const NavBar = () => {
                       to="/reported-prompts"
                       exact
                       activeClassName="router-link-exact-active"
+                      style={{ color: textColor }}
                     >
                       Reported Prompts
                     </NavLink>
@@ -84,6 +92,7 @@ const NavBar = () => {
                       to="/tutorials"
                       exact
                       activeClassName="router-link-exact-active"
+                      style={{ color: textColor }}
                     >
                       Tutorials
                     </NavLink>
@@ -96,10 +105,17 @@ const NavBar = () => {
                   href="https://forms.gle/ZenT7RtnNM1mCDzL9"
                   target="_blank"
                   rel="noopener noreferrer"
+                  style={{ color: textColor }}
                 >
                   Beta Test & Feedback
                 </NavLink>
-                <p style={{ fontSize: "12px", margin: "5px 0 0" }}>
+                <p
+                  style={{
+                    fontSize: "12px",
+                    margin: "5px 0 0",
+                    color: textColor,
+                  }}
+                >
                   Your feedback is crucial in helping us improve Overflow Prompts. By participating, you'll have the opportunity to directly influence future features and ensure the platform meets your needs. Plus, as a beta tester, you'll get early access to new tools and enhancements!
                 </p>
               </NavItem>
@@ -184,6 +200,7 @@ const NavBar = () => {
                   <RouterNavLink
                     to="/profile"
                     activeClassName="router-link-exact-active"
+                    style={{ color: textColor }}
                   >
                     Profile
                   </RouterNavLink>
@@ -194,6 +211,7 @@ const NavBar = () => {
                     to="#"
                     id="qsLogoutBtn"
                     onClick={() => logoutWithRedirect()}
+                    style={{ color: textColor }}
                   >
                     Log out
                   </RouterNavLink>
