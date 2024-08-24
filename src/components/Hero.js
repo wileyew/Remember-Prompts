@@ -13,7 +13,7 @@ const Hero = ({ mode }) => (
     )}
     <h1 className="mb-4">Overflow Prompts</h1>
     <p className="lead">
-      Community Driven AI Accountability. Watch an overview about Overflow Prompts below, and register or login to get started!
+      Community Driven AI Accountability. Watch an overview about Overflow Prompts below, and register or login to get started! Authentication for this application is powered by <a href="https://auth0.com/resources/webinars/demo-consumer-facing-applications?utm_source=google&utm_campaign=amer_namer_usa_all_ciam-all_dg-ao_auth0_search_google_text_kw_DSA_utm2&utm_medium=cpc&utm_id=aNK4z000000UCSHGA4&gad_source=1&gclid=CjwKCAjw5qC2BhB8EiwAvqa41jv5p2UHsbIBqX-PyXJLNzV6RM7yYzw_ztnn2EX8HXhtYy4jWFDNKxoCY8wQAvD_BwE">Auth0</a>.
     </p>
     <p className="lead">
       <strong>Why participate?</strong> By reporting, upvoting, and commenting on prompts, you play a key role in improving AI for everyone. 
