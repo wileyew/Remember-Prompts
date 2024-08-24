@@ -3,7 +3,6 @@ import { NavLink as RouterNavLink } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import logo from "../assets/rememberprompts.svg";
 
-
 import {
   Collapse,
   Container,
@@ -57,59 +56,53 @@ const NavBar = () => {
                   Home
                 </NavLink>
               </NavItem>
-              {/* <NavLink
-              
-              {/* {isAuthenticated && (
-                <NavItem>
-                  <NavLink
-                    tag={RouterNavLink}
-                    to="/external-api"
-                    exact
-                    activeClassName="router-link-exact-active"
-                  >
-                    External API
-                  </NavLink>
-                </NavItem>
-              )} */} 
-               {isAuthenticated && (
-                <NavItem>
-                  <NavLink
-                    tag={RouterNavLink}
-                    to="/remember-prompts"
-                    exact
-                    activeClassName="router-link-exact-active"
-                  >
-                   Create a Report
-                  </NavLink>
-                </NavItem>
-                
+              {isAuthenticated && (
+                <>
+                  <NavItem>
+                    <NavLink
+                      tag={RouterNavLink}
+                      to="/remember-prompts"
+                      exact
+                      activeClassName="router-link-exact-active"
+                    >
+                      Create a Report
+                    </NavLink>
+                  </NavItem>
+                  <NavItem>
+                    <NavLink
+                      tag={RouterNavLink}
+                      to="/reported-prompts"
+                      exact
+                      activeClassName="router-link-exact-active"
+                    >
+                      Reported Prompts
+                    </NavLink>
+                  </NavItem>
+                  <NavItem>
+                    <NavLink
+                      tag={RouterNavLink}
+                      to="/tutorials"
+                      exact
+                      activeClassName="router-link-exact-active"
+                    >
+                      Tutorials
+                    </NavLink>
+                  </NavItem>
+                </>
               )}
-   {isAuthenticated && (
-                <NavItem>
-                  <NavLink
-                    tag={RouterNavLink}
-                    to="/reported-prompts"
-                    exact
-                    activeClassName="router-link-exact-active"
-                  >
-                    Reported Prompts
-                  </NavLink>
-                </NavItem>
-                
-              )}
-                {isAuthenticated && (
-                <NavItem>
-                  <NavLink
-                    tag={RouterNavLink}
-                    to="/tutorials"
-                    exact
-                    activeClassName="router-link-exact-active"
-                  >
-                   Tutorials
-                  </NavLink>
-                </NavItem>
-                
-              )}
+              {/* Call to Action for Beta Testing */}
+              <NavItem>
+                <NavLink
+                  href="https://forms.gle/ZenT7RtnNM1mCDzL9"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Beta Test & Feedback
+                </NavLink>
+                <p style={{ fontSize: "12px", margin: "5px 0 0" }}>
+                  Your feedback is crucial in helping us improve Overflow Prompts. By participating, you'll have the opportunity to directly influence future features and ensure the platform meets your needs. Plus, as a beta tester, you'll get early access to new tools and enhancements!
+                </p>
+              </NavItem>
             </Nav>
             <Nav className="d-none d-md-block" navbar>
               {!isAuthenticated && (
