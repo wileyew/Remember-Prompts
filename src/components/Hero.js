@@ -20,7 +20,6 @@ const Hero = ({ mode }) => (
       Reporting prompts helps uncover issues and drive improvements directly to AI companies AND most importantly gives visibility to AI companies to fix the issues (if deemed an issue from their perspective) you report! Upvoting highlights the most critical issues, ensuring they get the attention they deserve. 
       Commenting allows you to share insights, suggest solutions, and collaborate with a community of like-minded individuals. Plus, as an active contributor, you'll gain early access to new features and tools, and earn recognition within the community!
     </p>
-    <Video videoId="1AaVt0ucVoPe3UateyK2l23NjVcg2Lg8B" />
   </div>
 );
 

@@ -116,7 +116,7 @@ const NavBar = ({ mode }) => {
                     color: textColor,
                   }}
                 >
-                  Your feedback is crucial in helping us improve Overflow Prompts. By participating, you'll have the opportunity to directly influence future features and ensure the platform meets your needs. Plus, as a beta tester, you'll get early access to new tools and enhancements!
+                  Your feedback is crucial in helping us improve Overflow Prompts. By participating, you'll give visibility to AI companies to fix the issues you report and earn a certification in AI evangelism!
                 </p>
               </NavItem>
             </Nav>
