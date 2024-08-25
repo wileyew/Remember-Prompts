@@ -34,7 +34,7 @@ const NavBar = ({ mode }) => {
     });
 
   // Determine text color based on mode
-  const textColor = mode === "light" ? "#fff" : "#000";
+  const textColor = mode === "light" ? "#000": "#000";
   const backgroundColor = mode === "dark" ? "#fff" : "#f8f9fa";
 
   return (

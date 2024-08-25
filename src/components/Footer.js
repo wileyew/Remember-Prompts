@@ -5,7 +5,7 @@ import logo from "../assets/rememberprompts.svg";
 const Footer = ({ mode }) => (
   <footer className="bg-gray-100 dark:bg-gray-800 p-3 text-center">
     <div className="mb-3 app-logo" />
-    <strong style={{ color: mode === 'light' ? '#fff' : '#000' }}>
+    <strong style={{ color: mode === 'light' ? '#000' : '#000' }}>
       Have questions? Contact us at overflowprompts@gmail.com. Overflow Prompts is a member of Remember Prompts LLC.
     </strong>
     {mode === 'light' ? (
