@@ -9,7 +9,7 @@ const Footer = ({ mode }) => (
       Have questions? Contact us at overflowprompts@gmail.com. Overflow Prompts is a member of Remember Prompts LLC.
     </strong>
     {mode === 'light' ? (
-      <img className="mb-3 app-logo" src={darkmodelogo} alt="React logo" width="120" />
+      <img className="mb-3 app-logo" src={logo} alt="React logo" width="120" />
     ) : (
       <img className="mb-3 app-logo" src={logo} alt="React logo" width="120" />
     )}
