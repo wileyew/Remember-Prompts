@@ -207,10 +207,6 @@ function BotpressChatbot() {
       
       // Send the payload when the chat is loaded
       setTimeout(() => {
-        window.botpressWebChat.sendPayload({
-          type: 'text',
-          text: `Hello, ${user.name}, starting your session associated with the email ${user.email}.`,
-        });
       }, 2000);
     }, ["LIFECYCLE.LOADED"]);
   };
