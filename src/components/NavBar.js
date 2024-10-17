@@ -19,7 +19,7 @@ import {
   DropdownItem,
 } from "reactstrap";
 
-import { Amplify, Auth } from 'aws-amplify';
+import { Amplify} from 'aws-amplify';
 import awsconfig from '../aws-exports';
 import { AmplifyAuthenticator, AmplifySignOut, AmplifySignIn } from '@aws-amplify/ui-react';
 
