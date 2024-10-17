@@ -16,7 +16,7 @@ import PublicReportedIssuesAndRememberTriggers from "./views/PublicReportedIssue
 import ButtonComponent from "./components/ButtonComponent"; // Ensure this is the correct path
 import initFontAwesome from "./utils/initFontAwesome";
 import BotpressChatbot from "./components/BotpressChatbot";
-import Amplify from 'aws-amplify';
+import { Amplify } from 'aws-amplify';
 import awsExports from './aws-exports';
 import { withAuthenticator } from '@aws-amplify/ui-react';
 
