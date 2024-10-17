@@ -75,7 +75,7 @@ const NavBar = ({ mode }) => {
         container={false}
       >
         <Container>
-          <NavbarBrand src="logo" />
+          <NavbarBrand src="../assets/rememberprompts.svg" />
           {/* <NavbarToggler onClick={toggle} /> */}
           <Collapse isOpen={isOpen} navbar>
             <Nav className="mr-auto" navbar>
