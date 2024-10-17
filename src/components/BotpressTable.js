@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
-import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
+import { useAuth0 } from "@auth0/auth0-react";
 import { Disclosure } from '@headlessui/react';
 import { ChevronUpIcon } from '@heroicons/react/20/solid';
 import "../../src/index.css";
@@ -422,6 +422,4 @@ const BotpressTable = () => {
     );
 };
 
-export default withAuthenticationRequired(BotpressTable, {
-    // Options for handling authentication, redirecting, etc.
-});
+export default BotpressTable;
