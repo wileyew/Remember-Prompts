@@ -6,7 +6,7 @@ import Loading from "../components/Loading";
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
 
 export const TableComponent = () => {
-  const { user } = useAuth0();
+  // const { user } = useAuth0();
 
   return (
     <Container className="mb-5">
@@ -15,6 +15,6 @@ export const TableComponent = () => {
   );
 };
 
-export default withAuthenticationRequired(TableComponent, {
+export default (TableComponent, {
   onRedirecting: () => <Loading />,
 });
