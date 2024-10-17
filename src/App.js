@@ -20,6 +20,9 @@ import Amplify from 'aws-amplify';
 import awsExports from './aws-exports';
 import { withAuthenticator } from '@aws-amplify/ui-react';
 
+// Initialize Amplify configuration
+Amplify.configure(awsExports);
+
 initFontAwesome();
 
 const App = () => {
@@ -42,10 +45,10 @@ const App = () => {
     const handleChange = (e) => {
       setMode(e.matches ? 'dark' : 'light');
     };
-    mediaQuery.addListener(handleChange);
+    mediaQuery.addEventListener('change', handleChange);
 
     return () => {
-      mediaQuery.removeListener(handleChange);
+      mediaQuery.removeEventListener('change', handleChange);
       if (btnConvo) {
         btnConvo.removeEventListener('click', navigateToConversations);
       }
@@ -88,4 +91,5 @@ const App = () => {
   );
 };
 
+// Wrap the App with Authenticator from AWS Amplify
 export default withAuthenticator(App);
