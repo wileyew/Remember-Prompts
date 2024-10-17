@@ -20,9 +20,6 @@ import Amplify from 'aws-amplify';
 import awsExports from './aws-exports';
 import { withAuthenticator } from '@aws-amplify/ui-react';
 
-Amplify.configure(awsExports);
-
-
 initFontAwesome();
 
 const App = () => {
