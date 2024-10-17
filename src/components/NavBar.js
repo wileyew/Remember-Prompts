@@ -90,7 +90,7 @@ const NavBar = ({ mode }) => {
                   Home
                 </NavLink>
               </NavItem>
-               && (
+            
                 <>
                   <NavItem>
                     <NavLink
@@ -126,7 +126,7 @@ const NavBar = ({ mode }) => {
                     </NavLink>
                   </NavItem>
                 </>
-              )
+              
               <NavItem>
                 <NavLink
                   href="https://forms.gle/ZenT7RtnNM1mCDzL9"
