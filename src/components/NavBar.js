@@ -30,36 +30,36 @@ const NavBar = ({ mode }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-    Auth.currentAuthenticatedUser()
-      .then(user => {
-        setUser(user);
-        setIsAuthenticated(true);
-      })
-      .catch(() => {
-        setIsAuthenticated(false);
-      });
-  }, []);
+  // useEffect(() => {
+  //   Auth.currentAuthenticatedUser()
+  //     .then(user => {
+  //       setUser(user);
+  //       setIsAuthenticated(true);
+  //     })
+  //     .catch(() => {
+  //       setIsAuthenticated(false);
+  //     });
+  // }, []);
 
-  const toggle = () => setIsOpen(!isOpen);
+  // const toggle = () => setIsOpen(!isOpen);
 
-  const login = async () => {
-    try {
-      await Auth.federatedSignIn();
-    } catch (error) {
-      console.error("Error signing in", error);
-    }
-  };
+  // const login = async () => {
+  //   try {
+  //     await Auth.federatedSignIn();
+  //   } catch (error) {
+  //     console.error("Error signing in", error);
+  //   }
+  // };
 
-  const logout = async () => {
-    try {
-      await Auth.signOut();
-      setIsAuthenticated(false);
-      setUser(null);
-    } catch (error) {
-      console.error("Error signing out", error);
-    }
-  };
+  // const logout = async () => {
+  //   try {
+  //     await Auth.signOut();
+  //     setIsAuthenticated(false);
+  //     setUser(null);
+  //   } catch (error) {
+  //     console.error("Error signing out", error);
+  //   }
+  // };
 
   // Determine text color based on mode
   const textColor = mode === "light" ? "#000" : "#000";
