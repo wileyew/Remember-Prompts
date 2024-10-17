@@ -76,7 +76,7 @@ const NavBar = ({ mode }) => {
       >
         <Container>
           <NavbarBrand src="logo" />
-          <NavbarToggler onClick={toggle} />
+          {/* <NavbarToggler onClick={toggle} /> */}
           <Collapse isOpen={isOpen} navbar>
             <Nav className="mr-auto" navbar>
               <NavItem>
@@ -154,7 +154,7 @@ const NavBar = ({ mode }) => {
                     id="qsLoginBtn"
                     color="primary"
                     className="btn-margin"
-                    onClick={login}
+                    // onClick={login}
                   >
                     Log in or Register
                   </Button>
@@ -181,7 +181,7 @@ const NavBar = ({ mode }) => {
                     </DropdownItem>
                     <DropdownItem
                       id="qsLogoutBtn"
-                      onClick={logout}
+                      // onClick={logout}
                     >
                       <FontAwesomeIcon icon="power-off" className="mr-3" /> Log
                       out
