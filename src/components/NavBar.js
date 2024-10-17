@@ -41,7 +41,7 @@ const NavBar = ({ mode }) => {
   //     });
   // }, []);
 
-  // const toggle = () => setIsOpen(!isOpen);
+  const toggle = () => setIsOpen(!isOpen);
 
   // const login = async () => {
   //   try {
@@ -76,7 +76,7 @@ const NavBar = ({ mode }) => {
       >
         <Container>
           <NavbarBrand src="../assets/rememberprompts.svg" />
-          {/* <NavbarToggler onClick={toggle} /> */}
+          <NavbarToggler onClick={toggle} />
           <Collapse isOpen={isOpen} navbar>
             <Nav className="mr-auto" navbar>
               <NavItem>
