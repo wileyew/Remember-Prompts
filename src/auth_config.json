@@ -2,5 +2,5 @@
     "domain": "www.overflowprompts.net",
     "clientId": "6ynAiNXKC15tyy6XdHZNQ0mXACIKWcQx",
     "apiOrigin": "https://dev-ypza21y2pn8n2krs.us.auth0.com/api/v2/",
-    "redirectUri": "www.overflowprompts.net"
+    "redirectUri": "overflowprompts.net"
   }
