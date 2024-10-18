@@ -15,7 +15,7 @@ const config = {
   headers: {
     'Content-Type': 'application/json',
     'Access-Control-Request-Headers': '*',
-    'api-key': process.env.MONGO_API_KEY // Use the environment variable here
+    'api-key': 'rs0qR8HxnpjWTLTDFL1RRVHH277ID0yPXLVvM426h8xuocaFWzwLPdLFz09V9exE' // Use the environment variable here
   },
   data: data
 };
