@@ -4,7 +4,7 @@ import { Disclosure } from '@headlessui/react';
 import { ChevronUpIcon } from '@heroicons/react/20/solid';
 import "../../src/index.css";
 import { useTable, usePagination } from 'react-table';
-import { getConfig } from "../config";
+import { getConfig } from '../utils/config';
 import AWS from 'aws-sdk';
 import { Buffer } from 'buffer';
 
