@@ -1,5 +1,3 @@
-require('dotenv').config(); // This line is needed to load the environment variables from the .env file
-
 const axios = require('axios'); // Assuming Axios is used for HTTP requests
 
 const data = JSON.stringify({
