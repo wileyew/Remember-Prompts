@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
-import { useAuth0 } from "@auth0/auth0-react";
+// import { useAuth0 } from "@auth0/auth0-react";
 import { Disclosure } from '@headlessui/react';
 import { ChevronUpIcon } from '@heroicons/react/20/solid';
 import "../../src/index.css";
@@ -21,7 +21,7 @@ const replaceHtmlEntities = (text) => {
 };
 
 const BotpressTable = () => {
-    const { user } = useAuth0();
+    // const { user } = useAuth0();
     const [originalData, setOriginalData] = useState([]);
     const [tableData, setTableData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -131,12 +131,12 @@ const BotpressTable = () => {
             const matchesSearchQuery = searchQuery === '' || Object.values(item).some(value =>
                 (value ? value.toString().toLowerCase().includes(searchQuery.toLowerCase()) : false));
             const matchesCategory = category === 'all' || item.category === category;
-            const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' && item.email === user.email);
+            const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' );
             return matchesSearchQuery && matchesCategory && matchesTab;
         });
 
         setTableData(filteredData);
-    }, [originalData, searchQuery, category, activeTab, user.email]);
+    }, [originalData, searchQuery, category, activeTab]) //user.email]);
 
     const handleCategoryChange = useCallback((e) => {
         setCategory(e.target.value);
@@ -188,22 +188,22 @@ const BotpressTable = () => {
     }, [userUpvotes, originalData, setTableData, setOriginalData, getConfig]);
 
     // Ensure that `username` is correctly set before using it in `handleAddComment`
-    useEffect(() => {
-        if (user && user.name) {
-            setUsername(user.name);
-        }
-    }, [user]);
+    // useEffect(() => {
+    //     // if (user && user.name) {
+    //     //     setUsername(user.name);
+    //     // }
+    // }, [user]);
 
     const handleAddComment = useCallback(async (id, commentText) => {
-        if (!username) {
-            console.error('Username is not set');
-            return;
-        }
+        // if (!username) {
+        //     console.error('Username is not set');
+        //     return;
+        // }
 
         const newComment = {
-            username: username,
+            // username: username,
             comment: replaceHtmlEntities(commentText),
-            userEmail: user.email,
+            // userEmail: user.email,
         };
 
         const { apiOrigin } = getConfig();
@@ -229,7 +229,7 @@ const BotpressTable = () => {
         } catch (error) {
             console.error('Error adding comment:', error);
         }
-    }, [username, user.email, setComments]);
+    }, [setComments]);//username, user.email, setComments]);
 
     const columns = useMemo(() => {
         const baseColumns = [
