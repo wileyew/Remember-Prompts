@@ -57,7 +57,7 @@ const BotpressTable = () => {
         };
 
         const fetchDataFromDatabase = async () => {
-            const { apiOrigin } = 'mongodb://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/findOne';
+            const { apiOrigin } = 'https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/reported-prompts';
 
             setIsLoading(true);
             try {
