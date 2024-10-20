@@ -4,7 +4,7 @@ import botpress from "../botpress.json";
 import "../index.css";
 import { jsPDF } from "jspdf";
 import DOMPurify from 'dompurify';
-import { getConfig } from "../config";
+import config from '../utils/config';
 import AWS from 'aws-sdk';
 
 
@@ -357,7 +357,7 @@ function BotpressChatbot() {
           category,
           userEmail: user.email,
         };
-      const { apiOrigin, audience } = getConfig();
+      const { apiOrigin} = config.insertUrl;
 
       const response = await fetch(`${apiOrigin}/reported-prompts`, {
         method: 'POST',

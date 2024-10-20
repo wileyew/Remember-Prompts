@@ -57,7 +57,7 @@ const BotpressTable = () => {
         };
 
         const fetchDataFromDatabase = async () => {
-            const { apiOrigin } = config.url;
+            const { apiOrigin } = config.fetchUrl;
 
             setIsLoading(true);
             try {
