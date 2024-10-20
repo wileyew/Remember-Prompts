@@ -4,7 +4,7 @@ import { Disclosure } from '@headlessui/react';
 import { ChevronUpIcon } from '@heroicons/react/20/solid';
 import "../../src/index.css";
 import { useTable, usePagination } from 'react-table';
-import { getConfig } from '../utils/config';
+import config from '../utils/config'; // Import the config object directly
 import AWS from 'aws-sdk';
 import { Buffer } from 'buffer';
 
@@ -57,7 +57,7 @@ const BotpressTable = () => {
         };
 
         const fetchDataFromDatabase = async () => {
-            const { apiOrigin } = getConfig();
+            const { apiOrigin } = config.url;
 
             setIsLoading(true);
             try {
@@ -156,7 +156,10 @@ const BotpressTable = () => {
                 return;
             }
 
-            const { apiOrigin } = getConfig();
+            const apiOrigin = config.apiOrigin; // Get API origin from config
+
+            setIsLoading(true);
+          
 
             const payload = {
                 id: id,
@@ -185,7 +188,7 @@ const BotpressTable = () => {
                 console.error('Error upvoting:', error);
             }
         }
-    }, [userUpvotes, originalData, setTableData, setOriginalData, getConfig]);
+    }, [userUpvotes, originalData, setTableData, setOriginalData, config]);
 
     // Ensure that `username` is correctly set before using it in `handleAddComment`
     // useEffect(() => {
@@ -206,7 +209,7 @@ const BotpressTable = () => {
             // userEmail: user.email,
         };
 
-        const { apiOrigin } = getConfig();
+        const { apiOrigin } = config.url;
 
         try {
             const response = await fetch(`${apiOrigin}/comments/${id}`, {
