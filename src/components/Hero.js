@@ -20,8 +20,8 @@ const Hero = ({ mode }) => (
           autoStart: true,
           loop: true,
           deleteSpeed: 50,
-        }} AI Issues for Everyone
-      />
+        }} 
+      /> AI Issues for Everyone
     </h1>
     
     <p className="lead">
