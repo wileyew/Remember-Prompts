@@ -36,7 +36,9 @@ body {
   font-size: var(--font-size-normal);
   line-height: 1.6;
   transition: background-color 0.3s, color 0.3s; /* Smooth transition for theme changes */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
+
 
 .wrapper {
   display: flex; /* Or grid */
