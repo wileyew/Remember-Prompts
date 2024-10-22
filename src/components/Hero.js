@@ -13,14 +13,14 @@ const Hero = ({ mode }) => (
       <img className="mb-3 app-logo" src={overflowlogo} alt="Overflow Prompts logo" width="120" />
     )}
     
-    <h1 className="mb-4">
+    <h1 className="mb-4"> An AI Governance Platform to <br></br>
       <Typewriter
         options={{
           strings: ["Educate", "Identify", "Report Issues"],
           autoStart: true,
           loop: true,
           deleteSpeed: 50,
-        }}
+        }} AI Issues for Everyone
       />
     </h1>
     
