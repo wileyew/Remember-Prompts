@@ -1,7 +1,7 @@
 {
   "name": "auth0-react-sample",
   "version": "0.1.0",
-  "proxy": "http://localhost:5000",
+  "proxy": "https://6tgwnaw945.execute-api.us-east-1.amazonaws.com",
   "private": true,
   "homepage": "http://.",
   "scripts": {

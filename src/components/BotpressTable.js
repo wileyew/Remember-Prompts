@@ -64,7 +64,8 @@ const BotpressTable = () => {
                 const response = await fetch(`https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/reported-prompts/reported-prompts`, {
                     headers: {
                         'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Origin': window.location.origin
                     }
                 });
 
