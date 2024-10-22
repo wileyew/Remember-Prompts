@@ -36,7 +36,7 @@ body {
   font-size: var(--font-size-normal);
   line-height: 1.6;
   transition: background-color 0.3s, color 0.3s; /* Smooth transition for theme changes */
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(159deg, rgba(176,224,230,1) 0%, rgba(70,130,180,1) 100%); /* Adjust to match the body */
 }
 
 
@@ -448,10 +448,4 @@ header, footer {
   padding: 20px;
 }
 
-.nav-container {
-  background: linear-gradient(159deg, rgba(176,224,230,1) 0%, rgba(70,130,180,1) 100%); /* Adjust to match the body */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 
