@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { NavLink as RouterNavLink } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import logo from "../assets/rememberprompts.svg";
-
 import {
   Collapse,
   Container,
@@ -12,70 +10,40 @@ import {
   Nav,
   NavItem,
   NavLink,
-  Button,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
 } from "reactstrap";
 
-import { Amplify} from 'aws-amplify';
-import awsconfig from '../aws-exports';
-import { AmplifyAuthenticator, AmplifySignOut, AmplifySignIn } from '@aws-amplify/ui-react';
+import { Amplify } from "aws-amplify";
+import awsconfig from "../aws-exports";
+import { AmplifyAuthenticator } from "@aws-amplify/ui-react";
 
 Amplify.configure(awsconfig);
 
 const NavBar = ({ mode }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // useEffect(() => {
-  //   Auth.currentAuthenticatedUser()
-  //     .then(user => {
-  //       setUser(user);
-  //       setIsAuthenticated(true);
-  //     })
-  //     .catch(() => {
-  //       setIsAuthenticated(false);
-  //     });
-  // }, []);
 
   const toggle = () => setIsOpen(!isOpen);
 
-  // const login = async () => {
-  //   try {
-  //     await Auth.federatedSignIn();
-  //   } catch (error) {
-  //     console.error("Error signing in", error);
-  //   }
-  // };
-
-  // const logout = async () => {
-  //   try {
-  //     await Auth.signOut();
-  //     setIsAuthenticated(false);
-  //     setUser(null);
-  //   } catch (error) {
-  //     console.error("Error signing out", error);
-  //   }
-  // };
-
   // Determine text color based on mode
-  const textColor = mode === "light" ? "#000" : "#000";
-  const backgroundColor = mode === "dark" ? "#fff" : "#f8f9fa";
+  const textColor = mode === "light" ? "#000" : "#fff";
+
+  // Linear gradient background
+  const backgroundImage = "linear-gradient(159deg, #b0e0e6, #4682b4)";
 
   return (
     <div className="nav-container">
       <Navbar
-        style={{ backgroundColor: backgroundColor }}
-        color={mode === "dark" ? "light" : "light"}
+        style={{
+          backgroundImage: backgroundImage,
+          color: textColor,
+        }}
         light
         expand="md"
         container={false}
       >
         <Container>
-          <NavbarBrand src="../assets/rememberprompts.svg" />
+          <NavbarBrand>
+            <img src={logo} alt="Logo" height="40" />
+          </NavbarBrand>
           <NavbarToggler onClick={toggle} />
           <Collapse isOpen={isOpen} navbar>
             <Nav className="mr-auto" navbar>
@@ -90,43 +58,39 @@ const NavBar = ({ mode }) => {
                   Home
                 </NavLink>
               </NavItem>
-            
-                <>
-                  <NavItem>
-                    <NavLink
-                      tag={RouterNavLink}
-                      to="/remember-prompts"
-                      exact
-                      activeClassName="router-link-exact-active"
-                      style={{ color: textColor }}
-                    >
-                      Create a Report
-                    </NavLink>
-                  </NavItem>
-                  <NavItem>
-                    <NavLink
-                      tag={RouterNavLink}
-                      to="/reported-prompts"
-                      exact
-                      activeClassName="router-link-exact-active"
-                      style={{ color: textColor }}
-                    >
-                      Reported Prompts
-                    </NavLink>
-                  </NavItem>
-                  <NavItem>
-                    <NavLink
-                      tag={RouterNavLink}
-                      to="/tutorials"
-                      exact
-                      activeClassName="router-link-exact-active"
-                      style={{ color: textColor }}
-                    >
-                      Tutorials
-                    </NavLink>
-                  </NavItem>
-                </>
-              
+              <NavItem>
+                <NavLink
+                  tag={RouterNavLink}
+                  to="/remember-prompts"
+                  exact
+                  activeClassName="router-link-exact-active"
+                  style={{ color: textColor }}
+                >
+                  Create a Report
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink
+                  tag={RouterNavLink}
+                  to="/reported-prompts"
+                  exact
+                  activeClassName="router-link-exact-active"
+                  style={{ color: textColor }}
+                >
+                  Reported Prompts
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink
+                  tag={RouterNavLink}
+                  to="/tutorials"
+                  exact
+                  activeClassName="router-link-exact-active"
+                  style={{ color: textColor }}
+                >
+                  Tutorials
+                </NavLink>
+              </NavItem>
               <NavItem>
                 <NavLink
                   href="https://forms.gle/ZenT7RtnNM1mCDzL9"
@@ -143,7 +107,9 @@ const NavBar = ({ mode }) => {
                     color: textColor,
                   }}
                 >
-                  Your feedback is crucial in helping us improve Overflow Prompts. By participating, you'll give visibility to AI companies to fix the issues you report and earn a certification in AI evangelism!
+                  Your feedback is crucial in helping us improve Overflow Prompts.
+                  By participating, you'll give visibility to AI companies to fix the
+                  issues you report and earn a certification in AI evangelism!
                 </p>
               </NavItem>
             </Nav>
