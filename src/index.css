@@ -443,8 +443,15 @@ input:checked + .slider:before {
   margin-top: 20px; /* Add some margin above the submit button */
 }
 header, footer {
-  background: linear-gradient(135deg, #897eea 0%, #9c68b4 100%); /* Adjust to match the body */
+  background: linear-gradient(159deg, rgba(176,224,230,1) 0%, rgba(70,130,180,1) 100%); /* Adjust to match the body */
   color: white;
   padding: 20px;
+}
+
+.nav-container {
+  background: linear-gradient(159deg, rgba(176,224,230,1) 0%, rgba(70,130,180,1) 100%); /* Adjust to match the body */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
