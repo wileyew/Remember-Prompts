@@ -442,3 +442,9 @@ input:checked + .slider:before {
   text-align: right; /* Align submit button to the right */
   margin-top: 20px; /* Add some margin above the submit button */
 }
+header, footer {
+  background: linear-gradient(135deg, #897eea 0%, #9c68b4 100%); /* Adjust to match the body */
+  color: white;
+  padding: 20px;
+}
+
