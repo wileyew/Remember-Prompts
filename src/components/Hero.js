@@ -16,8 +16,7 @@ const Hero = ({ mode }) => (
       Check out our video below to learn more about Overflow Prompts and how you can help improve AI for everyone!
     </p>
     <div className="video-container">
-      <Video src="https://drive.google.com/file/d/1f79xMu5kYvZG4X-jjS918pWg1r1Cy_Kd/view?usp=sharing" />
-    </div>
+    <iframe src="https://drive.google.com/file/d/1f79xMu5kYvZG4X-jjS918pWg1r1Cy_Kd/preview" width="640" height="480" allow="autoplay"></iframe>    </div>
     <p className="lead">
       <strong>Why participate?</strong> <br></br>By reporting, up voting, and commenting on prompts, you play a key role in improving AI for everyone. 
       Reporting prompts helps uncover issues and drive improvements directly to AI companies AND most importantly gives visibility to AI companies to fix the issues (if deemed an issue from their perspective) you report! Upvoting highlights the most critical issues, ensuring they get the attention they deserve. 
