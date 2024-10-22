@@ -147,49 +147,6 @@ const NavBar = ({ mode }) => {
                 </p>
               </NavItem>
             </Nav>
-            <Nav className="d-none d-md-block" navbar>
-              {!isAuthenticated ? (
-                <NavItem>
-                  <Button
-                    id="qsLoginBtn"
-                    color="primary"
-                    className="btn-margin"
-                    // onClick={login}
-                  >
-                    Log in or Register
-                  </Button>
-                </NavItem>
-              ) : (
-                <UncontrolledDropdown nav inNavbar>
-                  <DropdownToggle nav caret id="profileDropDown">
-                    <img
-                      src={user.attributes.picture}
-                      alt="Profile"
-                      className="nav-user-profile rounded-circle"
-                      width="50"
-                    />
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    <DropdownItem header>{user.username}</DropdownItem>
-                    <DropdownItem
-                      tag={RouterNavLink}
-                      to="/profile"
-                      className="dropdown-profile"
-                      activeClassName="router-link-exact-active"
-                    >
-                      <FontAwesomeIcon icon="user" className="mr-3" /> Profile
-                    </DropdownItem>
-                    <DropdownItem
-                      id="qsLogoutBtn"
-                      // onClick={logout}
-                    >
-                      <FontAwesomeIcon icon="power-off" className="mr-3" /> Log
-                      out
-                    </DropdownItem>
-                  </DropdownMenu>
-                </UncontrolledDropdown>
-              )}
-            </Nav>
           </Collapse>
         </Container>
       </Navbar>
