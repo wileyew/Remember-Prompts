@@ -25,7 +25,7 @@ const Hero = ({ mode }) => (
     </h1>
     
     <p className="lead">
-      Community Driven AI Accountability
+      Enabling community driven AI accountability. <br></br>
       Check out our video below to learn more about Overflow Prompts and how you can help improve AI for everyone!
     </p>
     
