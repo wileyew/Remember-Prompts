@@ -24,10 +24,10 @@ const NavBar = ({ mode }) => {
   const toggle = () => setIsOpen(!isOpen);
 
   // Determine text color based on mode
-  const textColor = mode === "light" ? "#000" : "#fff";
+  const textColor = mode === "light" ? "#000" : "#000";
 
   // Linear gradient background
-  const backgroundImage = "linear-gradient(159deg, #b0e0e6, #4682b4)";
+  const backgroundImage = " background: linear-gradient(to right, #FFFFFF, #1877F2)";
 
   return (
     <div className="nav-container">
