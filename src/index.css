@@ -6,8 +6,8 @@
   --font-size-code: 14px;
   
   /* Dark mode colors */
-  --background-color-dark: #282c34;
-  --text-color-dark: #c7c7c7;
+  --background-color-dark: #f0f0f0;
+  --text-color-dark: #141313;
   --font-size-normal-dark: 16px; /* Adjust font size for dark mode if needed */
   --font-size-code-dark: 14px; /* Adjust font size for code elements in dark mode */
 }
