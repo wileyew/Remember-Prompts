@@ -383,7 +383,7 @@ const BotpressTable = () => {
                 </select>
             </div>
             <input type="text" placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-            <table {...getTableProps()}>
+            <table class="reportTable" {...getTableProps()}>
                 <thead>
                     {headerGroups.map(headerGroup => (
                         <tr {...headerGroup.getHeaderGroupProps()}>

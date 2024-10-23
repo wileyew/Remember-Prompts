@@ -40,6 +40,23 @@ body {
   /* Adjust to match the body */
 }
 
+.reportTable {
+  background-color: #FFFFFF;
+}
+
+.reportTable tr:hover,
+.reportTable td:hover,
+.reportTable th:hover,
+.reportTable tr:focus,
+.reportTable td:focus,
+.reportTable th:focus,
+.reportTable tr:active,
+.reportTable td:active,
+.reportTable th:active {
+  background-color: inherit; /* Ensure the background color remains unchanged */
+  color: inherit; /* Ensure the text color remains unchanged */
+}
+
 
 .wrapper {
   display: flex; /* Or grid */
