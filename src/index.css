@@ -444,7 +444,7 @@ input:checked + .slider:before {
   margin-top: 20px; /* Add some margin above the submit button */
 }
 header, footer {
-  background: linear-gradient(159deg, rgba(176,224,230,1) 0%, rgba(70,130,180,1) 100%); /* Adjust to match the body */
+ background: linear-gradient(to right, #FFFFFF, #1877F2);
   color: white;
   padding: 20px;
 }
