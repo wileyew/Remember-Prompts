@@ -12,23 +12,23 @@ const botpressid = botpress.botId;
 const clientId = botpress.clientId;// Destructuring for easier access
 
 
-const encryptEmail = async (email) => {
-  console.log('Email:', email);
-  const kms = new AWS.KMS({ region: 'us-east-1' }); // Replace with your region
-  const params = {
-    KeyId: 'alias/overflowpromptsemailencryption', // Replace with your KMS key alias or ID
-    Plaintext: email
-  };
+// // const encryptEmail = async (email) => {
+// //   console.log('Email:', email);
+// //   const kms = new AWS.KMS({ region: 'us-east-1' }); // Replace with your region
+// //   const params = {
+// //     KeyId: 'alias/overflowpromptsemailencryption', // Replace with your KMS key alias or ID
+// //     Plaintext: email
+// //   };
 
-  try {
-    const data = await kms.encrypt(params).promise();
-    console.log('Encrypted Data:', data.CiphertextBlob.toString('base64'));
-    return data.CiphertextBlob.toString('base64');
+//   try {
+//     const data = await kms.encrypt(params).promise();
+//     console.log('Encrypted Data:', data.CiphertextBlob.toString('base64'));
+//     return data.CiphertextBlob.toString('base64');
 
-  } catch (err) {
-    console.error('Encryption error:', err);
-  }
-};
+//   } catch (err) {
+//     console.error('Encryption error:', err);
+//   }
+// };
 
 function BotpressChatbot() {
   const { user } = useAuth0();
@@ -155,7 +155,7 @@ function BotpressChatbot() {
           setTimeout(() => {
             window.botpressWebChat.sendPayload({
               type: 'text',
-              text: `Hello, ${user.name}, starting your session associated with the email ${user.email}.`,
+              text: `Hello, starting your session.`,
             });
           }, 2000);
         }, ["LIFECYCLE.LOADED"]);
