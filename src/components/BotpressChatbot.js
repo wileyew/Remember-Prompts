@@ -357,14 +357,11 @@ function BotpressChatbot() {
           category,
           // userEmail: user.email,
         };
-      const { apiOrigin} = config.insertUrl;
-
-      const response = await fetch(`${apiOrigin}/reported-prompts`, {
-        method: 'POST',
-        headers: {  'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
-          'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+        const response = await fetch(config.insertUrl, {
+          method: config.method,
+          headers: config.headers,
+          body: JSON.stringify(payload),
+        });
       if (response.ok) {
         setShowSuccessModal(true);
         if (requestCertificate) {

@@ -9,7 +9,7 @@ const data = JSON.stringify({
 
 const config = {
   method: 'post',
-  url: 'mongodb://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/insertOne',
+  insertUrl: 'mongodb://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/insertOne',
   headers: {
     'Content-Type': 'application/json',
     'Access-Control-Request-Headers': '*',
