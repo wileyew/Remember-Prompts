@@ -357,7 +357,7 @@ function BotpressChatbot() {
           category,
           // userEmail: user.email,
         };
-        const response = await fetch('mongodb://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/insertOne', {
+        const response = await fetch('https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/insertOne', {
           method: config.method,
           headers: config.headers,
           body: JSON.stringify(payload),
