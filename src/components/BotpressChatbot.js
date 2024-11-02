@@ -355,7 +355,7 @@ function BotpressChatbot() {
           ...formData,
           ...processedFormData,
           category,
-          userEmail: user.email,
+          // userEmail: user.email,
         };
       const { apiOrigin} = config.insertUrl;
 
