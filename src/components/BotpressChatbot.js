@@ -361,6 +361,7 @@ function BotpressChatbot() {
           method: config.method,
           headers: config.headers,
           body: JSON.stringify(payload),
+          mode: 'no-cors',
         });
       if (response.ok) {
         setShowSuccessModal(true);
