@@ -357,9 +357,13 @@ function BotpressChatbot() {
           category,
           // userEmail: user.email,
         };
-        const response = await fetch('https://us-east-1.aws.data.mongodb-api.com/app/data-todpo/endpoint/data/v1/action/insertOne', {
-          method: config.method,
-          headers: config.headers,
+        const response = await fetch('https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/reported-prompts', {
+          method: 'POST',
+          headers: {
+            'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
+            'Content-Type': 'application/json',
+            'Origin': window.location.origin
+        },
           body: JSON.stringify(payload),
           mode: 'no-cors',
         });
