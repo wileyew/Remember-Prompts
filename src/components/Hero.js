@@ -16,7 +16,7 @@ const Hero = ({ mode }) => (
     <h1 className="mb-4"> An AI Governance Platform to <br></br>
       <Typewriter
         options={{
-          strings: ["provide education on ", "help identify ", "provide a platform to report "],
+          strings: ["provide education on ", "help identify ", "report "],
           autoStart: true,
           loop: true,
           deleteSpeed: 50,
