@@ -157,7 +157,7 @@ const BotpressTable = () => {
                 return;
             }
 
-            const apiOrigin = config.apiOrigin; // Get API origin from config
+            const apiOrigin = config.insertUrl; // Get API origin from config
 
             setIsLoading(true);
           
