@@ -364,17 +364,20 @@ function BotpressChatbot() {
             'Content-Type': 'application/json',
             'Origin': window.location.origin
         },
-          body: JSON.stringify(payload),
-          mode: 'no-cors',
+          body: JSON.stringify(payload)
         });
-      if (response.ok) {
-        setShowSuccessModal(true);
-        if (requestCertificate) {
-          createAndDownloadPdf();
-        }
-        setFormData({});
-        setProcessedFormData({});
-      }  else if (response.status === 400) {
+        const responseBody = await response.json();
+        console.log('Response body:', responseBody);
+
+        if (response.ok || response.status === 201) {
+          setShowSuccessModal(true);
+          if (requestCertificate) {
+              createAndDownloadPdf();
+          }
+          setFormData({});
+          setProcessedFormData({});
+      }
+        else if (response.status === 400) {
       setErrorMessage('Bad Request: Please check your data.');
     } else if (response.status === 500) {
       setErrorMessage('Server Error: Please try again later.');
