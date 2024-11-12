@@ -150,46 +150,35 @@ const BotpressTable = () => {
     const handleUpvote = useCallback(async (id) => {
         if (!userUpvotes.has(id)) {
             setUserUpvotes(prevUpvotes => new Set(prevUpvotes).add(id));
-
+    
             const rowToUpdate = originalData.find(item => item.id === id);
             if (!rowToUpdate) {
                 console.error("Error: Row not found for upvote");
                 return;
             }
-
-            const apiOrigin = config.insertUrl; // Get API origin from config
-
-            setIsLoading(true);
-          
-
-            const payload = {
-                id: id,
-            };
-
+    
+            const newUpvotes = rowToUpdate.upvotes + 1;
+            setTableData(prevData => 
+                prevData.map(item => 
+                    item.id === id ? { ...item, upvotes: newUpvotes } : item
+                )
+            );
+    
             try {
-                const response = await fetch(`https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/upvote/${id}`, {
+                await fetch(`https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/upvote/${id}`, {
                     method: 'PUT',
                     headers: {
-                      'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
+                        'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(payload),
+                    body: JSON.stringify({ id }),
                 });
-
-                if (!response.ok) {
-                    throw new Error('Failed to upvote');
-                }
-
-                const newUpvotes = rowToUpdate.upvotes + 1;
-                const updateData = data => data.map(item => item.id === id ? { ...item, upvotes: newUpvotes } : item);
-                setTableData(updateData);
-                setOriginalData(updateData);
-
             } catch (error) {
                 console.error('Error upvoting:', error);
             }
         }
-    }, [userUpvotes, originalData, setTableData, setOriginalData, config]);
+    }, [userUpvotes, setTableData]);
+    
 
     // Ensure that `username` is correctly set before using it in `handleAddComment`
     // useEffect(() => {
