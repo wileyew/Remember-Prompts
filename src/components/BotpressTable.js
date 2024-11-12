@@ -188,19 +188,10 @@ const BotpressTable = () => {
     // }, [user]);
 
     const handleAddComment = useCallback(async (id, commentText) => {
-        // if (!username) {
-        //     console.error('Username is not set');
-        //     return;
-        // }
-
         const newComment = {
-            // username: username,
             comment: replaceHtmlEntities(commentText),
-            // userEmail: user.email,
         };
-
-        const { apiOrigin } = config.url;
-
+    
         try {
             const response = await fetch(`https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/comments/${id}`, {
                 method: 'PUT',
@@ -210,19 +201,20 @@ const BotpressTable = () => {
                 },
                 body: JSON.stringify({ id, ...newComment }),
             });
-
+    
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-
-            setComments((prevComments) => ({
+    
+            setComments(prevComments => ({
                 ...prevComments,
                 [id]: [...(prevComments[id] || []), newComment],
             }));
         } catch (error) {
             console.error('Error adding comment:', error);
         }
-    }, [setComments]);//username, user.email, setComments]);
+    }, [setComments]);
+    
 
     const columns = useMemo(() => {
         const baseColumns = [
