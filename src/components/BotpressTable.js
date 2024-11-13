@@ -35,27 +35,6 @@ const BotpressTable = () => {
     const [username, setUsername] = useState('');
 
     useEffect(() => {
-        const decryptEmail = async (encryptedEmail) => {
-            if (!encryptedEmail || typeof encryptedEmail !== 'string') {
-                console.error('Invalid encrypted email:', encryptedEmail);
-                return encryptedEmail;
-            }
-
-            const kms = new AWS.KMS({ region: 'us-east-1' });
-            const params = {
-                KeyId: 'alias/overflowpromptsemailencryption',
-                CiphertextBlob: Buffer.from(encryptedEmail, 'base64')
-            };
-
-            try {
-                const data = await kms.decrypt(params).promise();
-                return data.Plaintext.toString('utf-8');
-            } catch (err) {
-                console.error('Decryption error:', err);
-                return encryptedEmail;
-            }
-        };
-
         const fetchDataFromDatabase = async () => {
             //const { apiOrigin } = 'https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/reported-prompts';
 
@@ -78,10 +57,8 @@ const BotpressTable = () => {
                 const commentsByRowId = {};
                 const idToMaxUpvotesMap = {};
                 const transformedData = await Promise.all(dataArray.map(async (data) => {
-                    const decryptedEmail = await decryptEmail(data.email);
                     const cleanedData = {
                         ...data,
-                        email: replaceHtmlEntities(decryptedEmail),
                         chatbotPlatform: replaceHtmlEntities(data.chatbot_platform),
                         versionChatbotHallucinationAnswer: replaceHtmlEntities(data.version_chatbot_hallucination_answer),
                         prompt: replaceHtmlEntities(data.prompt),
