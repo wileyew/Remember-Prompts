@@ -148,6 +148,7 @@ const BotpressTable = () => {
     }, []);
 
     const handleUpvote = useCallback(async (id) => {
+        console.log('id for upvoting', JSON.stringify(id));
         if (!userUpvotes.has(id)) {
             setUserUpvotes(prevUpvotes => new Set(prevUpvotes).add(id));
     
