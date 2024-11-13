@@ -127,35 +127,35 @@ const BotpressTable = () => {
     const handleUpvote = useCallback(async (id) => {
         console.log('id for upvoting', JSON.stringify(id));
         if (!userUpvotes.has(id)) {
-            setUserUpvotes(prevUpvotes => new Set(prevUpvotes).add(id));
-    
-            const rowToUpdate = originalData.find(item => item.id === id);
-            // if (!rowToUpdate) {
-            //     console.error("Error: Row not found for upvote");
-            //     return;
-            // }
-    
-            const newUpvotes = rowToUpdate.upvotes + 1;
-            setTableData(prevData => 
-                prevData.map(item => 
-                    item.id === id ? { ...item, upvotes: newUpvotes } : item
-                )
-            );
-    
-            try {
-                await fetch(`https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/upvote/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ id }),
-                });
-            } catch (error) {
-                console.error('Error upvoting:', error);
-            }
+          setUserUpvotes(prevUpvotes => new Set(prevUpvotes).add(id));
+      
+          const rowToUpdate = originalData.find(item => item.id === id);
+          if (!rowToUpdate) {
+            console.error("Error: Row not found for upvote");
+            return;
+          }
+      
+          const newUpvotes = rowToUpdate.count + 1; // Update using "count" field
+          setTableData(prevData => 
+            prevData.map(item => 
+              item.id === id ? { ...item, count: newUpvotes } : item // Update "count" field in table data
+            )
+          );
+      
+          try {
+            await fetch(`https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/upvote/${id}`, {
+              method: 'PUT',
+              headers: {
+                'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ id }),
+            });
+          } catch (error) {
+            console.error('Error upvoting:', error);
+          }
         }
-    }, [userUpvotes, setTableData]);
+      }, [userUpvotes, setTableData]);
     
 
     // Ensure that `username` is correctly set before using it in `handleAddComment`
