@@ -151,7 +151,6 @@ const BotpressTable = () => {
                     headers: {
                         'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
                         'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*',
                     },
                     body: JSON.stringify({ id }),
                 });
@@ -173,7 +172,6 @@ const BotpressTable = () => {
                 headers: {
                     'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
                     'Content-Type': 'application/json',
-                    "Access-Control-Allow-Origin": "*",
                 },
                 body: JSON.stringify({ id, ...newComment }),
             });
