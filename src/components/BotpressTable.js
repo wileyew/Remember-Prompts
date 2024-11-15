@@ -144,7 +144,8 @@ const BotpressTable = () => {
       
           try {
             await fetch(`https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/upvote/${id}`, {
-              method: 'POST',
+                mode: 'no-cors',
+                method: 'POST',
               headers: {
                 'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
                 'Content-Type': 'application/json',
