@@ -42,50 +42,53 @@ const BotpressTable = () => {
                         'Content-Type': 'application/json',
                     }
                 });
-
+    
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
+    
                 const data = await response.json();
-                const dataArray = Array.isArray(data) ? data : data.documents || [];
-
+                const dataArray = Array.isArray(data.documents) ? data.documents : [];
+    
                 const commentsByRowId = {};
                 const idToMaxUpvotesMap = {};
-                const transformedData = await Promise.all(dataArray.map(async (data) => {
+                const transformedData = dataArray.map((item) => {
                     const cleanedData = {
-                        ...data,
-                        chatbotPlatform: replaceHtmlEntities(data.chatbot_platform),
-                        versionChatbotHallucinationAnswer: replaceHtmlEntities(data.version_chatbot_hallucination_answer),
-                        prompt: replaceHtmlEntities(data.prompt),
-                        hallucinationAnswer: replaceHtmlEntities(data.hallucination_answer),
-                        answerUpdated: replaceHtmlEntities(data.answer_updated),
-                        updatedPromptAnswer: replaceHtmlEntities(data.answer_updated),
-                        promptTrigger: replaceHtmlEntities(data.prompt_trigger),
-                        privacy: typeof data.privacy === 'string' && data.privacy.toLowerCase().includes("public") ? "Public" : "Private",
-                        name: replaceHtmlEntities(data.name),
-                        upvotes: data.upvotes || 0,
-                        comments: Array.isArray(data.comments) ? data.comments.map(comment => replaceHtmlEntities(comment)) : [],
-                        id: data._id
+                        ...item,
+                        // Use `id` if it exists, otherwise fall back to `_id`
+                        id: item.id || item._id,
+                        chatbotPlatform: replaceHtmlEntities(item.chatbotPlatform || ""),
+                        versionChatbotHallucinationAnswer: replaceHtmlEntities(item.versionChatbotHallucinationAnswer || ""),
+                        prompt: replaceHtmlEntities(item.prompt || ""),
+                        hallucinationAnswer: replaceHtmlEntities(item.hallucinationAnswer || ""),
+                        updatedPromptAnswer: replaceHtmlEntities(item.updatedPromptAnswer || ""),
+                        justification: replaceHtmlEntities(item.justification || ""),
+                        dataSource: replaceHtmlEntities(item.dataSource || ""),
+                        privacy: typeof item.privacy === 'string' && item.privacy.toLowerCase().includes("public") ? "Public" : "Private",
+                        name: replaceHtmlEntities(item.name || ""),
+                        upvotes: item.upvotes || 0,
+                        comments: Array.isArray(item.comments) ? item.comments.map(comment => replaceHtmlEntities(comment)) : [],
                     };
-
+    
+                    // Track comments for the row
                     commentsByRowId[cleanedData.id] = cleanedData.comments;
-
+    
+                    // Track max upvotes for items with the same ID
                     if (idToMaxUpvotesMap[cleanedData.id]) {
-                        if (cleanedData.upvotes > idToMaxUpvotesMap[cleanedData.id]) {
-                            idToMaxUpvotesMap[cleanedData.id] = cleanedData.upvotes;
-                        }
+                        idToMaxUpvotesMap[cleanedData.id] = Math.max(idToMaxUpvotesMap[cleanedData.id], cleanedData.upvotes);
                     } else {
                         idToMaxUpvotesMap[cleanedData.id] = cleanedData.upvotes;
                     }
-
+    
                     return cleanedData;
-                }));
-
+                });
+    
+                // Apply max upvotes to final data
                 const finalData = transformedData.map(item => ({
                     ...item,
-                    upvotes: idToMaxUpvotesMap[item.id]
+                    upvotes: idToMaxUpvotesMap[item.id],
                 }));
-
+    
                 setTableData(finalData);
                 setOriginalData(finalData);
                 setComments(commentsByRowId);
@@ -95,9 +98,10 @@ const BotpressTable = () => {
                 setIsLoading(false);
             }
         };
-
+    
         fetchDataFromDatabase();
     }, []);
+    
 
     useEffect(() => {
         const filteredData = originalData.filter(item => {
@@ -120,37 +124,42 @@ const BotpressTable = () => {
     }, []);
 
     const handleUpvote = useCallback(async (id) => {
-        if (!userUpvotes.has(id)) {
-          setUserUpvotes(prevUpvotes => new Set(prevUpvotes).add(id));
-      
-          const rowToUpdate = originalData.find(item => item.id === id);
-        //   if (!rowToUpdate) {
-        //     console.error("Error: Row not found for upvote");
-        //     return;
-        //   }
-      
-          const newUpvotes = rowToUpdate.count + 1;
-          setTableData(prevData => 
-            prevData.map(item => 
-              item.id === id ? { ...item, count: newUpvotes } : item
-            )
-          );
-      
-          try {
-            await fetch(`https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/upvote/${id}`, {
-                method: 'POST',
-                headers: {
-                  'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
-                  'Content-Type': 'application/json',
-                  "Access-Control-Allow-Origin": "https://www.overflowprompts.net",
-                },
-                body: JSON.stringify({ id }),
-            });
-          } catch (error) {
-            console.error('Error upvoting:', error);
-          }
+        if (!id) {
+            console.error("Invalid ID provided for upvote.");
+            return;
         }
-      }, [userUpvotes, setTableData]);
+    
+        if (!userUpvotes.has(id)) {
+            setUserUpvotes(prevUpvotes => new Set(prevUpvotes).add(id));
+    
+            const rowToUpdate = originalData.find(item => item.id === id);
+            if (!rowToUpdate) {
+                console.error("Error: Row not found for upvote.");
+                return;
+            }
+    
+            const newUpvotes = rowToUpdate.upvotes + 1;
+            setTableData(prevData => 
+                prevData.map(item => 
+                    item.id === id ? { ...item, upvotes: newUpvotes } : item
+                )
+            );
+    
+            try {
+                await fetch(`https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/upvote/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id }),
+                });
+            } catch (error) {
+                console.error('Error upvoting:', error);
+            }
+        }
+    }, [userUpvotes, originalData]);
+    
 
     const handleAddComment = useCallback(async (id, commentText) => {
         const newComment = {
