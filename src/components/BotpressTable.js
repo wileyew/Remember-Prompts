@@ -1,5 +1,4 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
-// import { useAuth0 } from "@auth0/auth0-react";
 import { Disclosure } from '@headlessui/react';
 import { ChevronUpIcon } from '@heroicons/react/20/solid';
 import "../../src/index.css";
@@ -21,7 +20,6 @@ const replaceHtmlEntities = (text) => {
 };
 
 const BotpressTable = () => {
-    // const { user } = useAuth0();
     const [originalData, setOriginalData] = useState([]);
     const [tableData, setTableData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -36,15 +34,12 @@ const BotpressTable = () => {
 
     useEffect(() => {
         const fetchDataFromDatabase = async () => {
-            //const { apiOrigin } = 'https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/reported-prompts';
-
             setIsLoading(true);
             try {
                 const response = await fetch(`https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/reported-prompts`, {
                     headers: {
                         'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
                         'Content-Type': 'application/json',
-                        'Origin': window.location.origin
                     }
                 });
 
@@ -114,7 +109,7 @@ const BotpressTable = () => {
         });
 
         setTableData(filteredData);
-    }, [originalData, searchQuery, category, activeTab]) //user.email]);
+    }, [originalData, searchQuery, category, activeTab]);
 
     const handleCategoryChange = useCallback((e) => {
         setCategory(e.target.value);
@@ -125,7 +120,6 @@ const BotpressTable = () => {
     }, []);
 
     const handleUpvote = useCallback(async (id) => {
-        console.log('id for upvoting', JSON.stringify(id));
         if (!userUpvotes.has(id)) {
           setUserUpvotes(prevUpvotes => new Set(prevUpvotes).add(id));
       
@@ -135,36 +129,28 @@ const BotpressTable = () => {
             return;
           }
       
-          const newUpvotes = rowToUpdate.count + 1; // Update using "count" field
+          const newUpvotes = rowToUpdate.count + 1;
           setTableData(prevData => 
             prevData.map(item => 
-              item.id === id ? { ...item, count: newUpvotes } : item // Update "count" field in table data
+              item.id === id ? { ...item, count: newUpvotes } : item
             )
           );
       
           try {
             await fetch(`https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/upvote/${id}`, {
-                mode: 'no-cors',
                 method: 'POST',
-              headers: {
-                'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ id }),
+                headers: {
+                  'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
+                  'Content-Type': 'application/json',
+                  "Access-Control-Allow-Origin": "https://www.overflowprompts.net",
+                },
+                body: JSON.stringify({ id }),
             });
           } catch (error) {
             console.error('Error upvoting:', error);
           }
         }
       }, [userUpvotes, setTableData]);
-    
-
-    // Ensure that `username` is correctly set before using it in `handleAddComment`
-    // useEffect(() => {
-    //     // if (user && user.name) {
-    //     //     setUsername(user.name);
-    //     // }
-    // }, [user]);
 
     const handleAddComment = useCallback(async (id, commentText) => {
         const newComment = {
@@ -177,6 +163,7 @@ const BotpressTable = () => {
                 headers: {
                     'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
                     'Content-Type': 'application/json',
+                    "Access-Control-Allow-Origin": "https://www.overflowprompts.net",
                 },
                 body: JSON.stringify({ id, ...newComment }),
             });
@@ -193,8 +180,6 @@ const BotpressTable = () => {
             console.error('Error adding comment:', error);
         }
     }, [setComments]);
-    
-
     const columns = useMemo(() => {
         const baseColumns = [
             { Header: 'Category', accessor: 'category' },
