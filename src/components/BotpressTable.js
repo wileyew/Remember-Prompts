@@ -151,6 +151,7 @@ const BotpressTable = () => {
                     headers: {
                         'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
                         'Content-Type': 'application/json',
+                        'no-cors': true,
                     },
                     body: JSON.stringify({ id }),
                 });
