@@ -124,10 +124,10 @@ const BotpressTable = () => {
           setUserUpvotes(prevUpvotes => new Set(prevUpvotes).add(id));
       
           const rowToUpdate = originalData.find(item => item.id === id);
-          if (!rowToUpdate) {
-            console.error("Error: Row not found for upvote");
-            return;
-          }
+        //   if (!rowToUpdate) {
+        //     console.error("Error: Row not found for upvote");
+        //     return;
+        //   }
       
           const newUpvotes = rowToUpdate.count + 1;
           setTableData(prevData => 
