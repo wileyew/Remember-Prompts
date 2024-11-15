@@ -293,7 +293,6 @@ function BotpressChatbot() {
   
       // Adding text content
       doc.text("Overflow Prompts Certification", 20, 20);
-      doc.text(`Name: ${user.name}`, 20, 30);  
       doc.text(`Certificate Number: ${certificateNumber}`, 20, 40);
       doc.text("This certificate acknowledges that you are an AI evangelist!", 20, 50);
       doc.text("By submitting this report today, you are helping build a community", 20, 65);
