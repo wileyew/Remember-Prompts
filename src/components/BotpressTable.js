@@ -188,6 +188,7 @@ const BotpressTable = () => {
             console.error('Error adding comment:', error);
         }
     }, [setComments]);
+
     const columns = useMemo(() => {
         const baseColumns = [
             { Header: 'Category', accessor: 'category' },
