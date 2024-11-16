@@ -139,26 +139,31 @@ const BotpressTable = () => {
             }
     
             const newUpvotes = rowToUpdate.upvotes + 1;
-            setTableData(prevData => 
-                prevData.map(item => 
+            setTableData(prevData =>
+                prevData.map(item =>
                     item.id === id ? { ...item, upvotes: newUpvotes } : item
                 )
             );
     
             try {
+                // Sending the existing upvotes along with the id in the request body
                 await fetch(`https://n7mam9mzqb.execute-api.us-east-1.amazonaws.com/Upvotes/${id}`, {
                     method: 'PUT',
                     headers: {
                         'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ id }),
+                    body: JSON.stringify({
+                        id,
+                        upvotes: newUpvotes, // Send the updated upvote count
+                    }),
                 });
             } catch (error) {
                 console.error('Error upvoting:', error);
             }
         }
     }, [userUpvotes, originalData]);
+    
     
 
     const handleAddComment = useCallback(async (id, commentText) => {
