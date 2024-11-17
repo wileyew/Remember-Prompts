@@ -40,7 +40,7 @@ const BotpressTable = () => {
                     headers: {
                         'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
                         'Content-Type': 'application/json',
-                    }
+                    },
                 });
     
                 if (!response.ok) {
@@ -50,32 +50,27 @@ const BotpressTable = () => {
                 const data = await response.json();
                 const dataArray = Array.isArray(data.documents) ? data.documents : [];
     
-                const commentsByRowId = {};
+                // Track maximum upvotes for each id
                 const idToMaxUpvotesMap = {};
+                const commentsByRowId = {};
+    
                 const transformedData = dataArray.map((item) => {
                     const cleanedData = {
                         ...item,
-                        // Use `id` if it exists, otherwise fall back to `_id`
                         id: item.id || item._id,
-                        chatbotPlatform: replaceHtmlEntities(item.chatbotPlatform || ""),
-                        versionChatbotHallucinationAnswer: replaceHtmlEntities(item.versionChatbotHallucinationAnswer || ""),
-                        prompt: replaceHtmlEntities(item.prompt || ""),
-                        hallucinationAnswer: replaceHtmlEntities(item.hallucinationAnswer || ""),
-                        updatedPromptAnswer: replaceHtmlEntities(item.updatedPromptAnswer || ""),
-                        justification: replaceHtmlEntities(item.justification || ""),
-                        dataSource: replaceHtmlEntities(item.dataSource || ""),
-                        privacy: typeof item.privacy === 'string' && item.privacy.toLowerCase().includes("public") ? "Public" : "Private",
-                        name: replaceHtmlEntities(item.name || ""),
-                        upvotes: item.upvotes || 0,
-                        comments: Array.isArray(item.comments) ? item.comments.map(comment => replaceHtmlEntities(comment)) : [],
+                        upvotes: Number(item.upvotes) || 0, // Ensure upvotes is a valid number
+                        comments: Array.isArray(item.comments)
+                            ? item.comments.map((comment) => replaceHtmlEntities(comment))
+                            : [],
                     };
     
-                    // Track comments for the row
                     commentsByRowId[cleanedData.id] = cleanedData.comments;
     
-                    // Track max upvotes for items with the same ID
                     if (idToMaxUpvotesMap[cleanedData.id]) {
-                        idToMaxUpvotesMap[cleanedData.id] = Math.max(idToMaxUpvotesMap[cleanedData.id], cleanedData.upvotes);
+                        idToMaxUpvotesMap[cleanedData.id] = Math.max(
+                            idToMaxUpvotesMap[cleanedData.id],
+                            cleanedData.upvotes
+                        );
                     } else {
                         idToMaxUpvotesMap[cleanedData.id] = cleanedData.upvotes;
                     }
@@ -83,10 +78,9 @@ const BotpressTable = () => {
                     return cleanedData;
                 });
     
-                // Apply max upvotes to final data
-                const finalData = transformedData.map(item => ({
+                const finalData = transformedData.map((item) => ({
                     ...item,
-                    upvotes: idToMaxUpvotesMap[item.id],
+                    upvotes: idToMaxUpvotesMap[item.id], // Apply maximum upvotes
                 }));
     
                 setTableData(finalData);
@@ -130,35 +124,43 @@ const BotpressTable = () => {
         }
     
         if (!userUpvotes.has(id)) {
-            setUserUpvotes(prevUpvotes => new Set(prevUpvotes).add(id));
+            setUserUpvotes((prevUpvotes) => new Set(prevUpvotes).add(id));
     
-            const rowToUpdate = originalData.find(item => item.id === id);
+            const rowToUpdate = originalData.find((item) => item.id === id);
             if (!rowToUpdate) {
                 console.error("Error: Row not found for upvote.");
                 return;
             }
     
-            const newUpvotes = rowToUpdate.upvotes + 1;
-            setTableData(prevData => 
-                prevData.map(item => 
+            // Safely calculate the new upvotes
+            const currentUpvotes = Number(rowToUpdate.upvotes) || 0;
+            const newUpvotes = currentUpvotes + 1;
+    
+            // Update the local table data
+            setTableData((prevData) =>
+                prevData.map((item) =>
                     item.id === id ? { ...item, upvotes: newUpvotes } : item
                 )
             );
     
             try {
+                // Send the updated upvotes back to the server
                 await fetch(`https://n7mam9mzqb.execute-api.us-east-1.amazonaws.com/Upvotes/${id}`, {
                     method: 'POST',
                     headers: {
                         'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ id, upvotes: newUpvotes }), // Include upvotes in request body
+                    body: JSON.stringify({ id, upvotes: newUpvotes }), // Include the updated upvotes
                 });
             } catch (error) {
                 console.error('Error upvoting:', error);
             }
         }
     }, [userUpvotes, originalData]);
+    
+    
+    
     
 
     const handleAddComment = useCallback(async (id, commentText) => {
