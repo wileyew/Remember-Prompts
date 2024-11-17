@@ -124,7 +124,6 @@ const BotpressTable = () => {
     }, []);
 
     const handleUpvote = useCallback(async (id) => {
-        
         if (!id) {
             console.error("Invalid ID provided for upvote.");
             return;
@@ -153,7 +152,7 @@ const BotpressTable = () => {
                         'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ id }, newUpvotes),
+                    body: JSON.stringify({ id, upvotes: newUpvotes }), // Include upvotes in request body
                 });
             } catch (error) {
                 console.error('Error upvoting:', error);
