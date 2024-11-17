@@ -153,7 +153,7 @@ const BotpressTable = () => {
                         'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ id }),
+                    body: JSON.stringify({ id }, newUpvotes),
                 });
             } catch (error) {
                 console.error('Error upvoting:', error);
