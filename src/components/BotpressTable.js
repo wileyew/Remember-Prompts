@@ -134,7 +134,7 @@ const BotpressTable = () => {
     
             // Safely calculate the new upvotes
             const currentUpvotes = Number(rowToUpdate.upvotes) || 0;
-            const newUpvotes = currentUpvotes;
+            const newUpvotes = currentUpvotes + 1;
     
             // Update the local table data
             setTableData((prevData) =>
