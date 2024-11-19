@@ -169,7 +169,7 @@ const BotpressTable = () => {
         };
     
         try {
-            const response = await fetch(`https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/comments/${id}`, {
+            const response = await fetch(`https://e1mqjg40y0.execute-api.us-east-1.amazonaws.com/amplify-comments/${id}`, {
                 method: 'PUT',
                 headers: {
                     'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
