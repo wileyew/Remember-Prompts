@@ -175,7 +175,7 @@ const BotpressTable = () => {
                     'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ id, ...newComment }),
+                body: JSON.stringify({ id, comments: [newComment] }),  // Ensure the comments field is an array
             });
     
             if (!response.ok) {
@@ -190,6 +190,7 @@ const BotpressTable = () => {
             console.error('Error adding comment:', error);
         }
     }, [setComments]);
+    
 
     const columns = useMemo(() => {
         const baseColumns = [
