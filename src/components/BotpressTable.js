@@ -175,7 +175,10 @@ const BotpressTable = () => {
                     'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ id, comments: [newComment] }),  // Ensure the comments field is an array
+                body: JSON.stringify({ 
+                    id, 
+                    comments: [newComment]  // Ensure comments is an array
+                }),
             });
     
             if (!response.ok) {
