@@ -172,11 +172,12 @@ const BotpressTable = () => {
             const response = await fetch(`https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/comments/pets/comments/${id}`, {
                 method: 'POST',
                 headers: {
+                    'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',  // Same API Key as in handleUpvote
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ 
-                    id, 
-                    comments: [newComment]  // Ensure comments is an array
+                body: JSON.stringify({
+                    id,
+                    comments: [newComment],  // Ensure comments is an array
                 }),
             });
     
@@ -184,7 +185,7 @@ const BotpressTable = () => {
                 throw new Error('Network response was not ok');
             }
     
-            setComments(prevComments => ({
+            setComments((prevComments) => ({
                 ...prevComments,
                 [id]: [...(prevComments[id] || []), newComment],
             }));
@@ -192,6 +193,7 @@ const BotpressTable = () => {
             console.error('Error adding comment:', error);
         }
     }, [setComments]);
+    
     
 
     const columns = useMemo(() => {
