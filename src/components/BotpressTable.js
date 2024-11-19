@@ -169,7 +169,7 @@ const BotpressTable = () => {
         };
     
         try {
-            const response = await fetch(`https://n7mam9mzqb.execute-api.us-east-1.amazonaws.com/insert-comment/comments/${id}`, {
+            const response = await fetch(`https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/comments/pets/comments/${id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
