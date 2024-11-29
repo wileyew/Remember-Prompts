@@ -169,7 +169,7 @@ const BotpressTable = () => {
         };
     
         try {
-            const response = await fetch(`https://hj1k4jj2ei.execute-api.us-east-1.amazonaws.com/insert-comments/comment/${id}`, {
+            const response = await fetch(`https://e1mqjg40y0.execute-api.us-east-1.amazonaws.com/insertComment${id}`, {
                 method: 'POST',
                 headers: {
                     'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',  // Same API Key as in handleUpvote
