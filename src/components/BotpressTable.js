@@ -216,20 +216,43 @@ const BotpressTable = () => {
                                 <>
                                     <Disclosure.Button className="disclosure-button">
                                         <span>Comments ({comments[row.original.id]?.length || 0})</span>
-                                        <ChevronUpIcon className={`${open ? 'transform rotate-180' : ''} w-5 h-5 text-gray-500`} />
+                                        <ChevronUpIcon
+                                            className={`${open ? 'transform rotate-180' : ''} w-5 h-5 text-gray-500`}
+                                        />
                                     </Disclosure.Button>
                                     <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
-                                        {comments[row.original.id] && comments[row.original.id].map((comment, index) => (
-                                            <div key={index}><strong>{replaceHtmlEntities(comment.username)}</strong>: {replaceHtmlEntities(comment.comment)}</div>
-                                        ))}
-                                        <form onSubmit={(e) => {
-                                            e.preventDefault();
-                                            const comment = e.target.elements.comment.value;
-                                            handleAddComment(row.original.id, comment);
-                                            e.target.reset();
-                                        }}>
-                                            <input type="text" name="comment" placeholder="Add a comment" required />
-                                            <button type="submit">Add</button>
+                                        {comments[row.original.id] && comments[row.original.id].length > 0 ? (
+                                            comments[row.original.id].map((comment, index) => (
+                                                <div key={index} className="mb-2">
+                                                    <strong>{replaceHtmlEntities(comment.username || 'Anonymous')}</strong>: {replaceHtmlEntities(comment.comment)}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p>No comments yet.</p>
+                                        )}
+                                        <form
+                                            onSubmit={(e) => {
+                                                e.preventDefault();
+                                                const commentText = e.target.elements.comment.value.trim();
+                                                if (commentText) {
+                                                    handleAddComment(row.original.id, commentText);
+                                                    e.target.reset();
+                                                }
+                                            }}
+                                        >
+                                            <input
+                                                type="text"
+                                                name="comment"
+                                                placeholder="Add a comment"
+                                                required
+                                                className="border rounded px-2 py-1 w-full mb-2"
+                                            />
+                                            <button
+                                                type="submit"
+                                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                                            >
+                                                Add Comment
+                                            </button>
                                         </form>
                                     </Disclosure.Panel>
                                 </>
@@ -238,6 +261,7 @@ const BotpressTable = () => {
                     </div>
                 ),
             },
+            
         ];
 
         if (category === 'hallucinations') {
