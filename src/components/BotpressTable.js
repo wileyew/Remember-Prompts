@@ -54,14 +54,15 @@ const BotpressTable = () => {
                 const idToMaxUpvotesMap = {};
                 const commentsByRowId = {};
     
+                // Load comments from local storage
+            const storedComments = JSON.parse(localStorage.getItem('comments')) || {};
+
                 const transformedData = dataArray.map((item) => {
                     const cleanedData = {
                         ...item,
                         id: item.id || item._id,
                         upvotes: Number(item.upvotes) || 0, // Ensure upvotes is a valid number
-                        comments: Array.isArray(item.comments)
-                            ? item.comments.map((comment) => replaceHtmlEntities(comment))
-                            : [],
+                        comments: storedComments[item.id] || [],
                     };
     
                     commentsByRowId[cleanedData.id] = cleanedData.comments;
@@ -185,14 +186,16 @@ const BotpressTable = () => {
                 throw new Error('Network response was not ok');
             }
     
-            setComments((prevComments) => ({
-                ...prevComments,
-                [id]: [...(prevComments[id] || []), newComment],
-            }));
+            const updatedComments = {
+                ...comments,
+                [id]: [...(comments[id] || []), newComment],
+            };
+            setComments(updatedComments);
+            localStorage.setItem('comments', JSON.stringify(updatedComments));
         } catch (error) {
             console.error('Error adding comment:', error);
         }
-    }, [setComments]);
+    }, [comments]);
     
     
 
