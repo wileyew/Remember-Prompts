@@ -24,8 +24,13 @@ const BotpressTable = () => {
     const [tableData, setTableData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [comments, setComments] = useState({});
+    const [searchQuery, setSearchQuery] = useState('');
+    const [activeTab, setActiveTab] = useState('allReports');
+    const [highlightedRow, setHighlightedRow] = useState(null);
     const [category, setCategory] = useState('hallucinations');
+    const [userUpvotes, setUserUpvotes] = useState(new Set());
+    const [comments, setComments] = useState({});
+    const [username, setUsername] = useState('');
 
     useEffect(() => {
         const fetchDataFromDatabase = async () => {
@@ -37,29 +42,49 @@ const BotpressTable = () => {
                         'Content-Type': 'application/json',
                     },
                 });
-
+    
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-
+    
                 const data = await response.json();
                 const dataArray = Array.isArray(data.documents) ? data.documents : [];
-
+    
+                // Track maximum upvotes for each id
+                const idToMaxUpvotesMap = {};
                 const commentsByRowId = {};
+    
                 const transformedData = dataArray.map((item) => {
                     const cleanedData = {
                         ...item,
-                        id: item._id,
+                        id: item.id || item._id,
                         upvotes: Number(item.upvotes) || 0, // Ensure upvotes is a valid number
-                        comments: Array.isArray(item.comments) ? item.comments.map((c) => replaceHtmlEntities(c.comment)) : [],
+                        comments: Array.isArray(item.comments)
+                            ? item.comments.map((comment) => replaceHtmlEntities(comment))
+                            : [],
                     };
-
+    
                     commentsByRowId[cleanedData.id] = cleanedData.comments;
+    
+                    if (idToMaxUpvotesMap[cleanedData.id]) {
+                        idToMaxUpvotesMap[cleanedData.id] = Math.max(
+                            idToMaxUpvotesMap[cleanedData.id],
+                            cleanedData.upvotes
+                        );
+                    } else {
+                        idToMaxUpvotesMap[cleanedData.id] = cleanedData.upvotes;
+                    }
+    
                     return cleanedData;
                 });
-
-                setTableData(transformedData);
-                setOriginalData(transformedData);
+    
+                const finalData = transformedData.map((item) => ({
+                    ...item,
+                    upvotes: idToMaxUpvotesMap[item.id], // Apply maximum upvotes
+                }));
+    
+                setTableData(finalData);
+                setOriginalData(finalData);
                 setComments(commentsByRowId);
             } catch (error) {
                 setError(error.message);
@@ -67,25 +92,99 @@ const BotpressTable = () => {
                 setIsLoading(false);
             }
         };
-
+    
         fetchDataFromDatabase();
     }, []);
+    
+
+    useEffect(() => {
+        const filteredData = originalData.filter(item => {
+            const matchesSearchQuery = searchQuery === '' || Object.values(item).some(value =>
+                (value ? value.toString().toLowerCase().includes(searchQuery.toLowerCase()) : false));
+            const matchesCategory = category === 'all' || item.category === category;
+            const matchesTab = activeTab === 'allReports' || (activeTab === 'myReports' );
+            return matchesSearchQuery && matchesCategory && matchesTab;
+        });
+
+        setTableData(filteredData);
+    }, [originalData, searchQuery, category, activeTab]);
+
+    const handleCategoryChange = useCallback((e) => {
+        setCategory(e.target.value);
+    }, []);
+
+    const handleSearchChange = useCallback((e) => {
+        setSearchQuery(e.target.value);
+    }, []);
+
+    const handleUpvote = useCallback(async (id) => {
+        if (!id) {
+            console.error("Invalid ID provided for upvote.");
+            return;
+        }
+    
+        if (!userUpvotes.has(id)) {
+            setUserUpvotes((prevUpvotes) => new Set(prevUpvotes).add(id));
+    
+            const rowToUpdate = originalData.find((item) => item.id === id);
+            if (!rowToUpdate) {
+                console.error("Error: Row not found for upvote.");
+                return;
+            }
+    
+            // Safely calculate the new upvotes
+            const currentUpvotes = Number(rowToUpdate.upvotes) || 0;
+            const newUpvotes = currentUpvotes + 1;
+    
+            // Update the local table data
+            setTableData((prevData) =>
+                prevData.map((item) =>
+                    item.id === id ? { ...item, upvotes: newUpvotes } : item
+                )
+            );
+    
+            try {
+                // Send the updated upvotes back to the server
+                await fetch(`https://n7mam9mzqb.execute-api.us-east-1.amazonaws.com/Upvotes/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id, upvotes: newUpvotes }), // Include the updated upvotes
+                });
+            } catch (error) {
+                console.error('Error upvoting:', error);
+            }
+        }
+    }, [userUpvotes, originalData]);
+    
+    
+    
+    
 
     const handleAddComment = useCallback(async (id, commentText) => {
-        const newComment = replaceHtmlEntities(commentText);
+        const newComment = {
+            comment: replaceHtmlEntities(commentText),
+        };
+    
         try {
-            await fetch(`https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/reported-prompts`, {
+            const response = await fetch(`https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/reported-prompts`, {
                 method: 'POST',
                 headers: {
-                    'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',
+                    'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',  // Same API Key as in handleUpvote
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
                     id,
-                    comments: [{ comment: newComment }],
+                    comments: [newComment],  // Ensure comments is an array
                 }),
             });
-
+    
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+    
             setComments((prevComments) => ({
                 ...prevComments,
                 [id]: [...(prevComments[id] || []), newComment],
@@ -93,28 +192,44 @@ const BotpressTable = () => {
         } catch (error) {
             console.error('Error adding comment:', error);
         }
-    }, []);
+    }, [setComments]);
+    
+    
 
     const columns = useMemo(() => {
         const baseColumns = [
             { Header: 'Category', accessor: 'category' },
-            { Header: 'Upvotes', accessor: 'upvotes', Cell: ({ row }) => (
-                <button>{row.values.upvotes}</button>
-            )},
             {
-                Header: 'Comments', accessor: 'comments', Cell: ({ row }) => (
+                Header: 'Upvotes', accessor: 'upvotes', Cell: ({ row }) => (
+                    <button onClick={() => handleUpvote(row.original.id)} disabled={userUpvotes.has(row.original.id)}>
+                        {row.values.upvotes}
+                    </button>
+                )
+            },
+            {
+                Header: 'Comments',
+                accessor: 'comments',
+                Cell: ({ row }) => (
                     <div>
                         <Disclosure>
                             {({ open }) => (
                                 <>
-                                    <Disclosure.Button>
+                                    <Disclosure.Button className="disclosure-button">
                                         <span>Comments ({comments[row.original.id]?.length || 0})</span>
-                                        <ChevronUpIcon className={`${open ? 'transform rotate-180' : ''} w-5 h-5 text-gray-500`} />
+                                        <ChevronUpIcon
+                                            className={`${open ? 'transform rotate-180' : ''} w-5 h-5 text-gray-500`}
+                                        />
                                     </Disclosure.Button>
-                                    <Disclosure.Panel>
-                                        {comments[row.original.id]?.map((comment, index) => (
-                                            <div key={index}>{comment}</div>
-                                        )) || <p>No comments yet.</p>}
+                                    <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
+                                        {comments[row.original.id] && comments[row.original.id].length > 0 ? (
+                                            comments[row.original.id].map((comment, index) => (
+                                                <div key={index} className="mb-2">
+                                                    <strong>{replaceHtmlEntities(comment.username || 'Anonymous')}</strong>: {replaceHtmlEntities(comment.comment)}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p>No comments yet.</p>
+                                        )}
                                         <form
                                             onSubmit={(e) => {
                                                 e.preventDefault();
@@ -125,16 +240,28 @@ const BotpressTable = () => {
                                                 }
                                             }}
                                         >
-                                            <input type="text" name="comment" placeholder="Add a comment" required />
-                                            <button type="submit">Add Comment</button>
+                                            <input
+                                                type="text"
+                                                name="comment"
+                                                placeholder="Add a comment"
+                                                required
+                                                className="border rounded px-2 py-1 w-full mb-2"
+                                            />
+                                            <button
+                                                type="submit"
+                                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                                            >
+                                                Add Comment
+                                            </button>
                                         </form>
                                     </Disclosure.Panel>
                                 </>
                             )}
                         </Disclosure>
                     </div>
-                )
+                ),
             },
+            
         ];
 
         if (category === 'hallucinations') {
@@ -191,47 +318,72 @@ const BotpressTable = () => {
         }
 
         return baseColumns;
-    }, [category, comments, handleAddComment]);
+    }, [handleUpvote, userUpvotes, category, comments, handleAddComment]);
 
     const {
         getTableProps,
         getTableBodyProps,
         headerGroups,
         prepareRow,
-        rows
+        page,
+        canPreviousPage,
+        canNextPage,
+        pageCount,
+        gotoPage,
+        nextPage,
+        previousPage,
+        setPageSize,
+        state: { pageIndex, pageSize }
     } = useTable({
         columns,
         data: tableData,
-    });
+        initialState: { pageIndex: 0, pageSize: 10 }
+    }, usePagination);
+
+    const paginationStyle = {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '10px'
+    };
 
     if (isLoading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
 
     return (
-        <>
-            <select onChange={(e) => setCategory(e.target.value)} value={category}>
-                <option value="hallucinations">Hallucinations</option>
-                <option value="copyright">Copyright</option>
-                <option value="security">Security</option>
-                <option value="memory">Memory</option>
-                <option value="other">Other</option>
-            </select>
-            <table {...getTableProps()}>
+        <div className="botpress-table-container" style={{ marginTop: '20px', maxWidth: '98%', margin: '20px auto', overflowX: 'auto' }}>
+            <h2>Reported Prompts</h2>
+            <div className="tab-buttons">
+                <button onClick={() => setActiveTab('allReports')} className={activeTab === 'allReports' ? 'active' : ''}>
+                    All Public Reports
+                </button>
+            </div>
+            <div>
+                <select onChange={(e) => setCategory(e.target.value)} value={category}>
+                    <option value="hallucinations">Hallucinations</option>
+                    <option value="copyright">Copyright</option>
+                    <option value="security">Security Issues</option>
+                    <option value="memory">Memory Recall</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <input type="text" placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+            <table class="reportTable" {...getTableProps()}>
                 <thead>
-                    {headerGroups.map((headerGroup) => (
+                    {headerGroups.map(headerGroup => (
                         <tr {...headerGroup.getHeaderGroupProps()}>
-                            {headerGroup.headers.map((column) => (
+                            {headerGroup.headers.map(column => (
                                 <th {...column.getHeaderProps()}>{column.render('Header')}</th>
                             ))}
                         </tr>
                     ))}
                 </thead>
                 <tbody {...getTableBodyProps()}>
-                    {rows.map((row) => {
+                    {page.map(row => {
                         prepareRow(row);
                         return (
                             <tr {...row.getRowProps()}>
-                                {row.cells.map((cell) => (
+                                {row.cells.map(cell => (
                                     <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                                 ))}
                             </tr>
@@ -239,7 +391,23 @@ const BotpressTable = () => {
                     })}
                 </tbody>
             </table>
-        </>
+            <div style={paginationStyle}>
+                <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>{"<<"}</button>
+                <button onClick={() => previousPage()} disabled={!canPreviousPage}>{"<"}</button>
+                <button onClick={() => nextPage()} disabled={!canNextPage}>{">"}</button>
+                <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>{">>"}</button>
+                <select
+                    value={pageSize}
+                    onChange={e => {
+                        setPageSize(Number(e.target.value));
+                    }}
+                >
+                    {[10, 20, 30, 40, 50].map(size => (
+                        <option key={size} value={size}>Show {size}</option>
+                    ))}
+                </select>
+            </div>
+        </div>
     );
 };
 
