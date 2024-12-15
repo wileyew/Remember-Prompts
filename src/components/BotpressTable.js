@@ -62,7 +62,7 @@ const BotpressTable = () => {
                         ...item,
                         id: item.id || item._id,
                         upvotes: Number(item.upvotes) || 0, // Ensure upvotes is a valid number
-                        comments: [...(item.comments || []), ...(comments[item.id] || [])],// Use fetched comments and add local comments
+                        comments: [...(item.comments || []), ...(comments[item.id] || []).filter(c => !item.comments?.some(sc => sc.comment === c.comment))],// Use fetched comments and add local comments
                     };
     
                     commentsByRowId[cleanedData.id] = cleanedData.comments;
