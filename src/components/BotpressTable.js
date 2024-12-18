@@ -48,17 +48,17 @@ const BotpressTable = () => {
                 }
         
                 const data = await response.json();
-                const dataArray = Array.isArray(data.documents) ? data.documents : [];
+                const documents = Array.isArray(data.documents) ? data.documents : [];
         
+                // Load comments from local storage
                 const storedComments = JSON.parse(localStorage.getItem('comments')) || {};
                 const commentsByRowId = {};
         
-                const transformedData = dataArray.map((item) => {
-                    // Ensure backendComments is an array
-                    const backendComments = Array.isArray(item.comments) ? item.comments : [];
-                    const localComments = Array.isArray(storedComments[item._id]) ? storedComments[item._id] : [];
+                const transformedData = documents.map((doc) => {
+                    const backendComments = Array.isArray(doc.comments) ? doc.comments : [];
+                    const localComments = Array.isArray(storedComments[doc._id]) ? storedComments[doc._id] : [];
         
-                    // Merge and deduplicate comments
+                    // Merge backend and local comments without duplicates
                     const allComments = [
                         ...backendComments,
                         ...localComments.filter(
@@ -68,30 +68,31 @@ const BotpressTable = () => {
                         ),
                     ];
         
-                    const cleanedData = {
-                        ...item,
-                        id: item.id || item._id,
-                        upvotes: Number(item.upvotes) || 0,
+                    // Store comments by _id
+                    commentsByRowId[doc._id] = allComments;
+        
+                    // Transform data for the table
+                    return {
+                        ...doc,
+                        id: doc._id, // Use _id as id
+                        upvotes: Number(doc.upvotes) || 0,
                         comments: allComments,
                     };
-        
-                    // Map comments by _id
-                    commentsByRowId[cleanedData.id] = allComments;
-        
-                    return cleanedData;
                 });
         
                 console.log('Processed comments by _id:', commentsByRowId);
         
                 setTableData(transformedData);
                 setOriginalData(transformedData);
-                setComments(commentsByRowId);
+                setComments(commentsByRowId); // Set comments state keyed by _id
             } catch (error) {
+                console.error('Error fetching data:', error);
                 setError(error.message);
             } finally {
                 setIsLoading(false);
             }
         };
+        
         
              
     
@@ -219,14 +220,14 @@ const BotpressTable = () => {
                         {({ open }) => (
                           <>
                             <Disclosure.Button className="disclosure-button">
-                              <span>Comments ({comments[row.original._id]?.length || 0})</span>
+                              <span>Comments ({comments[row.original.id]?.length || 0})</span>
                               <ChevronUpIcon
                                 className={`${open ? 'transform rotate-180' : ''} w-5 h-5 text-gray-500`}
                               />
                             </Disclosure.Button>
                             <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
-                              {comments[row.original._id]?.length > 0 ? (
-                                comments[row.original._id].map((comment, index) => (
+                              {comments[row.original.id]?.length > 0 ? (
+                                comments[row.original.id].map((comment, index) => (
                                   <div key={index} className="mb-2">
                                     {replaceHtmlEntities(comment.comment)}
                                   </div>
@@ -239,7 +240,7 @@ const BotpressTable = () => {
                                   e.preventDefault();
                                   const commentText = e.target.elements.comment.value.trim();
                                   if (commentText) {
-                                    handleAddComment(row.original._id, commentText); // Use _id when adding comments
+                                    handleAddComment(row.original.id, commentText); // Use _id to add comments
                                     e.target.reset();
                                   }
                                 }}
@@ -263,6 +264,7 @@ const BotpressTable = () => {
                       </Disclosure>
                     </div>
                   ),
+                  
                   
               },
             
