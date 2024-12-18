@@ -54,34 +54,44 @@ const BotpressTable = () => {
                 const commentsByRowId = {};
         
                 const transformedData = dataArray.map((item) => {
-                    const itemComments = item.comments || [];
-                    const localComments = storedComments[item.id] || [];
-                    const allComments = [...itemComments, ...localComments.filter(
-                        localComment => !itemComments.some(
-                            serverComment => serverComment.comment === localComment.comment
-                        )
-                    )];
+                    const backendComments = item.comments || [];
+                    const localComments = storedComments[item._id] || []; // Access comments by _id
+        
+                    // Merge and deduplicate comments by 'comment' field
+                    const allComments = [
+                        ...backendComments,
+                        ...localComments.filter(
+                            localComment => !backendComments.some(
+                                backendComment => backendComment.comment === localComment.comment
+                            )
+                        ),
+                    ];
         
                     const cleanedData = {
                         ...item,
-                        id: item.id || item._id,
+                        id: item.id || item._id, // Ensure id falls back to _id
                         upvotes: Number(item.upvotes) || 0,
                         comments: allComments,
                     };
         
-                    commentsByRowId[cleanedData.id] = allComments;
+                    // Map comments by _id
+                    commentsByRowId[cleanedData.id] = backendComments;
+        
                     return cleanedData;
                 });
         
+                console.log('Processed comments by _id:', commentsByRowId);
+        
                 setTableData(transformedData);
                 setOriginalData(transformedData);
-                setComments(commentsByRowId);
+                setComments(commentsByRowId); // State now keyed by _id
             } catch (error) {
                 setError(error.message);
             } finally {
                 setIsLoading(false);
             }
-        };        
+        };
+             
     
         fetchDataFromDatabase();
     }, []);
@@ -207,14 +217,14 @@ const BotpressTable = () => {
                         {({ open }) => (
                           <>
                             <Disclosure.Button className="disclosure-button">
-                              <span>Comments ({comments[row.original.id]?.length || 0})</span>
+                              <span>Comments ({comments[row.original._id]?.length || 0})</span>
                               <ChevronUpIcon
                                 className={`${open ? 'transform rotate-180' : ''} w-5 h-5 text-gray-500`}
                               />
                             </Disclosure.Button>
                             <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
-                              {comments[row.original.id]?.length > 0 ? (
-                                comments[row.original.id].map((comment, index) => (
+                              {comments[row.original._id]?.length > 0 ? (
+                                comments[row.original._id].map((comment, index) => (
                                   <div key={index} className="mb-2">
                                     {replaceHtmlEntities(comment.comment)}
                                   </div>
@@ -227,7 +237,7 @@ const BotpressTable = () => {
                                   e.preventDefault();
                                   const commentText = e.target.elements.comment.value.trim();
                                   if (commentText) {
-                                    handleAddComment(row.original.id, commentText);
+                                    handleAddComment(row.original._id, commentText); // Use _id when adding comments
                                     e.target.reset();
                                   }
                                 }}
