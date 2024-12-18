@@ -54,10 +54,11 @@ const BotpressTable = () => {
                 const commentsByRowId = {};
         
                 const transformedData = dataArray.map((item) => {
-                    const backendComments = item.comments || [];
-                    const localComments = storedComments[item._id] || []; // Access comments by _id
+                    // Ensure backendComments is an array
+                    const backendComments = Array.isArray(item.comments) ? item.comments : [];
+                    const localComments = Array.isArray(storedComments[item._id]) ? storedComments[item._id] : [];
         
-                    // Merge and deduplicate comments by 'comment' field
+                    // Merge and deduplicate comments
                     const allComments = [
                         ...backendComments,
                         ...localComments.filter(
@@ -69,13 +70,13 @@ const BotpressTable = () => {
         
                     const cleanedData = {
                         ...item,
-                        id: item.id || item._id, // Ensure id falls back to _id
+                        id: item.id || item._id,
                         upvotes: Number(item.upvotes) || 0,
                         comments: allComments,
                     };
         
                     // Map comments by _id
-                    commentsByRowId[cleanedData.id] = backendComments;
+                    commentsByRowId[cleanedData.id] = allComments;
         
                     return cleanedData;
                 });
@@ -84,13 +85,14 @@ const BotpressTable = () => {
         
                 setTableData(transformedData);
                 setOriginalData(transformedData);
-                setComments(commentsByRowId); // State now keyed by _id
+                setComments(commentsByRowId);
             } catch (error) {
                 setError(error.message);
             } finally {
                 setIsLoading(false);
             }
         };
+        
              
     
         fetchDataFromDatabase();
