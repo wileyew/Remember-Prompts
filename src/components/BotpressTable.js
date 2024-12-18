@@ -42,58 +42,46 @@ const BotpressTable = () => {
                         'Content-Type': 'application/json',
                     },
                 });
-    
+        
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-    
+        
                 const data = await response.json();
                 const dataArray = Array.isArray(data.documents) ? data.documents : [];
-    
-                // Track maximum upvotes for each id
-                const idToMaxUpvotesMap = {};
+        
+                const storedComments = JSON.parse(localStorage.getItem('comments')) || {};
                 const commentsByRowId = {};
-    
-                // Load comments from local storage
-            const storedComments = JSON.parse(localStorage.getItem('comments')) || {};
-
+        
                 const transformedData = dataArray.map((item) => {
+                    const itemComments = item.comments || [];
+                    const localComments = storedComments[item.id] || [];
+                    const allComments = [...itemComments, ...localComments.filter(
+                        localComment => !itemComments.some(
+                            serverComment => serverComment.comment === localComment.comment
+                        )
+                    )];
+        
                     const cleanedData = {
                         ...item,
                         id: item.id || item._id,
-                        upvotes: Number(item.upvotes) || 0, // Ensure upvotes is a valid number
-                        comments: [...(item.comments || []), ...(comments[item.id] || []).filter(c => !item.comments?.some(sc => sc.comment === c.comment))],// Use fetched comments and add local comments
+                        upvotes: Number(item.upvotes) || 0,
+                        comments: allComments,
                     };
-                    console.log('comments from backend '  + JSON.stringify(cleanedData.comments));
-    
-                    commentsByRowId[cleanedData.id] = cleanedData.comments;
-    
-                    if (idToMaxUpvotesMap[cleanedData.id]) {
-                        idToMaxUpvotesMap[cleanedData.id] = Math.max(
-                            idToMaxUpvotesMap[cleanedData.id],
-                            cleanedData.upvotes
-                        );
-                    } else {
-                        idToMaxUpvotesMap[cleanedData.id] = cleanedData.upvotes;
-                    }
-    
+        
+                    commentsByRowId[cleanedData.id] = allComments;
                     return cleanedData;
                 });
-    
-                const finalData = transformedData.map((item) => ({
-                    ...item,
-                    upvotes: idToMaxUpvotesMap[item.id], // Apply maximum upvotes
-                }));
-    
-                setTableData(finalData);
-                setOriginalData(finalData);
+        
+                setTableData(transformedData);
+                setOriginalData(transformedData);
                 setComments(commentsByRowId);
             } catch (error) {
                 setError(error.message);
             } finally {
                 setIsLoading(false);
             }
-        };
+        };        
     
         fetchDataFromDatabase();
     }, []);
@@ -214,57 +202,56 @@ const BotpressTable = () => {
                 Header: 'Comments',
                 accessor: 'comments',
                 Cell: ({ row }) => (
-                  <div>
-                    <Disclosure>
-                      {({ open }) => (
-                        <>
-                          <Disclosure.Button className="disclosure-button">
-                            <span>Comments ({comments[row.original.id]?.length || 0})</span>
-                            <ChevronUpIcon
-                              className={`${open ? 'transform rotate-180' : ''} w-5 h-5 text-gray-500`}
-                            />
-                          </Disclosure.Button>
-                          <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
-                            {comments[row.original.id] && comments[row.original.id].length > 0 ? (
-                              <>
-                                {comments[row.original.id].map((comment, index) => (
-                                  <div key={index} className="mb-2">
-                                    {replaceHtmlEntities(comment.comment)} 
-                                  </div>
-                                ))}
-                              </>
-                            ) : (
-                              <p>No comments yet.</p>
-                            )}
-                            <form
-                              onSubmit={(e) => {
-                                e.preventDefault();
-                                const commentText = e.target.elements.comment.value.trim();
-                                if (commentText) {
-                                  handleAddComment(row.original.id, commentText);
-                                  e.target.reset();
-                                }
-                              }}
-                            >
-                              <input
-                                type="text"
-                                name="comment"
-                                placeholder="Add a comment"
-                                className="border rounded px-2 py-1 w-full mb-2" 
+                    <div>
+                      <Disclosure>
+                        {({ open }) => (
+                          <>
+                            <Disclosure.Button className="disclosure-button">
+                              <span>Comments ({comments[row.original.id]?.length || 0})</span>
+                              <ChevronUpIcon
+                                className={`${open ? 'transform rotate-180' : ''} w-5 h-5 text-gray-500`}
                               />
-                              <button
-                                type="submit"
-                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                            </Disclosure.Button>
+                            <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
+                              {comments[row.original.id]?.length > 0 ? (
+                                comments[row.original.id].map((comment, index) => (
+                                  <div key={index} className="mb-2">
+                                    {replaceHtmlEntities(comment.comment)}
+                                  </div>
+                                ))
+                              ) : (
+                                <p>No comments yet.</p>
+                              )}
+                              <form
+                                onSubmit={(e) => {
+                                  e.preventDefault();
+                                  const commentText = e.target.elements.comment.value.trim();
+                                  if (commentText) {
+                                    handleAddComment(row.original.id, commentText);
+                                    e.target.reset();
+                                  }
+                                }}
                               >
-                                Add Comment
-                              </button>
-                            </form>
-                          </Disclosure.Panel>
-                        </>
-                      )}
-                    </Disclosure>
-                  </div>
-                ),
+                                <input
+                                  type="text"
+                                  name="comment"
+                                  placeholder="Add a comment"
+                                  className="border rounded px-2 py-1 w-full mb-2"
+                                />
+                                <button
+                                  type="submit"
+                                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                                >
+                                  Add Comment
+                                </button>
+                              </form>
+                            </Disclosure.Panel>
+                          </>
+                        )}
+                      </Disclosure>
+                    </div>
+                  ),
+                  
               },
             
         ];
