@@ -1,3 +1,7 @@
+/* 1) Import Inter from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+/* 2) Define color scheme and font sizes */
 :root {
   /* Define color scheme and font sizes */
   --background-color-light: #f0f0f0;
@@ -22,22 +26,23 @@
   }
 }
 
-
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  /* 3) Use Inter with system fonts as fallback */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
   background-color: var(--background-color);
   color: var(--text-color);
   font-size: var(--font-size-normal);
   line-height: 1.6;
   transition: background-color 0.3s, color 0.3s; /* Smooth transition for theme changes */
+
+  /* Keeping your gradient background */
   background: linear-gradient(to right, #FFFFFF, #1877F2);
-  /* Adjust to match the body */
 }
 
 .reportTable {
@@ -56,7 +61,6 @@ body {
   background-color: inherit; /* Ensure the background color remains unchanged */
   color: inherit; /* Ensure the text color remains unchanged */
 }
-
 
 .wrapper {
   display: flex; /* Or grid */
@@ -202,14 +206,10 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
-.height-30, .height-40, .height-50 {
+.height-30,
+.height-40,
+.height-50 {
   height: var(--height);
-
-  &.btn, &.form-control {
-    line-height: var(--height);
-    padding-top: 0;
-    padding-bottom: 0;
-  }
 }
 
 .height-30 {
@@ -223,6 +223,7 @@ input:checked + .slider:before {
 .height-50 {
   --height: 50px;
 }
+
 /* Modal container */
 .modal {
   position: fixed;
@@ -244,7 +245,6 @@ input:checked + .slider:before {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Shadow effect */
 }
 
-/* Button styles */
 .modal-content button {
   margin: 5px;
   padding: 8px 16px;
@@ -253,10 +253,10 @@ input:checked + .slider:before {
   cursor: pointer;
 }
 
-/* Additional styles */
 .modal-content p {
   margin-bottom: 10px;
 }
+
 label[title]:hover:after {
   content: attr(title);
   padding: 4px 8px;
@@ -266,6 +266,7 @@ label[title]:hover:after {
   position: absolute;
   z-index: 1;
 }
+
 /* Overall form styling */
 form {
   display: grid;
@@ -350,7 +351,7 @@ button:disabled {
   height: 34px;
 }
 
-.switch input { 
+.switch input {
   opacity: 0;
   width: 0;
   height: 0;
@@ -424,6 +425,7 @@ input:checked + .slider:before {
 .disclosure-button .icon { /* Style the icon within the button */
   margin-right: 5px;  /* Add some space between icon and text */
 }
+
 .form-container {
   display: flex;
   flex-wrap: wrap;
@@ -460,10 +462,9 @@ input:checked + .slider:before {
   text-align: right; /* Align submit button to the right */
   margin-top: 20px; /* Add some margin above the submit button */
 }
+
 header, footer {
- background: linear-gradient(to right, #FFFFFF, #1877F2);
+  background: linear-gradient(to right, #FFFFFF, #1877F2);
   color: white;
   padding: 20px;
 }
-
-
