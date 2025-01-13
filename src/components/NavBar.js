@@ -66,7 +66,7 @@ const NavBar = ({ mode }) => {
                   activeClassName="router-link-exact-active"
                   style={{ color: textColor }}
                 >
-                  Create a Report
+                  Create Report
                 </NavLink>
               </NavItem>
               <NavItem>
