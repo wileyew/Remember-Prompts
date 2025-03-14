@@ -162,127 +162,142 @@ const BotpressTable = () => {
         }
     }, [userUpvotes, originalData]);
     
-    
-    
-    
+// eslint-disable-next-line no-unused-vars
 
     const handleAddComment = useCallback(async (id, commentText) => {
         const newComment = {
-            comment: replaceHtmlEntities(commentText),
+          comment: replaceHtmlEntities(commentText),
         };
-    
+      
         try {
-            const response = await fetch(`https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/reported-prompts`, {
-                method: 'POST',
-                headers: {
-                    'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70',  // Same API Key as in handleUpvote
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    id,
-                    comments: [newComment],  // Ensure comments is an array
-                }),
-            });
-    
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-    
-            const updatedComments = {
-                ...comments,
-                [id]: [...(comments[id] || []), newComment],
-            };
-            setComments(updatedComments);
-            localStorage.setItem('comments', JSON.stringify(updatedComments));
-        } catch (error) {
-            console.error('Error adding comment:', error);
-        }
-    }, [comments]);
-    
-    
-
-    const columns = useMemo(() => {
-        const baseColumns = [
-            { Header: 'Category', accessor: 'category' },
+          const response = await fetch(
+            `https://6tgwnaw945.execute-api.us-east-1.amazonaws.com/dev-pets/pets/reported-prompts`,
             {
-                Header: 'Upvotes', accessor: 'upvotes', Cell: ({ row }) => (
-                    <button onClick={() => handleUpvote(row.original.id)} disabled={userUpvotes.has(row.original.id)}>
-                        {row.values.upvotes}
-                    </button>
-                )
-            },
-            {
-                Header: 'Comments',
-                accessor: 'comments',
-                Cell: ({ row }) => (
-                    <div>
-                      <Disclosure>
-                        {({ open }) => (
-                          <>
-                            <Disclosure.Button className="disclosure-button">
-                              <span>Comments ({comments[row.original.id]?.length || 0})</span>
-                              <ChevronUpIcon
-                                className={`${open ? 'transform rotate-180' : ''} w-5 h-5 text-gray-500`}
-                              />
-                            </Disclosure.Button>
-                            <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
-                              {comments[row.original.id]?.length > 0 ? (
-                                comments[row.original.id].map((comment, index) => (
-                                  <div key={index} className="mb-2">
-                                    {replaceHtmlEntities(comment.comment)}
-                                  </div>
-                                ))
-                              ) : (
-                                <p>No comments yet.</p>
-                              )}
-                              <form
-                                onSubmit={(e) => {
-                                  e.preventDefault();
-                                  const commentText = e.target.elements.comment.value.trim();
-                                  if (commentText) {
-                                    handleAddComment(row.original.id, commentText); // Use _id to add comments
-                                    e.target.reset();
-                                  }
-                                }}
-                              >
-                                <input
-                                  type="text"
-                                  name="comment"
-                                  placeholder="Add a comment"
-                                  className="border rounded px-2 py-1 w-full mb-2"
-                                />
-                                <button
-                                  type="submit"
-                                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                                >
-                                  Add Comment
-                                </button>
-                              </form>
-                            </Disclosure.Panel>
-                          </>
-                        )}
-                      </Disclosure>
-                    </div>
-                  ),
-                  
-                  
+              method: 'POST',
+              headers: {
+                'x-api-key': 'klQ2fYOVVCMWHMAb8nLu9mR9H14gBidPOH5FbM70', // Same API key as in handleUpvote
+                'Content-Type': 'application/json',
               },
-            
-        ];
-
-        if (category === 'hallucinations') {
-            const hallucinationColumns = [
-                { Header: 'Platform', accessor: 'chatbotPlatform' },
-                { Header: 'Version', accessor: 'versionChatbotHallucinationAnswer' },
-                { Header: 'Prompt', accessor: 'prompt' },
-                { Header: 'Hallucination Answer', accessor: 'hallucinationAnswer' },
-                { Header: 'Proposed Correct Answer', accessor: 'updatedPromptAnswer' },
-                { Header: 'Justification', accessor: 'justification' },
-                { Header: 'Data Source', accessor: 'dataSource' },
-                { Header: 'Trigger', accessor: 'promptTrigger' },
-            ];
-            return [...baseColumns, ...hallucinationColumns];
+              body: JSON.stringify({
+                id,
+                comments: [newComment], // Ensure comments is an array
+              }),
+            }
+          );
+      
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+      
+          // Use a functional update to work with the latest state
+          setComments(prevComments => {
+            const updatedComments = {
+              ...prevComments,
+              [id]: [...(prevComments[id] || []), newComment],
+            };
+            localStorage.setItem('comments', JSON.stringify(updatedComments));
+            return updatedComments;
+          });
+        } catch (error) {
+          console.error('Error adding comment:', error);
         }
+      }, []);
+      
+    
+    
+      const columns = useMemo(() => {
+        const baseColumns = [
+          { Header: 'Category', accessor: 'category' },
+          {
+            Header: 'Upvotes',
+            accessor: 'upvotes',
+            Cell: ({ row }) => (
+              <button
+                onClick={() => handleUpvote(row.original.id)}
+                disabled={userUpvotes.has(row.original.id)}
+              >
+                {row.values.upvotes}
+              </button>
+            )
+          },
+          {
+            Header: 'Comments',
+            accessor: 'comments',
+            Cell: ({ row }) => (
+              <div>
+                <Disclosure>
+                  {({ open }) => (
+                    <>
+                      <Disclosure.Button className="disclosure-button">
+                        <span>
+                          Comments ({comments[row.original.id]?.length || 0})
+                        </span>
+                        <ChevronUpIcon
+                          className={`${open ? 'transform rotate-180' : ''} w-5 h-5 text-gray-500`}
+                        />
+                      </Disclosure.Button>
+                      <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
+                        {comments[row.original.id]?.length > 0 ? (
+                          comments[row.original.id].map((comment, index) => (
+                            <div key={index} className="mb-2">
+                              {replaceHtmlEntities(comment.comment)}
+                            </div>
+                          ))
+                        ) : (
+                          <p>No comments yet.</p>
+                        )}
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            const commentText = e.target.elements.comment.value.trim();
+                            if (commentText) {
+                              handleAddComment(row.original.id, commentText);
+                              e.target.reset();
+                            }
+                          }}
+                        >
+                          <input
+                            type="text"
+                            name="comment"
+                            placeholder="Add a comment"
+                            className="border rounded px-2 py-1 w-full mb-2"
+                          />
+                          <button
+                            type="submit"
+                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                          >
+                            Add Comment
+                          </button>
+                        </form>
+                      </Disclosure.Panel>
+                    </>
+                  )}
+                </Disclosure>
+              </div>
+            )
+          }
+        ];
+      
+        // Add additional columns based on the category if needed
+        if (category === 'hallucinations') {
+          const hallucinationColumns = [
+            { Header: 'Platform', accessor: 'chatbotPlatform' },
+            { Header: 'Version', accessor: 'versionChatbotHallucinationAnswer' },
+            { Header: 'Prompt', accessor: 'prompt' },
+            { Header: 'Hallucination Answer', accessor: 'hallucinationAnswer' },
+            { Header: 'Proposed Correct Answer', accessor: 'updatedPromptAnswer' },
+            { Header: 'Justification', accessor: 'justification' },
+            { Header: 'Data Source', accessor: 'dataSource' },
+            { Header: 'Trigger', accessor: 'promptTrigger' },
+          ];
+          return [...baseColumns, ...hallucinationColumns];
+        }
+      
+        // Similarly handle other categories...
+      
+        return baseColumns;
+      }, [handleUpvote, userUpvotes, category, comments, handleAddComment]);
+      
 
         if (category === 'copyright') {
             const copyrightColumns = [
