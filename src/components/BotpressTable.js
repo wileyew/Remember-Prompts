@@ -204,24 +204,36 @@ const BotpressTable = () => {
 
   const columns = useMemo(() => {
     if (minimalView) {
-      // Minimal view: only show the essential columns (prompt and platform)
+      // Minimal view: include only the essential and most useful columns for each category.
       switch (category) {
         case 'hallucinations':
-        case 'security':
-        case 'other':
           return [
             { Header: 'Prompt', accessor: 'prompt' },
             { Header: 'Platform', accessor: 'chatbotPlatform' },
+            { Header: 'Data Source', accessor: 'dataSource' },
+            { Header: 'Trigger', accessor: 'promptTrigger' },
           ];
         case 'copyright':
           return [
             { Header: 'Infringement Prompt', accessor: 'infringementPrompt' },
-            // Optionally, if there's a field representing the platform, include it here
+            { Header: 'Data Source', accessor: 'dataSource' },
+          ];
+        case 'security':
+          return [
+            { Header: 'Prompt', accessor: 'prompt' },
+            { Header: 'Platform', accessor: 'chatbotPlatform' },
+            { Header: 'Security Impact', accessor: 'securityImpact' },
           ];
         case 'memory':
           return [
             { Header: 'Prompt', accessor: 'prompt' },
             { Header: 'Trigger for Recall', accessor: 'prompt_record' },
+          ];
+        case 'other':
+          return [
+            { Header: 'Prompt', accessor: 'prompt' },
+            { Header: 'Platform', accessor: 'chatbotPlatform' },
+            { Header: 'Answer', accessor: 'promptAnswer' },
           ];
         default:
           return [
@@ -412,7 +424,7 @@ const BotpressTable = () => {
             checked={minimalView} 
             onChange={(e) => setMinimalView(e.target.checked)} 
           />
-          Minimal View
+           Minimal View 
         </label>
       </div>
       <input type="text" placeholder="Search..." value={searchQuery} onChange={handleSearchChange} />
