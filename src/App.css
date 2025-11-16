@@ -33,3 +33,24 @@
 .result-block-container .result-block {
   opacity: 1;
 }
+
+/* Apple-like navbar/footer refinements */
+.nav-container .navbar {
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  background: rgba(255, 255, 255, 0.7) !important;
+  border-bottom: 1px solid var(--border);
+}
+@media (prefers-color-scheme: dark) {
+  .nav-container .navbar {
+    background: rgba(28, 28, 30, 0.7) !important;
+  }
+}
+footer.bg-light {
+  background: transparent !important;
+  border-top: 1px solid var(--border);
+}
+footer p {
+  margin: 0;
+  color: var(--text-muted);
+}

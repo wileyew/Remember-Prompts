@@ -82,6 +82,16 @@ const NavBar = () => {
                 </NavItem>
                 
               )}
+              <NavItem>
+                <NavLink
+                  tag={RouterNavLink}
+                  to="/upload-check"
+                  exact
+                  activeClassName="router-link-exact-active"
+                >
+                  Upload Check
+                </NavLink>
+              </NavItem>
    {isAuthenticated && (
                 <NavItem>
                   <NavLink

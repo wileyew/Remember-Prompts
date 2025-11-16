@@ -11,6 +11,7 @@ import ExternalApi from "./views/ExternalApi";
 import PublicReports from "./views/PublicReportedIssuesAndRememberTriggers";
 import { useAuth0 } from "@auth0/auth0-react";
 import history from "./utils/history";
+import UploadCheck from "./views/UploadCheck";
 
 // styles
 import "./App.css";
@@ -66,6 +67,7 @@ const App = () => {
             <Route path="/external-api" component={ExternalApi} />
             <Route path="/remember-prompts" component={SearchReportIssuesUseChatbot} />
             <Route path="/reported-prompts" component={PublicReportedIssuesAndRememberTriggers} />
+            <Route path="/upload-check" component={UploadCheck} />
           </Switch>
         </Container>
         <Footer mode={mode} />

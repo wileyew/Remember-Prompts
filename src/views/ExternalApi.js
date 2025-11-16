@@ -1,18 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Alert } from "reactstrap";
 import Highlight from "../components/Highlight";
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
 import { getConfig } from "../config";
 import Loading from "../components/Loading";
+require('dotenv').config(); // This is usually sufficient if your .env file is at the root of your project
+const express = require('express');
+const cors = require('cors');
+const app = express();
+app.use(express.json());
+app.use(cors()); // Place this before defining your routes
+
 
 export const ExternalApiComponent = () => {
-  const { apiOrigin = "http://localhost:3001", audience } = getConfig();
-
   const [state, setState] = useState({
     showResult: false,
     apiMessage: "",
     error: null,
   });
+
+  // Add the new state for reported prompts here
+  const [reportedPromptsData, setReportedPromptsData] = useState({
+    prompts: [],
+    loading: false,
+    error: null,
+  });
+  const { apiOrigin = "http://localhost:3001", audience } = getConfig();
+
 
   const {
     getAccessTokenSilently,
@@ -78,6 +92,37 @@ export const ExternalApiComponent = () => {
       });
     }
   };
+  const fetchReportedPrompts = async () => {
+    // Function body as provided in the previous message
+  };
+  useEffect(() => {
+    const fetchReportedPrompts = async () => {
+      setReportedPromptsData({ ...reportedPromptsData, loading: true });
+      try {
+        const response = await fetch(`${apiOrigin}/reported-prompts`);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setReportedPromptsData({
+          prompts: data.documents || [],
+          loading: false,
+          error: null,
+        });
+      } catch (error) {
+        setReportedPromptsData({
+          prompts: [], // Resetting prompts to empty could be a sensible default action
+          loading: false,
+          error: error.message,
+        });
+      }
+    };
+  
+    fetchReportedPrompts();
+  }, []);
+  
+  
+  
 
   const handle = (e, fn) => {
     e.preventDefault();
