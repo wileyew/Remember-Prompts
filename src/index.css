@@ -26,8 +26,11 @@
   :root {
     --background-color: var(--background-color-dark);
     --text-color: var(--text-color-dark);
+    --font-size-normal: var(--font-size-normal-dark);
+    --font-size-code: var(--font-size-code-dark);
   }
 }
+
 
 body {
   margin: 0;

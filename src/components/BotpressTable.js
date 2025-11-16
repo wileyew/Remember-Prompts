@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 const BotpressTable = () => {
+  const { user } = useAuth0();
+  const [originalData, setOriginalData] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,7 +35,7 @@ const BotpressTable = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div>
+    <div className="botpress-table-container" style={{ marginTop: '20px', maxWidth: '98%', margin: '20px auto', overflowX: 'auto' }}>
       <h2>Reported Prompts</h2>
       <table>
         <thead>
@@ -53,10 +55,40 @@ const BotpressTable = () => {
               {/* Render additional fields here */}
             </tr>
           ))}
+        </thead>
+        <tbody {...getTableBodyProps()}>
+          {page.map(row => {
+            prepareRow(row);
+            return (
+              <tr {...row.getRowProps()}>
+                {row.cells.map(cell => (
+                  <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                ))}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
+      <div style={paginationStyle}>
+        <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>{"<<"}</button>
+        <button onClick={() => previousPage()} disabled={!canPreviousPage}>{"<"}</button>
+        <button onClick={() => nextPage()} disabled={!canNextPage}>{">"}</button>
+        <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>{">>"}</button>
+        <select
+          value={pageSize}
+          onChange={e => {
+            setPageSize(Number(e.target.value));
+          }}
+        >
+          {[10, 20, 30, 40, 50].map(size => (
+            <option key={size} value={size}>Show {size}</option>
+          ))}
+        </select>
+      </div>
     </div>
   );
 };
 
-export default BotpressTable;
+export default withAuthenticationRequired(BotpressTable, {
+  // Options for handling authentication, redirecting, etc.
+});

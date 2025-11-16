@@ -57,7 +57,9 @@ const NavBar = () => {
                   Home
                 </NavLink>
               </NavItem>
-              {isAuthenticated && (
+              {/* <NavLink
+              
+              {/* {isAuthenticated && (
                 <NavItem>
                   <NavLink
                     tag={RouterNavLink}
@@ -68,7 +70,7 @@ const NavBar = () => {
                     External API
                   </NavLink>
                 </NavItem>
-              )}
+              )} */} 
                {isAuthenticated && (
                 <NavItem>
                   <NavLink
@@ -77,7 +79,7 @@ const NavBar = () => {
                     exact
                     activeClassName="router-link-exact-active"
                   >
-                    Remember Prompts
+                   Create a Report
                   </NavLink>
                 </NavItem>
                 
@@ -101,6 +103,19 @@ const NavBar = () => {
                     activeClassName="router-link-exact-active"
                   >
                     Reported Prompts
+                  </NavLink>
+                </NavItem>
+                
+              )}
+                {isAuthenticated && (
+                <NavItem>
+                  <NavLink
+                    tag={RouterNavLink}
+                    to="/tutorials"
+                    exact
+                    activeClassName="router-link-exact-active"
+                  >
+                   Tutorials
                   </NavLink>
                 </NavItem>
                 
